@@ -17,9 +17,17 @@ def redirect_to_facebook_authorization(redirect_uri):
     request_variables['scope'] = ', '.join(settings.FACEBOOK_APPLICATION_INITIAL_PERMISSIONS)
   
   html = """
-    <script type="text/javascript">
-      window.parent.location = "https://graph.facebook.com/oauth/authorize?%s";
-    </script>
+    <!DOCTYPE html>
+    
+    <html>
+    
+      <head>
+        <script type="text/javascript">
+          window.parent.location = "https://graph.facebook.com/oauth/authorize?%s";
+        </script>
+      </head>
+    
+    </html>
   """ % urlencode(request_variables)
   
   return HttpResponse(html)
