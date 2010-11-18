@@ -1,8 +1,8 @@
-from urllib import urlencode
-
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.conf import settings
+
+from utils import redirect_to_facebook_authorization
 
 def facebook_authorization_required(function):
   """Redirect Facebook canvas views to authorization if required."""
