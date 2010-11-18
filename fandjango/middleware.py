@@ -81,7 +81,7 @@ def _parse_signed_request(signed_request, app_secret):
       encoded_sig = str(l[0])
       payload = str(l[1])
     except IndexError:
-      raise ValueError("'signed_request' malformed")
+      raise ValueError("Signed request malformed")
     
     sig = base64.urlsafe_b64decode(encoded_sig + "=" * ((4 - len(encoded_sig) % 4) % 4))
     data = base64.urlsafe_b64decode(payload + "=" * ((4 - len(payload) % 4) % 4))
@@ -89,11 +89,11 @@ def _parse_signed_request(signed_request, app_secret):
     data = json.loads(data)
 
     if data.get('algorithm').upper() != 'HMAC-SHA256':
-      raise ValueError("'signed_request' is using an unknown algorithm")
+      raise ValueError("Signed request is using an unknown algorithm")
     else:
       expected_sig = hmac.new(app_secret, msg=payload, digestmod=hashlib.sha256).digest()
 
     if sig != expected_sig:
-      raise ValueError("'signed_request' signature mismatch")
+      raise ValueError("Signed request signature mismatch")
     else:
       return data

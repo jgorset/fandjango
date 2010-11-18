@@ -83,6 +83,6 @@ You can read more about P3P at [w3.org][3].
 **Q:** *What happens when the OAuth token expires?*
 
 **A:** Fandjango will automatically renew the signed request once the OAuth token
-expires. This is done by hijacking the request and redirecting the client to Facebook, which
+expires. It does this by hijacking the request and redirecting the client to Facebook, which
 in turn redirects the client back to the URI it was originally retrieving with a new signed
 request attached.
