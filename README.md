@@ -65,6 +65,10 @@ Fandjango requires some constants to be set in your settings.py file:
 
 ## Frequently asked questions
 
+**Q:** *Do I need to pass the signed request around?*
+
+**A:** No. Fandjango caches the latest signed request in a cookie so you don't have to worry about it.
+
 **Q:** *What happens when the OAuth token expires?*
 
 **A:** Fandjango will automatically renew the signed request once the OAuth token
