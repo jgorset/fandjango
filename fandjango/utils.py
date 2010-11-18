@@ -16,6 +16,8 @@ def redirect_to_facebook_authorization(redirect_uri):
   if hasattr(settings, 'FACEBOOK_APPLICATION_INITIAL_PERMISSIONS'):
     request_variables['scope'] = ', '.join(settings.FACEBOOK_APPLICATION_INITIAL_PERMISSIONS)
   
+  urlencoded_request_variables = urlencode(request_variables)
+  
   html = """
     <!DOCTYPE html>
     
@@ -26,8 +28,14 @@ def redirect_to_facebook_authorization(redirect_uri):
           window.parent.location = "https://graph.facebook.com/oauth/authorize?%s";
         </script>
       </head>
+      
+      <body>
+        <noscript>
+          You must <a href="https://graph.facebook.com/oauth/authorize?%s">authorize the application</a> in order to continue.
+        </noscript>
+      </body>
     
     </html>
-  """ % urlencode(request_variables)
+  """ % (urlencoded_request_variables, urlencoded_request_variables)
   
   return HttpResponse(html)
