@@ -69,6 +69,17 @@ Fandjango requires some constants to be set in your settings.py file:
 
 **A:** No. Fandjango caches the latest signed request in a cookie so you don't have to worry about it.
 
+**Q:** *Why does Fandjango set a new header called "P3P"?*
+
+**A:** P3P (or *Platform for Privacy Preferences*) is a W3 standard that enables websites to express
+their privacy practices in a standard format that can be retrieved automatically and interpreted easily
+by user agents. While this is largely ignored by most browsers, Internet Explorer will ignore cookies
+set by third-party websites (ie. websites loaded in iframes) unless it specifies some P3P policies.
+
+You can read more about P3P at [w3.org][3].
+
+[3]: http://www.w3.org/TR/P3P/
+
 **Q:** *What happens when the OAuth token expires?*
 
 **A:** Fandjango will automatically renew the signed request once the OAuth token
