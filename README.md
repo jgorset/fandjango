@@ -45,7 +45,7 @@ You can also redirect the request in a control flow of your own by using the
     
     def foo(request, *args, **kwargs):
       if not request.facebook:
-        return redirect_to_facebook_authorization(redirect_uri='http://www.exampke.org/')
+        return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
         
 ## Installation
 
