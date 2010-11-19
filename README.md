@@ -22,7 +22,7 @@ with these keys:
 * `user_id` - An integer describing the user's id on Facebook.
 * `oauth_token` - A string describing the OAuth access token.
 * `issued_at` - A datetime object describing when the OAuth token was issued.
-* `expires_at` - A datetime object describing when the OAuth access token expires.
+* `expires_at` - A datetime object describing when the OAuth access token expires, or false if it doesn't.
 
 If the user has not authorized your application, `request.facebook` is `False`.
 
