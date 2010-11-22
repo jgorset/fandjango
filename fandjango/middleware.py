@@ -49,7 +49,7 @@ class FacebookCanvasMiddleware():
         
         if request.facebook['expires_at'] and request.facebook['expires_at'] < datetime.now():
           return redirect_to_facebook_authorization(
-            redirect_uri = settings.FACEBOOK_APPLICATION_URI + request.get_full_path()
+            redirect_uri = settings.FACEBOOK_APPLICATION_URL + request.get_full_path()
           )
         
       else:

@@ -58,7 +58,7 @@ Fandjango requires some constants to be set in your settings.py file:
 
 * `FACEBOOK_APPLICATION_ID` - Your Facebook application's ID.
 * `FACEBOOK_APPLICATION_SECRET_KEY` - Your Facebook application's secret key.
-* `FACEBOOK_APPLICATION_URI` - Your application's canvas URI (ex. http://apps.facebook.com/my_application)
+* `FACEBOOK_APPLICATION_URL` - Your application's canvas URI (ex. http://apps.facebook.com/my_application)
 * `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - An array of [extended permissions][2] to request upon authorizing the application (optional).
 
 [2]: http://developers.facebook.com/docs/authentication/permissions
