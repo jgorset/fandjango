@@ -49,7 +49,7 @@ You can also redirect the request in a control flow of your own by using the
         
 ## Installation
 
-* `pip install git+https://github.com/jgorset/fandjango`
+* `pip install git+http://github.com/jgorset/fandjango`
 * Add `fandjango.middleware.FacebookCanvasMiddleware` to your middleware classes.
 
 ## Configuration
