@@ -33,9 +33,9 @@ class FacebookCanvasMiddleware():
     For users who have not yet authorized the application, the attribute is set to False.
     
     """
-    if 'signed_request' in request.GET or 'signed_request' in request.COOKIES:
+    if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
       facebook_data = _parse_signed_request(
-        signed_request = request.GET['signed_request'] if 'signed_request' in request.GET else request.COOKIES['signed_request'],
+        signed_request = request.REQUEST['signed_request'] if 'signed_request' in request.REQUEST else request.COOKIES['signed_request'],
         app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
       )
 
@@ -67,8 +67,8 @@ class FacebookCanvasMiddleware():
     documents in iframes). If they are not set correctly, IE will not set these cookies.
     
     """
-    if 'signed_request' in request.GET:
-      response.set_cookie('signed_request', request.GET['signed_request'])
+    if 'signed_request' in request.REQUEST:
+      response.set_cookie('signed_request', request.REQUEST['signed_request'])
     response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
     return response
 
