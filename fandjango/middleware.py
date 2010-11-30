@@ -39,7 +39,7 @@ class FacebookCanvasMiddleware():
         app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
       )
 
-      if facebook_data['user_id']:
+      if facebook_data.has_key('user_id'):
         request.facebook = {
           'issued_at': datetime.fromtimestamp(facebook_data['issued_at']),
           'user_id': facebook_data['user_id'],
