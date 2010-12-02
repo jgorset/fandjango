@@ -40,19 +40,11 @@ class FacebookCanvasMiddleware():
         app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
       )
       
-      # A bug in Facebook platform causes it to send a timestamp rather than a number of seconds in the 'expires'
-      # value of the signed request for application tabs.
-      #
-      # Until this issue is resolved, Fandjango detects whether 'expires' is a timestamp and replaces it
-      # with the corresponding number of seconds if it is.
-      if facebook_data.has_key('expires') and facebook_data['expires'] > 1262304000:
-        facebook_data['expires'] = facebook_data['expires'] - time.time()
-
       if facebook_data.has_key('user_id'):
         request.facebook = {
           'issued_at': datetime.fromtimestamp(facebook_data['issued_at']),
           'user_id': facebook_data['user_id'],
-          'expires_at': None if facebook_data['expires'] == 0 else datetime.fromtimestamp(facebook_data['issued_at'] + facebook_data['expires']),
+          'expires_at': None if facebook_data['expires'] == 0 else datetime.fromtimestamp(facebook_data['expires']),
           'oauth_token': facebook_data['oauth_token']
         }
         
