@@ -38,7 +38,7 @@ class FacebookMiddleware():
         
         """
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
-            facebook_data = _parse_signed_request(
+            facebook_data = __parse_signed_request(
                 signed_request = request.REQUEST['signed_request'] if 'signed_request' in request.REQUEST else request.COOKIES['signed_request'],
                 app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
             )
@@ -101,7 +101,7 @@ class FacebookMiddleware():
 
     
     
-def _parse_signed_request(signed_request, app_secret):
+def __parse_signed_request(signed_request, app_secret):
         """Return dictionary with signed request data."""
         try:
             l = signed_request.split('.', 2)
