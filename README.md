@@ -8,6 +8,7 @@ applications powered by Django.
 ## Requirements
 
 Django
+Facebook Python SDK
 
 ## Usage
 
