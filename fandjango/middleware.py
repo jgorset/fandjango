@@ -29,7 +29,7 @@ class FacebookMiddleware():
                 app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
             )
             
-            # User is authenticated...
+            # User has authorized the application...
             if 'user_id' in facebook_data:
                 
                 # Redirect to Facebook Authorization if the OAuth token has expired
@@ -66,12 +66,12 @@ class FacebookMiddleware():
                 
                 request.facebook_user = user
             
-            # User is not authenticated...
+            # User has not authorized the application...
             else:
-                request.facebook = False
+                request.facebook_user = False
         # No signed request found
         else:
-            request.facebook = False
+            request.facebook_user = False
 
 
     def process_response(self, request, response):

@@ -25,7 +25,7 @@ the User class with these attributes:
 * `gender` - A string describing the user's gender.
 * `oauth_token` - An OAuth Token object.
 
-The OAuth token associated with an user has three attributes of its own:
+The OAuth token associated with each user has three attributes of its own:
 
 * `token` - A string describing the OAuth token itself.
 * `issued_at` - A datetime object describing when the token was issued.
