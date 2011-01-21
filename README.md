@@ -4,9 +4,6 @@
 
 Fandjango makes it easy to write Facebook applications powered by Django.
 
-easier to write Facebook canvas
-applications powered by Django.
-
 ## Requirements
 
 Django (http://github.com/django/django)
