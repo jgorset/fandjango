@@ -2,7 +2,9 @@
 
 ## About
 
-Fandjango is a Python library that makes it easier to make Facebook canvas
+Fandjango makes it easy to write Facebook applications powered by Django.
+
+easier to write Facebook canvas
 applications powered by Django.
 
 ## Requirements
@@ -15,8 +17,8 @@ Facebook Python SDK (http://github.com/facebook/python-sdk)
 Fandjango parses the signed request provided to Facebook canvas applications and populates
 the request object with data derived from it.
 
-If the client has authorized your application, `request.facebook_user` contains an instance of
-the User class with these attributes:
+If the client has authorized your application, `request.facebook_user` contains an object with
+these attributes:
 
 * `facebook_id` - An integer describing the user's Facebook ID.
 * `first_name` - A string describing the user's first name.
@@ -31,7 +33,8 @@ The OAuth token associated with each user has three attributes of its own:
 * `issued_at` - A datetime object describing when the token was issued.
 * `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
-If the client has not authorized your application, `request.facebook_user` is set to `False`.
+If the client has not authorized your application or the signed request is missing,
+`request.facebook_user` is `None`.
 
 You can require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
