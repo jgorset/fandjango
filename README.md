@@ -7,34 +7,40 @@ applications powered by Django.
 
 ## Requirements
 
-Django
-Facebook Python SDK
+Django (http://github.com/django/django)
+Facebook Python SDK (http://github.com/facebook/python-sdk)
 
 ## Usage
 
-Fandjango populates the request object with data derived from the signed
-request Facebook sends canvas applications (see the [documentation on signed requests][1]).
+Fandjango parses the signed request provided to Facebook canvas applications and populates
+the request object with data derived from it.
 
-[1]: http://developers.facebook.com/docs/authentication/canvas
+If the client has authorized your application, `request.facebook_user` contains an instance of
+the User class with these attributes:
 
-If the client has authorized your application, `request.facebook` is a dictionary
-with these keys:
+* `facebook_id` - An integer describing the user's Facebook ID.
+* `first_name` - A string describing the user's first name.
+* `last_name` - A string describing the user's last name.
+* `profile_url` - A string describing the URL to the user's Facebook profile.
+* `gender` - A string describing the user's gender.
+* `oauth_token` - An OAuth Token object.
 
-* `user_id` - An integer describing the user's id on Facebook.
-* `oauth_token` - A string describing the OAuth access token.
-* `issued_at` - A datetime object describing when the OAuth token was issued.
-* `expires_at` - A datetime object describing when the OAuth access token expires, or false if it doesn't.
+The OAuth token associated with an user has three attributes of its own:
 
-If the user has not authorized your application, `request.facebook` is `False`.
+* `token` - A string describing the OAuth token itself.
+* `issued_at` - A datetime object describing when the token was issued.
+* `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
-You can require a user to authorize your application before accessing a view with the
+If the client has not authorized your application, `request.facebook_user` is set to `False`.
+
+You can require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
 
     from fandjango.decorators import facebook_authorization_required
     
     @facebook_authorization_required
     def foo(request, *args, **kwargs):
-      [...]
+        pass
       
 This will redirect the request to the Facebook authorization dialog, which will in
 turn redirect back to the original URI.
@@ -45,13 +51,13 @@ You can also redirect the request in a control flow of your own by using the
     from fandjango.utils import redirect_to_facebook_authorization
     
     def foo(request, *args, **kwargs):
-      if not request.facebook:
-        return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
+        if not request.facebook_user:
+            return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
         
 ## Installation
 
 * `pip install git+http://github.com/jgorset/fandjango.git`
-* Add `fandjango.middleware.FacebookCanvasMiddleware` to your middleware classes.
+* Add `fandjango.middleware.FacebookMiddleware` to your middleware classes.
 
 ## Configuration
 
