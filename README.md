@@ -6,8 +6,8 @@ Fandjango makes it easy to write Facebook applications powered by Django.
 
 ## Requirements
 
-Django (http://github.com/django/django)
-Facebook Python SDK (http://github.com/facebook/python-sdk)
+* Django (http://github.com/django/django)
+* Facebook Python SDK (http://github.com/facebook/python-sdk)
 
 ## Usage
 
