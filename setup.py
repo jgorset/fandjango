@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name = 'fandjango',
-  version = '2.0',
+  version = '2.0.1',
   description = "Fandjango is a library for Facebook canvas applications powered by Django",
   author = "Johannes Gorset",
   author_email = "jgorset@gmail.com",
