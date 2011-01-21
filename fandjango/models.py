@@ -15,4 +15,4 @@ class User(models.Model):
 class OAuthToken(models.Model):
     token = models.CharField(max_length=255)
     issued_at = models.DateTimeField()
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(null=True, blank=True)
