@@ -11,11 +11,11 @@ Fandjango makes it easy to write Facebook applications powered by Django.
 
 ## Usage
 
-Fandjango parses the signed request provided to Facebook canvas applications and populates
-the request object with data derived from it.
+Fandjango parses the signed request provided to Facebook canvas applications and automatically saves users that
+have authorized your application in its `User` model. Once a user has authorized your application, you may
+access the corresponding model instance in `request.facebook_user`.
 
-If the client has authorized your application, `request.facebook_user` contains an object with
-these attributes:
+Instances of the `User` model has the following properties:
 
 * `facebook_id` - An integer describing the user's Facebook ID.
 * `first_name` - A string describing the user's first name.
@@ -24,16 +24,16 @@ these attributes:
 * `gender` - A string describing the user's gender.
 * `oauth_token` - An OAuth Token object.
 
-The OAuth token associated with each user has three attributes of its own:
+`oauth_token` is an instance of the `OAuthToken` model, which has the following properties:
 
 * `token` - A string describing the OAuth token itself.
 * `issued_at` - A datetime object describing when the token was issued.
 * `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
-If the client has not authorized your application or the signed request is missing,
+If the client has not authorized your application or the signed request is missing altogether,
 `request.facebook_user` is `None`.
 
-You can require a client to authorize your application before accessing a view with the
+You may require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
 
     from fandjango.decorators import facebook_authorization_required
@@ -45,7 +45,7 @@ You can require a client to authorize your application before accessing a view w
 This will redirect the request to the Facebook authorization dialog, which will in
 turn redirect back to the original URI.
 
-You can also redirect the request in a control flow of your own by using the
+If you prefer, you may also redirect the request in a control flow of your own by using the
 `redirect_to_facebook_authorization` function.
 
     from fandjango.utils import redirect_to_facebook_authorization
