@@ -1,3 +1,5 @@
+from httplib import HTTPConnection
+
 from django.db import models
 
 class User(models.Model):
@@ -24,6 +26,16 @@ class User(models.Model):
     @property
     def full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
+        
+    @property
+    def picture(self):
+        connection = HTTPConnection('graph.facebook.com')
+        connection.request('GET', '%s/picture' % self.facebook_id)
+        response = connection.getresponse()
+        return response.getheader('Location')
+
+        
+        
         
 class OAuthToken(models.Model):
     """
