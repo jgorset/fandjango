@@ -22,6 +22,8 @@ class User(models.Model):
     profile_url = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
     oauth_token = models.OneToOneField('OAuthToken')
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now_add=True)
     
     @property
     def full_name(self):
