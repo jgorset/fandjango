@@ -23,6 +23,8 @@ Instances of the `User` model has the following properties:
 * `profile_url` - A string describing the URL to the user's Facebook profile.
 * `gender` - A string describing the user's gender.
 * `oauth_token` - An OAuth Token object.
+* `created_at` - A datetime object describing when the user was registered.
+* `last_seen_at` - A datetime object describing when the user was last seen.
 
 `oauth_token` is an instance of the `OAuthToken` model, which has the following properties:
 
