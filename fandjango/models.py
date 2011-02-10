@@ -33,6 +33,9 @@ class User(models.Model):
         connection.request('GET', '%s/picture' % self.facebook_id)
         response = connection.getresponse()
         return response.getheader('Location')
+        
+    def __unicode__(self):
+        return self.full_name
 
         
         
