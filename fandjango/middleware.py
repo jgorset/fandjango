@@ -29,6 +29,11 @@ class FacebookMiddleware():
                 app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
             )
             
+            # Request is made from a tab...
+            if 'profile_id' in facebook_data or 'page' in facebook_data:
+                request.facebook_user = None
+                return
+            
             # User has authorized the application...
             if 'user_id' in facebook_data:
                 
