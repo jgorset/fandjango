@@ -72,10 +72,10 @@ class FacebookMiddleware():
             
             # User has not authorized the application...
             else:
-                request.facebook_user = False
+                request.facebook_user = None
         # No signed request found
         else:
-            request.facebook_user = False
+            request.facebook_user = None
 
 
     def process_response(self, request, response):
