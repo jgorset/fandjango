@@ -2,7 +2,7 @@
 
 ## About
 
-Fandjango makes it easy to write Facebook applications powered by Django.
+Fandjango makes it easy to create Facebook applications powered by Django.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ Fandjango parses the signed request provided to Facebook canvas applications and
 have authorized your application in its `User` model. Once a user has authorized your application, you may
 access the corresponding model instance in `request.facebook.user`.
 
-Instances of the `User` model has the following properties:
+Instances of the `User` model have the following properties:
 
 * `facebook_id` - An integer describing the user's Facebook ID.
 * `first_name` - A string describing the user's first name.
