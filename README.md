@@ -55,6 +55,18 @@ If you prefer, you may also redirect the request in a control flow of your own b
     def foo(request, *args, **kwargs):
         if not request.facebook_user:
             return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
+            
+If the application is accessed from a tab on a Facebook Page, you'll find an instance of `FacebookPage`
+in `request.facebook_page`.
+
+Instances of the `FacebookPage` model have the following properties:
+
+* `id` -- An integer describing the id of the page.
+* `is_admin` -- A boolean describing whether or not the current user is an administrator of the page.
+* `is_liked` -- A boolean describing whether or not the current user likes the page.
+* `url` -- A string describing the URL to the page.
+
+If the application is not accessed from a tab on a Facebook Page, `request.facebook_page` is `None`.
         
 ## Installation
 

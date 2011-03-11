@@ -11,7 +11,7 @@ import facebook
 from django.conf import settings
 
 from utils import redirect_to_facebook_authorization
-from models import User, OAuthToken
+from models import FacebookPage, User, OAuthToken
 
 class FacebookMiddleware():
     """
@@ -23,16 +23,25 @@ class FacebookMiddleware():
     
     def process_request(self, request):
         """Populate request.facebook_user with information about the current user (see models.User for details)."""
+        
+        # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
+            signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
+            
             facebook_data = parse_signed_request(
-                signed_request = request.REQUEST['signed_request'] if 'signed_request' in request.REQUEST else request.COOKIES['signed_request'],
+                signed_request = signed_request,
                 app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
             )
             
-            # Request is made from a tab...
-            if 'profile_id' in facebook_data or 'page' in facebook_data:
-                request.facebook_user = None
-                return
+            # The application is accessed from a tab on a Facebook page...
+            if 'page' in facebook_data:
+                request.facebook_page = FacebookPage(
+                    id = facebook_data['page']['id'],
+                    is_admin = facebook_data['page']['admin'],
+                    is_liked = facebook_data['page']['liked']
+                )
+            else:
+                request.facebook_page = None
             
             # User has authorized the application...
             if 'user_id' in facebook_data:
@@ -75,12 +84,14 @@ class FacebookMiddleware():
                 
                 request.facebook_user = user
             
-            # User has not authorized the application...
+            # ... user has not authorized the application
             else:
                 request.facebook_user = None
-        # No signed request found
+                
+        # ... no signed request found
         else:
             request.facebook_user = None
+            request.facebook_tab = None
 
 
     def process_response(self, request, response):
