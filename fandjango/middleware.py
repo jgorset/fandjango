@@ -91,7 +91,7 @@ class FacebookMiddleware():
         # ... no signed request found
         else:
             request.facebook_user = None
-            request.facebook_tab = None
+            request.facebook_page = None
 
 
     def process_response(self, request, response):
