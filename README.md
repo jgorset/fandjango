@@ -13,7 +13,7 @@ Fandjango makes it easy to write Facebook applications powered by Django.
 
 Fandjango parses the signed request provided to Facebook canvas applications and automatically saves users that
 have authorized your application in its `User` model. Once a user has authorized your application, you may
-access the corresponding model instance in `request.facebook_user`.
+access the corresponding model instance in `request.facebook.user`.
 
 Instances of the `User` model has the following properties:
 
@@ -33,7 +33,7 @@ Instances of the `User` model has the following properties:
 * `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
 If the client has not authorized your application or the signed request is missing altogether,
-`request.facebook_user` is `None`.
+`request.facebook.user` is `None`.
 
 You may require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
@@ -53,11 +53,11 @@ If you prefer, you may also redirect the request in a control flow of your own b
     from fandjango.utils import redirect_to_facebook_authorization
     
     def foo(request, *args, **kwargs):
-        if not request.facebook_user:
+        if not request.facebook.user:
             return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
             
 If the application is accessed from a tab on a Facebook Page, you'll find an instance of `FacebookPage`
-in `request.facebook_page`.
+in `request.facebook.page`.
 
 Instances of the `FacebookPage` model have the following properties:
 
@@ -66,7 +66,7 @@ Instances of the `FacebookPage` model have the following properties:
 * `is_liked` -- A boolean describing whether or not the current user likes the page.
 * `url` -- A string describing the URL to the page.
 
-If the application is not accessed from a tab on a Facebook Page, `request.facebook_page` is `None`.
+If the application is not accessed from a tab on a Facebook Page, `request.facebook.page` is `None`.
         
 ## Installation
 

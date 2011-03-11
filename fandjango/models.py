@@ -2,6 +2,19 @@ from httplib import HTTPConnection
 
 from django.db import models
 
+class Facebook:
+    """
+    Facebook instances hold information on the current user and
+    the page he/she is accessing the application from, as well as
+    the signed request that information is derived from.
+    
+    Properties:
+    user -- A User instance.
+    page -- A FacebookPage instance.
+    signed_request -- A string describing the raw signed request.
+    """
+    user, page, signed_request = [None] * 3
+
 class FacebookPage:
     """
     FacebookPage instances represent Facebook Pages.

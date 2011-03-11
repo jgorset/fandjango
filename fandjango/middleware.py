@@ -11,37 +11,32 @@ import facebook
 from django.conf import settings
 
 from utils import redirect_to_facebook_authorization
-from models import FacebookPage, User, OAuthToken
+from models import Facebook, FacebookPage, User, OAuthToken
 
 class FacebookMiddleware():
-    """
-    Middleware for Facebook applications.
-    
-    FacebookMiddleware populates the request object with data for the current facebook user (see
-    the process_request method for specifics).
-    """
+    """Middleware for Facebook applications."""
     
     def process_request(self, request):
-        """Populate request.facebook_user with information about the current user (see models.User for details)."""
+        """Populate request.facebook."""
         
         # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
-            signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
+            request.facebook = Facebook()
+            
+            request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
             
             facebook_data = parse_signed_request(
-                signed_request = signed_request,
+                signed_request = request.facebook.signed_request,
                 app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
             )
             
             # The application is accessed from a tab on a Facebook page...
             if 'page' in facebook_data:
-                request.facebook_page = FacebookPage(
+                request.facebook.page = FacebookPage(
                     id = facebook_data['page']['id'],
                     is_admin = facebook_data['page']['admin'],
                     is_liked = facebook_data['page']['liked']
                 )
-            else:
-                request.facebook_page = None
             
             # User has authorized the application...
             if 'user_id' in facebook_data:
@@ -82,16 +77,7 @@ class FacebookMiddleware():
                     user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data['expires']) if facebook_data['expires'] else None
                     user.oauth_token.save()
                 
-                request.facebook_user = user
-            
-            # ... user has not authorized the application
-            else:
-                request.facebook_user = None
-                
-        # ... no signed request found
-        else:
-            request.facebook_user = None
-            request.facebook_tab = None
+                request.facebook.user = user
 
 
     def process_response(self, request, response):
