@@ -78,6 +78,9 @@ class FacebookMiddleware():
                     user.oauth_token.save()
                 
                 request.facebook.user = user
+                
+        else:
+            request.facebook = False
 
 
     def process_response(self, request, response):
