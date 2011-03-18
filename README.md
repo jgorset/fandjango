@@ -45,7 +45,9 @@ You may require a client to authorize your application before accessing a view w
         pass
       
 This will redirect the request to the Facebook authorization dialog, which will in
-turn redirect back to the original URI.
+turn redirect back to the original URI. `facebook_authorization_required` accepts an
+optional argument `redirect_uri`, allowing you to customize the location the user
+is redirected to after authorizing the application.
 
 If you prefer, you may also redirect the request in a control flow of your own by using the
 `redirect_to_facebook_authorization` function.
