@@ -40,7 +40,7 @@ You may require a client to authorize your application before accessing a view w
 
     from fandjango.decorators import facebook_authorization_required
     
-    @facebook_authorization_required
+    @facebook_authorization_required()
     def foo(request, *args, **kwargs):
         pass
       
