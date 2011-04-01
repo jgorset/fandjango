@@ -65,11 +65,11 @@ class FacebookMiddleware():
                     profile = facebook.GraphAPI(oauth_token.token).get_object('me')
                     
                     user = User.objects.create(
-                        facebook_id = profile['id'],
-                        first_name = profile['first_name'],
-                        last_name = profile['last_name'],
-                        profile_url = profile['link'],
-                        gender = profile['gender'],
+                        facebook_id = profile.get('id'),
+                        first_name = profile.get('first_name'),
+                        last_name = profile.get('last_name'),
+                        profile_url = profile.get('link'),
+                        gender = profile.get('gender'),
                         oauth_token = oauth_token
                     )
                 else:

@@ -47,10 +47,10 @@ class User(models.Model):
     """
     
     facebook_id = models.BigIntegerField()
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    profile_url = models.CharField(max_length=255)
-    gender = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
+    profile_url = models.CharField(max_length=255, blank=True, null=True)
+    gender = models.CharField(max_length=255, blank=True, null=True)
     oauth_token = models.OneToOneField('OAuthToken')
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now_add=True)
