@@ -14,7 +14,7 @@ import facebook
 
 from django.conf import settings
 
-from utils import redirect_to_facebook_authorization
+from utils import redirect_to_facebook_authorization, parse_signed_request
 from models import Facebook, FacebookPage, User, OAuthToken
 
 class FacebookMiddleware():
@@ -100,29 +100,3 @@ class FacebookMiddleware():
             response.set_cookie('signed_request', request.REQUEST['signed_request'])
         response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         return response
-
-    
-    
-def parse_signed_request(signed_request, app_secret):
-        """Return dictionary with signed request data."""
-        try:
-            l = signed_request.split('.', 2)
-            encoded_sig = str(l[0])
-            payload = str(l[1])
-        except IndexError:
-            raise ValueError("Signed request malformed")
-        
-        sig = base64.urlsafe_b64decode(encoded_sig + "=" * ((4 - len(encoded_sig) % 4) % 4))
-        data = base64.urlsafe_b64decode(payload + "=" * ((4 - len(payload) % 4) % 4))
-
-        data = json.loads(data)
-
-        if data.get('algorithm').upper() != 'HMAC-SHA256':
-            raise ValueError("Signed request is using an unknown algorithm")
-        else:
-            expected_sig = hmac.new(app_secret, msg=payload, digestmod=hashlib.sha256).digest()
-
-        if sig != expected_sig:
-            raise ValueError("Signed request signature mismatch")
-        else:
-            return data
