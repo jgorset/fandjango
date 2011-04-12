@@ -93,6 +93,13 @@ Fandjango requires some constants to be set in your settings.py file:
 
 **A:** No. Fandjango caches the latest signed request in a cookie so you don't have to worry about it.
 
+**Q:** *Why does Django raise a CSRF exception when my application loads in the Facebook canvas?*
+
+**A:** As of March 2011, Facebook's initial request to your application is a HTTP POST request that evaluates
+to an attempt at cross-site request forgery by Django's built-in CSRF protection. You may remedy this by either
+disabling CSRF proteciton altogether, or bouncing Facebook's initial request to an intermediate
+view that is exempt from it.
+
 **Q:** *Why does Fandjango set a new header called "P3P"?*
 
 **A:** P3P (or *Platform for Privacy Preferences*) is a W3 standard that enables websites to express
