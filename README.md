@@ -97,7 +97,7 @@ Fandjango requires some constants to be set in your settings.py file:
 
 **A:** As of March 2011, Facebook's initial request to your application is a HTTP POST request that evaluates
 to an attempt at cross-site request forgery by Django's built-in CSRF protection. You may remedy this by either
-disabling CSRF proteciton altogether, or bouncing Facebook's initial request to an intermediate
+disabling CSRF protection altogether, or bouncing Facebook's initial request to an intermediate
 view that is exempt from it.
 
 **Q:** *Why does Fandjango set a new header called "P3P"?*
