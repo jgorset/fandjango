@@ -32,8 +32,7 @@ Instances of the `User` model have the following properties:
 * `issued_at` - A datetime object describing when the token was issued.
 * `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
-If the client has not authorized your application or the signed request is missing altogether,
-`request.facebook.user` is `None`.
+If the client has not authorized your application, `request.facebook.user` is `None`.
 
 You may require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
@@ -69,6 +68,8 @@ Instances of the `FacebookPage` model have the following properties:
 * `url` -- A string describing the URL to the page.
 
 If the application is not accessed from a tab on a Facebook Page, `request.facebook.page` is `None`.
+
+If the signed request is missing, `request.facebook` is `None`.
         
 ## Installation
 
