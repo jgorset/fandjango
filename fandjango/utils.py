@@ -1,4 +1,12 @@
 from urllib import urlencode
+import base64
+import hmac
+import hashlib
+
+try:
+   import json
+except ImportError:
+   from django.utils import simplejson as json
 
 from django.http import HttpResponse
 from django.conf import settings

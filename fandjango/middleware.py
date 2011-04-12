@@ -1,14 +1,6 @@
 from datetime import datetime
 from urllib import urlencode
-import base64
-import hmac
-import hashlib
 import time
-
-try:
-   import json
-except ImportError:
-   from django.utils import simplejson as json
 
 import facebook
 
