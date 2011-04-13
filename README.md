@@ -44,12 +44,18 @@ You may require a client to authorize your application before accessing a view w
         pass
       
 This will redirect the request to the Facebook authorization dialog, which will in
-turn redirect back to the original URI. `facebook_authorization_required` accepts an
-optional argument `redirect_uri`, allowing you to customize the location the user
-is redirected to after authorizing the application.
+turn redirect back to the original URI. The decorator accepts an optional argument `redirect_uri`,
+allowing you to customize the location the user is redirected to after authorizing the application:
 
-If you prefer, you may also redirect the request in a control flow of your own by using the
-`redirect_to_facebook_authorization` function.
+    from settings import FACEBOOK_APPLICATION_TAB_URL
+    from fandjango.decorators import facebook_authorization_required
+    
+    @facebook_authorization_required(redirect_uri=FACEBOOK_APPLICATION_TAB_URL)
+    def foo(request, *args, **kwargs):
+        pass
+
+If you prefer, you may redirect the request in a control flow of your own by using the
+`redirect_to_facebook_authorization` function:
 
     from fandjango.utils import redirect_to_facebook_authorization
     
