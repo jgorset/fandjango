@@ -1,5 +1,6 @@
 from urllib import urlencode
 import base64
+import re
 import hmac
 import hashlib
 from httplib import HTTPSConnection
@@ -11,6 +12,8 @@ except ImportError:
 
 from django.http import HttpResponse
 from django.conf import settings
+
+from settings import IGNORE_PATHS
 
 def redirect_to_facebook_authorization(redirect_uri):
     """
@@ -87,3 +90,17 @@ def get_facebook_profile(oauth_token):
     connection.request('GET', 'me?access_token=%s' % oauth_token)
     
     return json.loads(connection.getresponse().read())
+    
+def is_ignored_path(path):
+    """
+    Determine whether or not the path matches one or more paths
+    in the IGNORE_PATHS setting.
+    
+    Arguments:
+    path -- A string describing the path to be matched.
+    """
+    for ignore_path in IGNORE_PATHS:
+        match = re.search(ignore_path, path[1:])
+        if match:
+            return True
+    return False
