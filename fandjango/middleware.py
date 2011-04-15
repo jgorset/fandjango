@@ -1,11 +1,13 @@
 from datetime import datetime
 from urllib import urlencode
 import time
+import re
 
 from django.conf import settings
 
 from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile
 from models import Facebook, FacebookPage, User, OAuthToken
+from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
@@ -21,7 +23,7 @@ class FacebookMiddleware():
             
             facebook_data = parse_signed_request(
                 signed_request = request.facebook.signed_request,
-                app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
+                app_secret = FACEBOOK_APPLICATION_SECRET_KEY
             )
             
             # The application is accessed from a tab on a Facebook page...
@@ -39,7 +41,7 @@ class FacebookMiddleware():
                 if facebook_data['expires']:
                     if datetime.fromtimestamp(facebook_data['expires']) < datetime.now():
                         return redirect_to_facebook_authorization(
-                            redirect_uri = settings.FACEBOOK_APPLICATION_URL + request.get_full_path()
+                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
                         )
                 
                 # Initialize a User object and its corresponding OAuth token
