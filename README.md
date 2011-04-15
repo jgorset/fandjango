@@ -78,7 +78,7 @@ If the signed request is missing, `request.facebook` is `None`.
         
 ## Installation
 
-* `pip install git+http://github.com/jgorset/fandjango.git`
+* `pip install fandjango`
 * Add `fandjango` to `INSTALLED_APPS` in your settings file
 * Add `fandjango.middleware.FacebookMiddleware` to `MIDDLEWARE_CLASSES` in your settings file
 
