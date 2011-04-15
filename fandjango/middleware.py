@@ -2,11 +2,9 @@ from datetime import datetime
 from urllib import urlencode
 import time
 
-import facebook
-
 from django.conf import settings
 
-from utils import redirect_to_facebook_authorization, parse_signed_request
+from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile
 from models import Facebook, FacebookPage, User, OAuthToken
 
 class FacebookMiddleware():
@@ -54,7 +52,7 @@ class FacebookMiddleware():
                         expires_at = datetime.fromtimestamp(facebook_data['expires'])
                     )
                     
-                    profile = facebook.GraphAPI(oauth_token.token).get_object('me')
+                    profile = get_facebook_profile(oauth_token.token)
                     
                     user = User.objects.create(
                         facebook_id = profile.get('id'),

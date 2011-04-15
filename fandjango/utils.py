@@ -2,6 +2,7 @@ from urllib import urlencode
 import base64
 import hmac
 import hashlib
+from httplib import HTTPSConnection
 
 try:
    import json
@@ -73,3 +74,16 @@ def parse_signed_request(signed_request, app_secret):
             raise ValueError("Signed request signature mismatch")
         else:
             return data
+            
+def get_facebook_profile(oauth_token):
+    """
+    Query Facebook's Graph API for the current user's profile and
+    parse it into a dictionary.
+    
+    Arguments:
+    oauth_token -- A string describing the user's OAuth token.
+    """
+    connection = HTTPSConnection('graph.facebook.com')
+    connection.request('GET', 'me?access_token=%s' % oauth_token)
+    
+    return json.loads(connection.getresponse().read())
