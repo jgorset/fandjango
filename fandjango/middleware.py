@@ -26,8 +26,9 @@ class FacebookMiddleware():
             # the request method to HTTP GET to rectify their misinterpretation
             # of the HTTP protocol standard.
             #
-            # See the "Incorrect use of the HTTP protocol" discussion at
-            # http://forum.developers.facebook.net/viewtopic.php?id=93554
+            # References: 
+            # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
+            # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
             if request.method == 'POST' and 'signed_request' in request.POST:
                 request.method = 'GET'
             
