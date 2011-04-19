@@ -8,6 +8,10 @@ Fandjango makes it easy to create Facebook applications powered by Django.
 
 * Django (http://github.com/django/django)
 
+## Getting started
+
+You may find a sample application and a walkthrough to replicate it at the [Fandjango Example](https://github.com/jgorset/fandjango-example) repository.
+
 ## Usage
 
 Fandjango parses the signed request provided to Facebook canvas applications and automatically saves users that
