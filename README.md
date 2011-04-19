@@ -79,8 +79,8 @@ If the signed request is missing, `request.facebook` is `None`.
 ## Installation
 
 * `pip install fandjango`
-* Add `fandjango` to `INSTALLED_APPS` in your settings file
-* Add `fandjango.middleware.FacebookMiddleware` to `MIDDLEWARE_CLASSES` in your settings file
+* Add `fandjango` to `INSTALLED_APPS`
+* Add `fandjango.middleware.FacebookMiddleware` before `django.middleware.csrf.CsrfViewMiddleware` in `MIDDLEWARE_CLASSES`
 
 ## Configuration
 
@@ -104,9 +104,9 @@ should typically be paths that are accessed outside of the Facebook Canvas, such
 **Q:** *Why does Django raise a CSRF exception when my application loads in the Facebook canvas?*
 
 **A:** As of March 2011, Facebook's initial request to your application is a HTTP POST request that evaluates
-to an attempt at cross-site request forgery by Django's built-in CSRF protection. You may remedy this by either
-disabling CSRF protection altogether, or bouncing Facebook's initial request to an intermediate
-view that is exempt from it.
+to an attempt at cross-site request forgery by Django's built-in CSRF protection. Fandjango remedies this by
+overriding the request method of POST requests that only contain a signed request to GET, but you need to make
+sure that its middleware is loaded before Django's `CsrfViewMiddleware`.
 
 **Q:** *Why does Fandjango set a new header called "P3P"?*
 

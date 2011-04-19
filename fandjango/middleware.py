@@ -21,6 +21,16 @@ class FacebookMiddleware():
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
             request.facebook = Facebook()
             
+            # If the request method is POST and its body only contains the signed request,
+            # chances are it's a request from the Facebook platform and we'll override
+            # the request method to HTTP GET to rectify their misinterpretation
+            # of the HTTP protocol standard.
+            #
+            # See the "Incorrect use of the HTTP protocol" discussion at
+            # http://forum.developers.facebook.net/viewtopic.php?id=93554
+            if request.method == 'POST' and 'signed_request' in request.POST:
+                request.method = 'GET'
+            
             request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
             
             facebook_data = parse_signed_request(
