@@ -6,3 +6,4 @@ fandjango/decorators.py
 fandjango/middleware.py
 fandjango/models.py
 fandjango/utils.py
+fandjango/settings.py
