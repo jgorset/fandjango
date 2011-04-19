@@ -3,4 +3,10 @@ from django.conf import settings
 FACEBOOK_APPLICATION_ID = getattr(settings, 'FACEBOOK_APPLICATION_ID')
 FACEBOOK_APPLICATION_SECRET_KEY = getattr(settings, 'FACEBOOK_APPLICATION_SECRET_KEY')
 FACEBOOK_APPLICATION_URL = getattr(settings, 'FACEBOOK_APPLICATION_URL')
-IGNORE_PATHS = getattr(settings, 'FANDJANGO_IGNORE_PATHS', [])
+DISABLED_PATHS = getattr(settings, 'FANDJANGO_DISABLED_PATHS', [])
+ENABLED_PATHS = getattr(settings, 'FANDJANGO_ENABLED_PATHS', [])
+
+# Alias FANDJANGO_IGNORE_PATHS to DISABLED_PATHS. FANDJANGO_IGNORE_PATHS
+# is deprecated as of v3.3.1, and will be removed in v3.4.
+if not DISABLED_PATHS:
+    DISABLED_PATHS = getattr(settings, 'FANDJANGO_IGNORE_PATHS', [])

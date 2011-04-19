@@ -3,10 +3,11 @@ from urllib import urlencode
 import time
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
-from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_ignored_path
+from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_disabled_path, is_enabled_path
 from models import Facebook, FacebookPage, User, OAuthToken
-from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
+from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
@@ -14,7 +15,13 @@ class FacebookMiddleware():
     def process_request(self, request):
         """Populate request.facebook."""
         
-        if is_ignored_path(request.path):
+        if ENABLED_PATHS and DISABLED_PATHS:
+            raise ImproperlyConfigured('You must configure either FANDJANGO_ENABLED_PATHS and FANDJANGO_DISABLED_PATHS, not both.')
+        
+        if DISABLED_PATHS and is_disabled_path(request.path):
+            return
+        
+        if ENABLED_PATHS and not is_enabled_path(request.path):
             return
         
         # Signed request found in either GET, POST or COOKIES...
