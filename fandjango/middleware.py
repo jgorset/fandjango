@@ -6,7 +6,7 @@ from django.conf import settings
 
 from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_ignored_path
 from models import Facebook, FacebookPage, User, OAuthToken
-from settings import IGNORE_PATHS, FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
+from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
