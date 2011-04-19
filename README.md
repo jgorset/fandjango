@@ -2,7 +2,11 @@
 
 ## About
 
-Fandjango makes it easy to create Facebook applications powered by Django.
+Facebook applications are simply websites that load in iframes on Facebook. Facebook provide documents loaded
+within these iframes with various data, such as information about the user accessing it or the Facebook Page
+it is accessed from. This data is encapsulated in [signed requests](http://developers.facebook.com/docs/authentication/signed_request/).
+
+Fandjango parses the signed request and abstracts the information contained within, populating the request object accordingly.
 
 ## Getting started
 
@@ -10,9 +14,10 @@ You may find a sample application and a walkthrough to replicate it at the [Fand
 
 ## Usage
 
-Fandjango parses the signed request provided to Facebook canvas applications and automatically saves users that
-have authorized your application in its `User` model. Once a user has authorized your application, you may
-access the corresponding model instance in `request.facebook.user`.
+### Users
+
+Fandjango saves users that have authorized your application in its `User` model. You may access
+the corresponding model instance in `request.facebook.user`.
 
 Instances of the `User` model have the following properties:
 
@@ -32,6 +37,8 @@ Instances of the `User` model have the following properties:
 * `expires_at` - A datetime object describing when the token expires (or `None` if it doesn't)
 
 If the client has not authorized your application, `request.facebook.user` is `None`.
+
+#### Authorizing users
 
 You may require a client to authorize your application before accessing a view with the
 `facebook_authorization_required` decorator.
@@ -61,7 +68,9 @@ If you prefer, you may redirect the request in a control flow of your own by usi
     def foo(request, *args, **kwargs):
         if not request.facebook.user:
             return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
-            
+
+### Pages
+
 If the application is accessed from a tab on a Facebook Page, you'll find an instance of `FacebookPage`
 in `request.facebook.page`.
 
@@ -73,8 +82,6 @@ Instances of the `FacebookPage` model have the following properties:
 * `url` -- A string describing the URL to the page.
 
 If the application is not accessed from a tab on a Facebook Page, `request.facebook.page` is `None`.
-
-If the signed request is missing, `request.facebook` is `None`.
         
 ## Installation
 
