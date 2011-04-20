@@ -16,7 +16,7 @@ class FacebookMiddleware():
         """Populate request.facebook."""
         
         if ENABLED_PATHS and DISABLED_PATHS:
-            raise ImproperlyConfigured('You must configure either FANDJANGO_ENABLED_PATHS and FANDJANGO_DISABLED_PATHS, not both.')
+            raise ImproperlyConfigured('You may configure either FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, but not both.')
         
         if DISABLED_PATHS and is_disabled_path(request.path):
             return
