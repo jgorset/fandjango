@@ -1,7 +1,11 @@
 from django.contrib import admin
-from models import User
+from models import User, OAuthToken
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'facebook_id', 'created_at', 'last_seen_at']
     
+class OAuthTokenAdmin(admin.ModelAdmin):
+    list_display = ['user', 'issued_at', 'expires_at', 'expired']
+    
 admin.site.register(User, UserAdmin)
+admin.site.register(OAuthToken, OAuthTokenAdmin)
