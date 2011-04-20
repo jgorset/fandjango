@@ -89,7 +89,7 @@ class OAuthToken(models.Model):
 
     @property
     def expired(self):
-        return self.expires_at < datetime.now()
+        return self.expires_at < datetime.now() if self.expires_at else False
         
     class Meta:
         verbose_name = 'OAuth token'
