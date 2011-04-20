@@ -1,4 +1,5 @@
 from httplib import HTTPConnection
+from datetime import datetime
 
 from django.db import models
 
@@ -85,3 +86,11 @@ class OAuthToken(models.Model):
     token = models.CharField(max_length=255)
     issued_at = models.DateTimeField()
     expires_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def expired(self):
+        return self.expires_at < datetime.now()
+        
+    class Meta:
+        verbose_name = 'OAuth token'
+        verbose_name_plural = 'OAuth tokens'
