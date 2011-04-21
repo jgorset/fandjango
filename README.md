@@ -5,7 +5,7 @@
 Facebook applications are simply websites that load in iframes on Facebook. Facebook provide documents loaded
 within these iframes with various data, such as information about the user accessing it or the Facebook Page
 it is accessed from. This data is encapsulated in [signed requests](http://developers.facebook.com/docs/authentication/signed_request/).
-Fandjango parses the signed request, abstracts the information contained within and populates the request object accordingly.
+Fandjango parses signed requests, abstracts the information contained within and populates the request object accordingly.
 
 ## Getting started
 
