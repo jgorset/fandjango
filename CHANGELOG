@@ -1,0 +1,77 @@
+CHANGELOG
+
+v3.4
+- New feature: FANDJANGO_ENABLED_PATHS
+- New feature: FANDJANGO_DISABLED_PATHS
+- FANDJANGO_IGNORE_PATHS is now deprecated.
+- New feature: OAuthToken#expired
+- The OAuth Token model is now registered with Django's admin.
+
+v3.3
+- HTTP POST requests made from the Facebook platform as a result of Facebook's 'POST to Canvas' migration
+are now transparently converted to HTTP GET requests.
+
+v3.2.2
+- New feature: FANDJANGO_IGNORE_PATHS
+
+v3.2.1
+- Fandjango is no longer dependant on Facebook's Python SDK.
+- Fix ImportError exceptions introduced in 3.2.
+
+v3.2
+- Fix a bug that caused an exception when the user had not specified his/her/its first name,
+last name or gender. Note that this changes the schema for the users database table;
+the 'first_name', 'last_name', 'profile_url' and 'gender' columns of the 'fandjango_users' table
+can now be NULL.
+
+v3.1.1
+- Fandjango now supports Python 2.5.
+
+v3.1
+- The 'facebook_authorization_required' decorator now has an optional argument; 'redirect_uri'. Note
+that this changes its syntax; it now requires to be suffixed by a set of parenthesis.
+
+v3.0.1
+- Fixed a bug that caused Fandjango to crash if no signed request was available.
+
+v3.0
+- Information previously found in 'request.facebook_page' and 'request.facebook_user' are now found
+in 'request.facebook.page' and 'request.facebook.user', respectively.
+
+v2.2
+- New feature: Facebook application tabs.
+- The 'facebook_user' attribute of the request object is now set to 'None' if no signed request.
+is availabe, or the user has not authorized the application.
+
+v2.1
+- New feature: User#created_at.
+- New feature: User#last_seen_at.
+- New feature: User#picture.
+- Fixed a bug that prevented renewed OAuth tokens to be discarded.
+- Fandjango is now registered with Django's admin.
+
+v2.0.2
+- Fix a bug that prevented the 'facebook_user' attribute of the request object from being
+set to false if no signed request was found or the user had not authorized the application.
+
+v2.0.1
+- Fix a bug that caused permanent OAuth tokens to have their expiry set incorrectly.
+
+v2.0
+- Facebook users that have authorized your application are now automatically registered
+in Fandjango's user model.
+
+v1.2
+- Fixed a bug that caused an exception if the signed request did not contain an user ID.
+- Fixed a bug that caused the expiry time of OAuth tokens to be incorrect.
+
+v1.1
+- Fandjango now supports Facebook's "POST to Canvas" migration.
+- FACEBOOK_APPLICATION_URI has been renamed to FACEBOOK_APPLICATION_URL for consistency.
+
+v1.01
+- Fandjango's version number is now available in the VERSION constant.
+- Fandjango is now compatible with browsers that have JavaScript disabled.
+
+v1.0
+- Everything
