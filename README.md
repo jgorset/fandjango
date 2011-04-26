@@ -107,7 +107,7 @@ Otherwise, Facebook's requests to your application will qualify cross-site reque
 ## Upgrading to 3.5
 
 Fandjango 3.5 introduces several new fields to its `User` model. Thankfully, migrations for [South](http://south.aeracode.org/)
-have been bundled with Django since 3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
+have been bundled with Fandjango since 3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
 
 If you're not using South, start using South. If you really don't want to, though, you can upgrade your database manually
 by adding the following fields to the `fandjango_user` table:
