@@ -91,6 +91,29 @@ If the application is not accessed from a tab on a Facebook Page, `request.faceb
 *Note:* If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's middleware precedes it.
 Otherwise, Facebook's requests to your application will qualify cross-site request forgeries.
 
+## Upgrading to 3.5
+
+Fandjango 3.5 introduces several new fields to its `User` model. Thankfully, migrations for [South](http://south.aeracode.org/)
+have been bundled with Django since 3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
+
+If you're not using South, start using South. If you really don't want to, though, you can upgrade your database manually
+by adding the following fields to the `fandjango_user` table:
+
+    Field name                  Field type
+    
+    facebook_username           varchar (255)
+    hometown                    varchar (255)
+    location                    varchar (255)
+    bio                         text
+    relationship_status         varchar (255)
+    political_views             varchar (255)
+    email                       varchar (255)
+    website                     varchar (255)
+    locale                      varchar (255)
+    verified                    tinyint (1)
+    birthday                    datetime
+    
+
 ## Configuration
 
 Fandjango requires some constants to be set in your settings.py file:
