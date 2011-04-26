@@ -21,10 +21,21 @@ the corresponding model instance in `request.facebook.user`.
 Instances of the `User` model have the following properties:
 
 * `facebook_id` - An integer describing the user's Facebook ID.
+* `facebook_username` - A string describing the user's Facebook username.
 * `first_name` - A string describing the user's first name.
 * `last_name` - A string describing the user's last name.
 * `profile_url` - A string describing the URL to the user's Facebook profile.
 * `gender` - A string describing the user's gender.
+* `hometown` - A string describing the user's home town (requires 'user_hometown' extended permission).
+* `location` - A string describing the user's current location (requires 'user_location' extended permission).
+* `bio` - A string describing the user's "about me" field on Facebook (requires 'user\_about\_me' extended permission).
+* `relationship_status` - A string describing the user's relationship status (requires 'user_relationships' extended permission).
+* `political_views` - A string describing the user's political views (requires 'user\_religion\_politics' extended permission).
+* `email` - A string describing the user's email address (requires 'email' extended permission).
+* `website` - A string describing the user's website (requires 'user_website' extended permission).
+* `locale` - A string describing the user's locale.
+* `verified` - A boolean describing whether or not the user is verified by Facebook.
+* `birthday` - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
 * `oauth_token` - An OAuth Token object.
 * `created_at` - A datetime object describing when the user was registered.
 * `last_seen_at` - A datetime object describing when the user was last seen.
