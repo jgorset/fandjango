@@ -14,6 +14,9 @@ v3.5
 - New feature: User#birthday
 - New feature: User#synchronize()
 
+Note: The database schema has changed. The 'fandjango_user' table now have fields corresponding to each
+of its new attributes.
+
 v3.4.1
 - Fandjango now supports South database migrations. To enable South in an existing installation of Fandjango,
 run 'python manage.py migrate fandajngo 0001 --fake'.
