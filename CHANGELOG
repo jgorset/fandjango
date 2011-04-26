@@ -1,5 +1,9 @@
 CHANGELOG
 
+v3.4.1
+- Fandjango now supports South database migrations. To enable South in an existing installation of Fandjango,
+run 'python manage.py migrate fandajngo 0001 --fake'.
+
 v3.4
 - New feature: FANDJANGO_ENABLED_PATHS
 - New feature: FANDJANGO_DISABLED_PATHS
