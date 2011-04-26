@@ -92,7 +92,7 @@ class FacebookMiddleware():
                         website = profile.get('website'),
                         locale = profile.get('locale'),
                         verified = profile.get('verified'),
-                        birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.get('birthday') else None,
+                        birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None,
                         oauth_token = oauth_token
                     )
                 else:

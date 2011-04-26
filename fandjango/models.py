@@ -102,7 +102,7 @@ class User(models.Model):
         self.website = profile.get('website')
         self.locale = profile.get('locale')
         self.verified = profile.get('verified')
-        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.get('birthday') else None
+        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
         
         self.save()
         
