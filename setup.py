@@ -7,5 +7,5 @@ setup(
   author = "Johannes Gorset",
   author_email = "jgorset@gmail.com",
   url = "http://github.com/jgorset/fandjango",
-  packages = ['fandjango']
+  packages = ['fandjango', 'fandjango.migrations']
 )

@@ -78,10 +78,21 @@ class FacebookMiddleware():
                     
                     user = User.objects.create(
                         facebook_id = profile.get('id'),
+                        facebook_username = profile.get('username'),
                         first_name = profile.get('first_name'),
                         last_name = profile.get('last_name'),
                         profile_url = profile.get('link'),
                         gender = profile.get('gender'),
+                        hometown = profile['hometown']['name'] if profile.has_key('hometown') else None,
+                        location = profile['location']['name'] if profile.has_key('location') else None,
+                        bio = profile.get('bio'),
+                        relationship_status = profile.get('relationship_status'),
+                        political_views = profile.get('political'),
+                        email = profile.get('email'),
+                        website = profile.get('website'),
+                        locale = profile.get('locale'),
+                        verified = profile.get('verified'),
+                        birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.get('birthday') else None,
                         oauth_token = oauth_token
                     )
                 else:
