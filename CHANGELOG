@@ -12,6 +12,7 @@ v3.5
 - New feature: User#locale
 - New feature: User#verified
 - New feature: User#birthday
+- New feature: User#synchronize()
 
 v3.4.1
 - Fandjango now supports South database migrations. To enable South in an existing installation of Fandjango,
