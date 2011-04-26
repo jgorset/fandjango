@@ -3,6 +3,8 @@ from datetime import datetime
 
 from django.db import models
 
+from utils import get_facebook_profile
+
 class Facebook:
     """
     Facebook instances hold information on the current user and
@@ -77,6 +79,32 @@ class User(models.Model):
         connection.request('GET', '%s/picture' % self.facebook_id)
         response = connection.getresponse()
         return response.getheader('Location')
+        
+    def synchronize(self):
+        """Synchronize the user with Facebook's Graph API."""
+        if self.oauth_token.expired:
+            raise ValueError('Signed request expired.')
+        
+        profile = get_facebook_profile(self.oauth_token.token)
+        
+        self.facebook_id = profile.get('id')
+        self.facebook_username = profile.get('username')
+        self.first_name = profile.get('first_name')
+        self.last_name = profile.get('last_name')
+        self.profile_url = profile.get('link')
+        self.gender = profile.get('gender')
+        self.hometown = profile['hometown']['name'] if profile.has_key('hometown') else None
+        self.location = profile['location']['name'] if profile.has_key('location') else None
+        self.bio = profile.get('bio')
+        self.relationship_status = profile.get('relationship_status')
+        self.political_views = profile.get('political')
+        self.email = profile.get('email')
+        self.website = profile.get('website')
+        self.locale = profile.get('locale')
+        self.verified = profile.get('verified')
+        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.get('birthday') else None
+        
+        self.save()
         
     def __unicode__(self):
         return self.full_name

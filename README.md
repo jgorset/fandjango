@@ -40,6 +40,8 @@ Instances of the `User` model have the following properties:
 * `created_at` - A datetime object describing when the user was registered.
 * `last_seen_at` - A datetime object describing when the user was last seen.
 
+You may synchronize these properties with Facebook at any time with the model's `synchronize` method.
+
 `oauth_token` is an instance of the `OAuthToken` model, which has the following properties:
 
 * `token` - A string describing the OAuth token itself.
