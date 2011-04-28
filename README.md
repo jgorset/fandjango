@@ -36,6 +36,7 @@ Instances of the `User` model have the following properties:
 * `locale` - A string describing the user's locale.
 * `verified` - A boolean describing whether or not the user is verified by Facebook.
 * `birthday` - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
+* `authorized` - A boolean describing whether or not the user has currently authorized your application.
 * `oauth_token` - An OAuth Token object.
 * `created_at` - A datetime object describing when the user was registered.
 * `last_seen_at` - A datetime object describing when the user was last seen.
@@ -80,6 +81,12 @@ If you prefer, you may redirect the request in a control flow of your own by usi
     def foo(request, *args, **kwargs):
         if not request.facebook.user:
             return redirect_to_facebook_authorization(redirect_uri='http://www.example.org/')
+            
+... or link to it from your template:
+
+    [...]
+    <a href="{% url authorize_application %}" target="_top">Authorize application</a>
+    [...]
 
 ### Pages
 
@@ -100,32 +107,18 @@ If the application is not accessed from a tab on a Facebook Page, `request.faceb
 * `pip install fandjango`
 * Add `fandjango` to `INSTALLED_APPS`
 * Add `fandjango.middleware.FacebookMiddleware` to `MIDDLEWARE_CLASSES`
+* Add `url(r'^fandjango/', include('fandjango.urls')),` to your project's root URL configuration.
 
 *Note:* If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's middleware precedes it.
 Otherwise, Facebook's requests to your application will qualify cross-site request forgeries.
 
-## Upgrading to 3.5
+## Upgrading
 
-Fandjango 3.5 introduces several new fields to its `User` model. Thankfully, migrations for [South](http://south.aeracode.org/)
+You may have to change your database schema when you upgrade Fandjango. Thankfully, schema migrations for [South](http://south.aeracode.org/)
 have been bundled with Fandjango since 3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
 
-If you're not using South, start using South. If you really don't want to, though, you can upgrade your database manually
-by adding the following fields to the `fandjango_user` table:
-
-    Field name                  Field type
-    
-    facebook_username           varchar (255)
-    hometown                    varchar (255)
-    location                    varchar (255)
-    bio                         text
-    relationship_status         varchar (255)
-    political_views             varchar (255)
-    email                       varchar (255)
-    website                     varchar (255)
-    locale                      varchar (255)
-    verified                    tinyint (1)
-    birthday                    datetime
-    
+If you're not using South, start using South. If you really don't want to, though, I suppose you could migrate your database schema
+manually. You'll find detailed information about changes to the database schema in the changelog and South's migration files.
 
 ## Configuration
 
@@ -134,13 +127,14 @@ Fandjango requires some constants to be set in your settings.py file:
 * `FACEBOOK_APPLICATION_ID` - Your Facebook application's ID.
 * `FACEBOOK_APPLICATION_SECRET_KEY` - Your Facebook application's secret key.
 * `FACEBOOK_APPLICATION_URL` - Your application's canvas URI (ex. http://apps.facebook.com/my_application)
-* `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - A list of [extended permissions][2] to request upon authorizing the application (optional).
+* `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - A list of [extended permissions][http://developers.facebook.com/docs/authentication/permissions] to request upon authorizing the application (optional).
 * `FANDJANGO_DISABLED_PATHS` - A list of regular expression patterns describing paths on which Fandjango should not act (optional). These
 should typically be paths that are accessed outside of the Facebook Canvas, such as Django's admin site.
 * `FANDJANGO_ENABLED_PATHS` - A list of regular expression patterns describing paths on which Fandjango should act (optional). If undefined,
 Fandjango will operate on all paths.
 
-[2]: http://developers.facebook.com/docs/authentication/permissions
+If you'd like to track whether users currently authorize your application to interact with their accounts, you also need to set
+the "deauthorize callback" option in your application's settings on Facebook to `[...]/fandjango/deauthorize_application.html`.
 
 ## Frequently asked questions
 
