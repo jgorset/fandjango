@@ -122,19 +122,24 @@ manually. You'll find detailed information about changes to the database schema 
 
 ## Configuration
 
-Fandjango requires some constants to be set in your settings.py file:
+Fandjango requires some constants to be set in your settings file:
+
+### Required configuration
 
 * `FACEBOOK_APPLICATION_ID` - Your Facebook application's ID.
 * `FACEBOOK_APPLICATION_SECRET_KEY` - Your Facebook application's secret key.
-* `FACEBOOK_APPLICATION_URL` - Your application's canvas URI (ex. http://apps.facebook.com/my_application)
-* `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - A list of [extended permissions][http://developers.facebook.com/docs/authentication/permissions] to request upon authorizing the application (optional).
+* `FACEBOOK_APPLICATION_URL` - Your application's canvas URI (ex. http://apps.facebook.com/my_application).
+
+### Optional configuration
+
+* `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - A list of [extended permissions](http://developers.facebook.com/docs/authentication/permissions) to request upon authorizing the application (optional).
 * `FANDJANGO_DISABLED_PATHS` - A list of regular expression patterns describing paths on which Fandjango should not act (optional). These
 should typically be paths that are accessed outside of the Facebook Canvas, such as Django's admin site.
 * `FANDJANGO_ENABLED_PATHS` - A list of regular expression patterns describing paths on which Fandjango should act (optional). If undefined,
 Fandjango will operate on all paths.
 
-If you'd like to track whether users currently authorize your application to interact with their accounts, you also need to set
-the "deauthorize callback" option in your application's settings on Facebook to `[...]/fandjango/deauthorize_application.html`.
+If you'd like to track whether users currently authorize your application to interact with their accounts, you need to set the
+"deauthorize callback" option in your application's settings on Facebook to "[...]/fandjango/deauthorize_application.html".
 
 ## Frequently asked questions
 
