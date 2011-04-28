@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name = 'fandjango',
-  version = '3.5',
+  version = '3.6',
   description = "Fandjango makes it easy to create Facebook applications powered by Django",
   author = "Johannes Gorset",
   author_email = "jgorset@gmail.com",
