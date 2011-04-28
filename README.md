@@ -85,7 +85,7 @@ If you prefer, you may redirect the request in a control flow of your own by usi
 ... or link to it from your template:
 
     [...]
-    <a href="{% url authorize_application %}" target="_top">Authorize application</a>
+    <a href="{% url authorize_application %}">Authorize application</a>
     [...]
 
 ### Pages
@@ -118,12 +118,11 @@ You may have to change your database schema when you upgrade Fandjango. Thankful
 have been bundled with Fandjango since v3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
 
 If you're not using South, you should start using South. If you don't want to, I suppose you could migrate your database schema
-manually (there's detailed information about changes to the database schema in the changelog)... but you'd be making things
-really hard on yourself.
+manually... but you'd be making things really hard on yourself.
 
 ## Configuration
 
-Fandjango requires some constants to be set in your settings file:
+Fandjango looks to your settings file for its configuration.
 
 #### Required configuration
 
