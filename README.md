@@ -107,7 +107,7 @@ If the application is not accessed from a tab on a Facebook Page, `request.faceb
 * `pip install fandjango`
 * Add `fandjango` to `INSTALLED_APPS`
 * Add `fandjango.middleware.FacebookMiddleware` to `MIDDLEWARE_CLASSES`
-* Add `url(r'^fandjango/', include('fandjango.urls')),` to your project's root URL configuration.
+* Add `url(r'^fandjango/', include('fandjango.urls'))` to your project's root URL configuration.
 
 *Note:* If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's middleware precedes it.
 Otherwise, Facebook's requests to your application will qualify cross-site request forgeries.
