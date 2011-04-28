@@ -16,6 +16,7 @@ class Facebook:
     page -- A FacebookPage instance.
     signed_request -- A string describing the raw signed request.
     """
+    
     user, page, signed_request = [None] * 3
 
 class FacebookPage:
@@ -45,8 +46,21 @@ class User(models.Model):
     last_name -- A string describing the user's last name.
     profile_url -- A string describing the URL to the user's Facebook profile.
     gender -- A string describing the user's gender.
+    hometown -- A string describing the user's home town.
+    hometown - A string describing the user's home town (requires 'user_hometown' extended permission).
+    location - A string describing the user's current location (requires 'user_location' extended permission).
+    bio - A string describing the user's "about me" field on Facebook (requires 'user_about_me' extended permission).
+    relationship_status - A string describing the user's relationship status (requires 'user_relationships' extended permission).
+    political_views - A string describing the user's political views (requires 'user_religion_politics' extended permission).
+    email - A string describing the user's email address (requires 'email' extended permission).
+    website - A string describing the user's website (requires 'user_website' extended permission).
+    locale - A string describing the user's locale.
+    verified - A boolean describing whether or not the user is verified by Facebook.
+    birthday - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
+    authorized - A boolean describing whether or not the user has currently authorized your application.
+    oauth_token - An OAuth Token object.
+    created_at - A datetime object describing when the user was registered.
     oauth_token -- An OAuth Token object.
-    
     """
     
     facebook_id = models.BigIntegerField()
@@ -120,7 +134,6 @@ class OAuthToken(models.Model):
     token -- A string describing the OAuth token itself.
     issued_at -- A datetime object describing when the token was issued.
     expires_at -- A datetime object describing when the token expires (or None if it doesn't)
-    
     """
     
     token = models.CharField(max_length=255)
