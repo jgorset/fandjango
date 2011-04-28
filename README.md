@@ -124,13 +124,13 @@ manually. You'll find detailed information about changes to the database schema 
 
 Fandjango requires some constants to be set in your settings file:
 
-### Required configuration
+#### Required configuration
 
 * `FACEBOOK_APPLICATION_ID` - Your Facebook application's ID.
 * `FACEBOOK_APPLICATION_SECRET_KEY` - Your Facebook application's secret key.
 * `FACEBOOK_APPLICATION_URL` - Your application's canvas URI (ex. http://apps.facebook.com/my_application).
 
-### Optional configuration
+#### Optional configuration
 
 * `FACEBOOK_APPLICATION_INITIAL_PERMISSIONS` - A list of [extended permissions](http://developers.facebook.com/docs/authentication/permissions) to request upon authorizing the application (optional).
 * `FANDJANGO_DISABLED_PATHS` - A list of regular expression patterns describing paths on which Fandjango should not act (optional). These
