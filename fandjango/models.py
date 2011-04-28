@@ -65,6 +65,7 @@ class User(models.Model):
     locale = models.CharField(max_length=255, blank=True, null=True)
     verified = models.BooleanField()
     birthday = models.DateField(blank=True, null=True)
+    authorized = models.BooleanField(default=True)
     oauth_token = models.OneToOneField('OAuthToken')
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now_add=True)
