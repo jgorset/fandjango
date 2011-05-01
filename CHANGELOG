@@ -4,7 +4,7 @@ v3.6
 - It is now possible to direct users to application authorization from templates: "{% url authorize_application %}".
 - Fandjango now tracks whether users currently authorize the application (this requires some configuration; see the README for details).
 
-Note: The database schema has changed. See migration 0002.
+Note: The database schema has changed. See migration 0003.
 
 v3.5
 - The user model has been upgraded with a number of new properties: facebook_username, hometown, location, bio,
