@@ -1,5 +1,9 @@
 CHANGELOG
 
+v3.6.1
+- Fixed a bug that caused the "facebook_authorization_required" decorator to be incompatible with Django libraries that modify
+the order of arguments given to views.
+
 v3.6
 - It is now possible to direct users to application authorization from templates: "{% url authorize_application %}".
 - Fandjango now tracks whether users currently authorize the application (this requires some configuration; see the README for details).
