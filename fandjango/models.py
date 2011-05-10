@@ -86,7 +86,8 @@ class User(models.Model):
     
     @property
     def full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        if self.first_name and self.last_name:
+            return "%s %s" % (self.first_name, self.last_name)
         
     @property
     def picture(self):
@@ -122,11 +123,13 @@ class User(models.Model):
         self.save()
         
     def __unicode__(self):
-        return self.full_name
+        if self.full_name:
+            return self.full_name
+        elif self.facebook_username:
+            return self.facebook_username
+        else:
+            return self.facebook_id
 
-        
-        
-        
 class OAuthToken(models.Model):
     """
     Instances of the OAuthToken class are credentials used to query the Facebook API on behalf of a user.
