@@ -1,5 +1,11 @@
 CHANGELOG
 
+v3.6.2
+- Fixed a bug that caused Facebook Page profiles to raise an IntegrityError.
+- Fixed a bug that caused Facebook Page profiles to display with full name 'None None' in the admin.
+
+Note: The database schema has changed. See migration 0004.
+
 v3.6.1
 - Fixed a bug that caused the "facebook_authorization_required" decorator to be incompatible with Django libraries that modify
 the order of arguments given to views.
