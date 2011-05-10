@@ -77,7 +77,7 @@ class User(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     website = models.CharField(max_length=255, blank=True, null=True)
     locale = models.CharField(max_length=255, blank=True, null=True)
-    verified = models.BooleanField()
+    verified = models.NullBooleanField()
     birthday = models.DateField(blank=True, null=True)
     authorized = models.BooleanField(default=True)
     oauth_token = models.OneToOneField('OAuthToken')
