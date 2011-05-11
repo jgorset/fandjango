@@ -58,7 +58,7 @@ class FacebookMiddleware():
             if 'user_id' in facebook_data:
                 
                 # Redirect to Facebook Authorization if the OAuth token has expired
-                if facebook_data.has_key('expires'):
+                if facebook_data['expires']:
                     if datetime.fromtimestamp(facebook_data['expires']) < datetime.now():
                         return redirect_to_facebook_authorization(
                             redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
