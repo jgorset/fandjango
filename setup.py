@@ -2,11 +2,11 @@
 
 from distutils.core import setup
 
-from fandjango import VERSION
+import fandjango
 
 setup(
   name = 'fandjango',
-  version = VERSION,
+  version = fandjango.__version__,
   description = "Fandjango makes it easy to create Facebook applications powered by Django",
   author = "Johannes Gorset",
   author_email = "jgorset@gmail.com",
