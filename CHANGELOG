@@ -1,5 +1,8 @@
 CHANGELOG
 
+v3.6.3
+- Fixed a bug that caused endless redirection for users who have granted the application offline access.
+
 v3.6.2
 - Fixed a bug that caused Facebook Page profiles to raise an IntegrityError.
 - Fixed a bug that caused Facebook Page profiles to display with full name 'None None' in the admin.
