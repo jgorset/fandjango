@@ -1,8 +1,10 @@
 from distutils.core import setup
 
+from fandjango import VERSION
+
 setup(
   name = 'fandjango',
-  version = '3.6.3',
+  version = VERSION,
   description = "Fandjango makes it easy to create Facebook applications powered by Django",
   author = "Johannes Gorset",
   author_email = "jgorset@gmail.com",
