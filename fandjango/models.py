@@ -125,8 +125,19 @@ class User(models.Model):
     @property
     def graph(self):
         """Return a GraphAPI instance with the user's access token."""
-        from facepy import GraphAPI
-        return GraphAPI(self.oauth_token.token)
+        try:
+            from facepy import GraphAPI
+            return GraphAPI(self.oauth_token.token)
+        except ImportError:
+            pass
+            
+        try:
+            from facebook import GraphAPI
+            return GraphAPI(self.oauth_token.token)
+        except ImportError:
+            pass
+        
+        raise ImportError('Neither Facepy nor Facebook-SDK could be imported')
         
     def __unicode__(self):
         if self.full_name:
