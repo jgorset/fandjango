@@ -106,13 +106,6 @@ class FacebookMiddleware():
                         user.oauth_token.save()
 
                 request.facebook.user = user
-                
-                # Try to initialize a Facepy Graph API instance with this user's oauth token
-                try:
-                    from facepy import GraphAPI
-                    request.facebook.user.graph = GraphAPI(user.oauth_token.token)
-                except ImportError:
-                    pass
 
         # ... no signed request found.
         else:

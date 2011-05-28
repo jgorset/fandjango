@@ -121,6 +121,12 @@ class User(models.Model):
         self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
         
         self.save()
+    
+    @property
+    def graph(self):
+        """Return a GraphAPI instance with the user's access token."""
+        from facepy import GraphAPI
+        return GraphAPI(self.oauth_token.token)
         
     def __unicode__(self):
         if self.full_name:
