@@ -2,11 +2,6 @@ from django import template
 from django.conf import settings
 register = template.Library()
 
-
-@register.inclusion_tag('facebook_load.html')
-def facebook_load():
-    pass
-
 @register.tag
 def facebook_init(parser, token):
     nodelist = parser.parse(('endfacebook',))
