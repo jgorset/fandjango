@@ -112,11 +112,6 @@ Fandjango provides a template tag for loading and initializing Facebook's JavaSc
         # This code will be run once the JavaScript SDK has been loaded and initialized.
         alert('It worked!')
     {% endfacebook %}
-
-You might also find the `facebook_perms` template tag useful. It produces a comma-separated list of
-the extended permissions specified in your configuration.
-
-    <fb:login-button perms="{% facebook_perms %} />
         
 ## Installation
 

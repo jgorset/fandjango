@@ -26,7 +26,3 @@ class FacebookNode(template.Node):
         custom_context['code'] = code
         custom_context['app_id'] = self.app_id
         return t.render(context)
-
-@register.simple_tag
-def facebook_perms():
-    return ",".join(getattr(settings, 'FACEBOOK_APPLICATION_INITIAL_PERMISSIONS', []))
