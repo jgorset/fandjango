@@ -1,5 +1,8 @@
 CHANGELOG
 
+v3.7.1
+- Fixed a bug that caused a TypeError in Django's admin for models that were linked to Fandjango's User model.
+
 v3.7
 - You may now find an instance of your favourite Graph API client (provided your favourite is either
 Facepy or Facebook's official Python SDK) initialized with the user's access token in 'User#graph'.
