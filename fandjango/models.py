@@ -141,11 +141,11 @@ class User(models.Model):
         
     def __unicode__(self):
         if self.full_name:
-            return self.full_name
+            return u'%s' % self.full_name
         elif self.facebook_username:
-            return self.facebook_username
+            return u'%s' % self.facebook_username
         else:
-            return self.facebook_id
+            return u'%s' % self.facebook_id
 
 class OAuthToken(models.Model):
     """
