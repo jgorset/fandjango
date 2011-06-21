@@ -128,7 +128,7 @@ Otherwise, Facebook's requests to your application will qualify cross-site reque
 You may have to change your database schema when you upgrade Fandjango. Thankfully, schema migrations for [South](http://south.aeracode.org/)
 have been bundled with Fandjango since v3.4.1 and upgrading your database is as simple as running `./manage.py migrate fandjango`.
 
-If you're not using South, you should start using South. If you don't want to, I suppose you could migrate your database schema
+If you're not using South, you should start. If you don't want to, I suppose you could migrate your database schema
 manually... but you'd be making things really hard on yourself.
 
 ## Configuration
