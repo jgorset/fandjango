@@ -33,6 +33,7 @@ Instances of the `User` model have the following properties:
 * `political_views` - A string describing the user's political views (requires 'user\_religion\_politics' extended permission).
 * `email` - A string describing the user's email address (requires 'email' extended permission).
 * `website` - A string describing the user's website (requires 'user_website' extended permission).
+* `picture` - A string describing the URL to the user's profile picture.
 * `locale` - A string describing the user's locale.
 * `verified` - A boolean describing whether or not the user is verified by Facebook.
 * `birthday` - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
