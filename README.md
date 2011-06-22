@@ -39,6 +39,7 @@ Instances of the `User` model have the following properties:
 * `birthday` - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
 * `authorized` - A boolean describing whether or not the user has currently authorized your application.
 * `oauth_token` - An OAuth Token object.
+* `graph` - A pre-initialized instance of [Facebook's Python SDK](http://github.com/facebook/python-sdk) or [Facepy](http://github.com/jgorset/facepy).
 * `created_at` - A datetime object describing when the user was registered.
 * `last_seen_at` - A datetime object describing when the user was last seen.
 
