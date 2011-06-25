@@ -97,13 +97,12 @@ class FacebookMiddleware():
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
-                    user.save()
-
                     if facebook_data.has_key('oauth_token'):
                         user.oauth_token.token = facebook_data['oauth_token']
                         user.oauth_token.issued_at = datetime.fromtimestamp(facebook_data['issued_at'])
                         user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data['expires']) if facebook_data['expires'] else None
                         user.oauth_token.save()
+                    user.save()
 
                 request.facebook.user = user
 
