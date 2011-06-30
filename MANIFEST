@@ -11,6 +11,7 @@ fandjango/views.py
 fandjango/migrations/0001_initial.py
 fandjango/migrations/0002_auto__add_field_user_facebook_username__add_field_user_hometown__add_f.py
 fandjango/migrations/0003_auto__add_field_user_authorized.py
+fandjango/migrations/0004_auto__chg_field_user_verified.py
 fandjango/migrations/__init__.py
 fandjango/templates/facebook_init.html
 fandjango/templatetags/__init__.py
