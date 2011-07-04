@@ -58,7 +58,7 @@ class FacebookMiddleware():
             if 'user_id' in facebook_data:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
-                if facebook_data['expires'] and datetime.fromtimestamp(facebook_data['expires']) < datetime.now():
+                if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
                         return redirect_to_facebook_authorization(
                             redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
                         )
@@ -70,7 +70,7 @@ class FacebookMiddleware():
                     oauth_token = OAuthToken.objects.create(
                         token = facebook_data['oauth_token'],
                         issued_at = datetime.fromtimestamp(facebook_data['issued_at']),
-                        expires_at = datetime.fromtimestamp(facebook_data['expires'])
+                        expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
                     )
 
                     profile = get_facebook_profile(oauth_token.token)
@@ -100,7 +100,7 @@ class FacebookMiddleware():
                     if facebook_data.has_key('oauth_token'):
                         user.oauth_token.token = facebook_data['oauth_token']
                         user.oauth_token.issued_at = datetime.fromtimestamp(facebook_data['issued_at'])
-                        user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data['expires']) if facebook_data['expires'] else None
+                        user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
                         user.oauth_token.save()
                     user.save()
 
