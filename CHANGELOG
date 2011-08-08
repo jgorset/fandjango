@@ -1,5 +1,8 @@
 CHANGELOG
 
+v3.7.2
+- Fixed a bug that caused a KeyError when Facebook lists the user's hometown and location incorrectly.
+
 v3.7.1
 - Fixed a bug that caused a TypeError in Django's admin for models that were linked to Fandjango's User model.
 
