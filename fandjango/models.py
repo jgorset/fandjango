@@ -92,7 +92,7 @@ class User(models.Model):
     @property
     def picture(self):
         connection = HTTPConnection('graph.facebook.com')
-        connection.request('GET', '%s/picture' % self.facebook_id)
+        connection.request('GET', '/%s/picture' % self.facebook_id)
         response = connection.getresponse()
         return response.getheader('Location')
         
