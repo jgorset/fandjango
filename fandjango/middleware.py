@@ -3,6 +3,7 @@ from urllib import urlencode
 import time
 
 from django.conf import settings
+from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
 from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_disabled_path, is_enabled_path
@@ -37,6 +38,7 @@ class FacebookMiddleware():
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
             # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
             if request.method == 'POST' and 'signed_request' in request.POST:
+                request.POST = QueryDict()
                 request.method = 'GET'
 
             request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
