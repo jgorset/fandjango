@@ -154,6 +154,18 @@ Fandjango will operate on all paths.
 If you'd like to track whether users currently authorize your application to interact with their accounts, you need to set the
 "deauthorize callback" option in your application's settings on Facebook to "[...]/fandjango/deauthorize_application.html".
 
+## Development tips
+
+There are a couple of ways to develop Facebook applications without pushing commits
+to a server to see how they fare:
+
+1. Point your "Site URL" and "Canvas URL" in your application settings on Facebook
+   to your local development server (e.g. "http://localhost:8000").
+
+2. Inspect Facebook's initial POST request to your application and copy the signed
+   request into the query string of your local development server
+   (e.g. "http://localhost:8000/?signed_request[...])
+
 ## Frequently asked questions
 
 **Q:** *Do I need to pass the signed request around?*
