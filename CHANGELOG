@@ -1,5 +1,11 @@
 CHANGELOG
 
+v3.7.3
+- Fixed a bug that produced HTTP 500, causing 'User#picture' to fail.
+- 'request.POST' is now reset to an empty QueryDict instance after
+  overriding the request method of Facebook's initial request
+  from POST to GET.
+
 v3.7.2
 - Fixed a bug that caused a KeyError when Facebook lists the user's hometown and location incorrectly.
 
