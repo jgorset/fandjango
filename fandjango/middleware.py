@@ -38,7 +38,7 @@ class FacebookMiddleware():
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
             # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
             if request.method == 'POST' and 'signed_request' in request.POST:
-                request.POST = QueryDict()
+                request.POST = QueryDict('')
                 request.method = 'GET'
 
             request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
