@@ -81,6 +81,7 @@ class FacebookMiddleware():
                         facebook_id = profile.get('id'),
                         facebook_username = profile.get('username'),
                         first_name = profile.get('first_name'),
+                        middle_name = profile.get('middle_name'),
                         last_name = profile.get('last_name'),
                         profile_url = profile.get('link'),
                         gender = profile.get('gender'),
@@ -94,6 +95,8 @@ class FacebookMiddleware():
                         locale = profile.get('locale'),
                         verified = profile.get('verified'),
                         birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None,
+                        timezone = profile.get('timezone'),
+                        quotes = profile.get('quotes'),
                         oauth_token = oauth_token
                     )
                 else:
