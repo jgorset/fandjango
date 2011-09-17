@@ -4,6 +4,7 @@ import re
 import hmac
 import hashlib
 from httplib import HTTPSConnection
+from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY
 
 try:
    import json
@@ -77,6 +78,70 @@ def parse_signed_request(signed_request, app_secret):
             raise ValueError("Signed request signature mismatch")
         else:
             return data
+
+def create_signed_request(*args, **kwargs):
+    """
+    Returns a string that is a valid signed_request parameter specified by Facebook
+    see: http://developers.facebook.com/docs/authentication/signed_request/
+    
+    Arguments:
+    args -- optional An integer representing the facebook uid of a user. If this argument is given
+                a default JSON object will be used for the request that is signed. The JSON object
+                will contain the following fields and values:
+                    - 'user_id': args[0]
+                    - 'algorithm': 'HMAC-SHA256'
+                    - 'expires': 0
+                    - 'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+                    - 'issued_at': 1306179904
+    kwargs -- optional A Dict which will be used as the JSON object for the request that is signed. The Dict must contain
+                the following fields:
+                    - 'user_id' for which the value must be an integer representing the Facebook uid of a user
+                    - 'algorithm' which must be set to the value 'HMAC-SHA256'
+                other optional fields:
+                    - 'issued_at'
+                    - 'oauth_token'
+                    - 'expires'
+                    - 'app_data'
+                    - 'page'
+                    - 'profile_id'
+
+    Examples:
+        create_signed_request(199)
+        create_signed_request({'user_id': 199, 'algorithm': 'HMAC-SHA256'})
+
+    Note: if no arguments are given, a default signed_request String will returned which be semantically be the same as calling
+    create_signed_request(1)
+    """
+    payload = {'user_id': 1, 'algorithm': 'HMAC-SHA256', 'expires': 0, 'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk', 'issued_at': 1306179904}
+    if args is not None:
+        payload['user_id'] = args[0]
+    elif kwargs is not None:
+        payload = kwargs
+
+    return __create_signed_request_parameter(json.dumps(payload))
+
+def __prepend_signature(payload):
+        """
+            Returns a SHA256 signed and base64 encoded signature based on the given payload
+
+            Arguments:
+            payload - a base64url encoded String
+        """
+        dig = hmac.new(FACEBOOK_APPLICATION_SECRET_KEY, msg=payload, digestmod=hashlib.sha256).digest()
+        dig = base64.urlsafe_b64encode(dig)
+        return dig
+
+def __create_signed_request_parameter(payload):
+        """
+            Returns a String value usable as the Facebook signed_request parameter. The String will be based on the given payload.
+            The signed_request parameter is the concatenation of a HMAC SHA-256 signature string, a period (.), and a
+            the base64url encoded payload.
+
+            Arguments:
+            payload - a JSON formatted String
+        """
+        base64_encoded_payload = base64.urlsafe_b64encode(payload)
+        return __prepend_signature(base64_encoded_payload) + "." + base64_encoded_payload
             
 def get_facebook_profile(oauth_token):
     """
