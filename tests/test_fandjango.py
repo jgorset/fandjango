@@ -26,45 +26,52 @@ def test_create_signed_request():
     from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
     from fandjango.utils import create_signed_request
     from fandjango.utils import parse_signed_request
-    import pytest
+    from datetime import datetime, timedelta
+    import time
 
-    # test sending a facebook uid
-    signed_request_user_1 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, 1)
-    assert signed_request_user_1 == '2ZEHvNnxJi5Yx9g6znqKFQOAWPmPKyakKvpgn_PH0Es=.eyJpc3N1ZWRfYXQiOiAxMzA2MTc5OTA0LCAib2F1dGhfdG9rZW4iOiAiMTgxMjU5NzExOTI1MjcwfDE1NzBhNTUzYWQ2NjA1NzA1ZDFiN2E1Zi4xLTQ5OTcyOTEyOXw4WHFNUmhDV0RLdHBHLWlfelJrSEJEU3NxcWsiLCAiZXhwaXJlcyI6IDAsICJ1c2VyX2lkIjogMSwgImFsZ29yaXRobSI6ICJITUFDLVNIQTI1NiJ9'
+    # test sending only user_id
+    signed_request_user_1 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=1, issued_at=1254459601)
+    assert signed_request_user_1 == 'Y0ZEAYY9tGklJimbbSGy2dgpYz9qZyVJp18zrI9xQY0=.eyJpc3N1ZWRfYXQiOiAxMjU0NDU5NjAxLCAidXNlcl9pZCI6IDEsICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYifQ=='
 
     data_user_1 = parse_signed_request(signed_request_user_1, FACEBOOK_APPLICATION_SECRET_KEY)
-    assert data_user_1.keys().sort() == [u'user_id', u'algorithm', u'expires', u'oauth_token', u'issued_at'].sort()
+    assert sorted(data_user_1.keys()) == sorted([u'user_id', u'algorithm', u'issued_at'])
     assert data_user_1['user_id'] == 1
     assert data_user_1['algorithm'] == 'HMAC-SHA256'
-    assert data_user_1['expires'] == 0
-    assert data_user_1['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert data_user_1['issued_at'] == 1306179904
 
-    # test not sending a facebook uid which will default to uid 1
-    signed_request_user_2 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY)
+    # test not sending a user_id which will default to user_id 1
+    signed_request_user_2 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, issued_at=1254459601)
     assert signed_request_user_1 == signed_request_user_2
 
-    # test sending a Dict to be used as JSON object payload
-    user_3_json = {
-        'user_id': 999,
-        'algorithm': 'HMAC-SHA256',
-        'foo': 'bar',
-        'face': 'book'
-    }
-    signed_request_user_3 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, json_object=user_3_json)
-    assert signed_request_user_3 == 'cYb_A-C8tgwweLedoNAlSx8g5seh-tgtu6oCyjduK58=.eyJmb28iOiAiYmFyIiwgInVzZXJfaWQiOiA5OTksICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYiLCAiZmFjZSI6ICJib29rIn0='
+    # test sending each available named argument
+    today = datetime.now()
+    tomorrow = today + timedelta(hours=1)
+
+    signed_request_user_3 = create_signed_request(
+       app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+       user_id = 999,
+       issued_at = 1254459600,
+       expires = tomorrow,
+       oauth_token = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
+       app_data = {},
+       page = {
+           'id': '1',
+           'liked': True
+       }
+   )
 
     data_user_3 = parse_signed_request(signed_request_user_3, FACEBOOK_APPLICATION_SECRET_KEY)
-    assert data_user_3.keys().sort() == [u'user_id', u'algorithm', u'foo', u'face'].sort()
+    assert sorted(data_user_3.keys()) == sorted([u'user_id', u'algorithm', u'issued_at', u'expires', u'oauth_token', u'app_data', u'page'])
     assert data_user_3['user_id'] == 999
     assert data_user_3['algorithm'] == 'HMAC-SHA256'
-    assert data_user_3['foo'] == 'bar'
-    assert data_user_3['face'] == 'book'
+    assert data_user_3['issued_at'] == 1254459600
+    assert data_user_3['expires'] == int(time.mktime(tomorrow.timetuple()))
+    assert data_user_3['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+    assert data_user_3['app_data'] == {}
+    assert data_user_3['page'] == {
+       'id': '1',
+       'liked': True
+    }
 
-    # test unsupported algorithm
-    user_3_json['algorithm'] = 'HMAC-SHA512'
-    with pytest.raises(NotImplementedError):
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, json_object=user_3_json)
 
 def test_get_facebook_profile():
     from fandjango.utils import get_facebook_profile

@@ -1,3 +1,4 @@
+from datetime import datetime
 from urllib import urlencode
 import base64
 import re
@@ -5,6 +6,7 @@ import hmac
 import hashlib
 from httplib import HTTPSConnection
 from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY
+import time
 
 try:
    import json
@@ -79,49 +81,51 @@ def parse_signed_request(signed_request, app_secret):
         else:
             return data
 
-def create_signed_request(app_secret, facebook_id=None, json_object=None):
+def create_signed_request(app_secret, user_id=1, issued_at=None, oauth_token=None, expires=None, app_data=None, page=None):
     """
     Returns a string that is a valid signed_request parameter specified by Facebook
     see: http://developers.facebook.com/docs/authentication/signed_request/
     
     Arguments:
     app_secret -- the secret key that Facebook assigns to each Facebook application
-    facebook_id -- optional An integer representing the facebook uid of a user. If this argument is given
-                a default JSON object will be used for the request that is signed. The JSON object
-                will contain the following fields and values:
-                    - 'user_id': args[0]
-                    - 'algorithm': 'HMAC-SHA256'
-                    - 'expires': 0
-                    - 'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-                    - 'issued_at': 1306179904
-    json_object -- optional A Dict which will be used as the JSON object for the request that is signed. The Dict must contain
-                the following fields:
-                    - 'user_id' for which the value must be an integer representing the Facebook uid of a user
-                    - 'algorithm' which must be set to the value 'HMAC-SHA256'
-                other optional fields:
-                    - 'issued_at'
-                    - 'oauth_token'
-                    - 'expires'
-                    - 'app_data'
-                    - 'page'
-                    - 'profile_id'
+    user_id -- optional a long representing the Facebook user identifier (UID) of a user
+    issued_at -- optional an int or a datetime representing a timestamp when the request was signed
+    oauth_token -- optional a String token to pass in to the Facebook graph api
+    expires -- optional an int or a datetime representing a timestamp at which the oauth token expires
+    app_data -- optional a dict containing additional application data
+    page -- optional a dict having the keys id (string), liked (boolean) if the user has liked the page and optionally admin (boolean) if the user is an admin of that page.
+
+    Regardless of which arguments are given, the encoded JSON object will always contain the following properties:
+        -- user_id
+        -- algorithm
+        -- issued_at
 
     Examples:
         create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY)
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, facebook_id=199)
-        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, json_object={'user_id': 199, 'algorithm': 'HMAC-SHA256'})
+        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=199)
+        create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=199, issued_at=1254459600)
 
-    Note: if no arguments are given, a default signed_request String will returned which be semantically be the same as calling
-    create_signed_request(1)
     """
-    payload = {'user_id': 1, 'algorithm': 'HMAC-SHA256', 'expires': 0, 'oauth_token': '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk', 'issued_at': 1306179904}
-    if facebook_id is not None:
-        payload['user_id'] = facebook_id
-    elif json_object is not None and len(json_object) > 0 and 'user_id' in json_object and 'algorithm' in json_object:
-        algorithm = json_object['algorithm']
-        if json_object['algorithm'] != 'HMAC-SHA256':
-            raise NotImplementedError('Unsupported algorithm ' + algorithm)
-        payload = json_object
+    payload = {'user_id': user_id, 'algorithm': 'HMAC-SHA256'}
+
+    value = int(time.time())
+    if issued_at is not None and (isinstance(issued_at, datetime) or isinstance(issued_at, int)):
+        value = issued_at
+        if isinstance(issued_at, datetime):
+            value = int(time.mktime(issued_at.timetuple()))
+    payload['issued_at'] = value
+
+    if oauth_token is not None:
+        payload['oauth_token'] = oauth_token
+    if expires is not None and (isinstance(expires, datetime) or isinstance(expires, int)):
+        value = expires
+        if isinstance(expires, datetime):
+            value = int(time.mktime(expires.timetuple()))
+        payload['expires'] = value
+    if app_data is not None and isinstance(app_data, dict):
+        payload['app_data'] = app_data
+    if page is not None and isinstance(page, dict):
+        payload['page'] = page
 
     return __create_signed_request_parameter(app_secret, json.dumps(payload))
 
