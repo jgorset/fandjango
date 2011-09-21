@@ -1,3 +1,4 @@
+import pytest
 import mock_django
 
 TEST_ACCESS_TOKEN = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
@@ -20,7 +21,58 @@ def test_parse_signed_request():
     assert data['expires'] == 0
     assert data['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
     assert data['issued_at'] == 1306179904
-    
+
+def test_create_signed_request():
+    from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
+    from fandjango.utils import create_signed_request
+    from fandjango.utils import parse_signed_request
+    from datetime import datetime, timedelta
+    import time
+
+    # test sending only user_id
+    signed_request_user_1 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=1, issued_at=1254459601)
+    assert signed_request_user_1 == 'Y0ZEAYY9tGklJimbbSGy2dgpYz9qZyVJp18zrI9xQY0=.eyJpc3N1ZWRfYXQiOiAxMjU0NDU5NjAxLCAidXNlcl9pZCI6IDEsICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYifQ=='
+
+    data_user_1 = parse_signed_request(signed_request_user_1, FACEBOOK_APPLICATION_SECRET_KEY)
+    assert sorted(data_user_1.keys()) == sorted([u'user_id', u'algorithm', u'issued_at'])
+    assert data_user_1['user_id'] == 1
+    assert data_user_1['algorithm'] == 'HMAC-SHA256'
+
+    # test not sending a user_id which will default to user_id 1
+    signed_request_user_2 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, issued_at=1254459601)
+    assert signed_request_user_1 == signed_request_user_2
+
+    # test sending each available named argument
+    today = datetime.now()
+    tomorrow = today + timedelta(hours=1)
+
+    signed_request_user_3 = create_signed_request(
+       app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+       user_id = 999,
+       issued_at = 1254459600,
+       expires = tomorrow,
+       oauth_token = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
+       app_data = {},
+       page = {
+           'id': '1',
+           'liked': True
+       }
+   )
+
+    data_user_3 = parse_signed_request(signed_request_user_3, FACEBOOK_APPLICATION_SECRET_KEY)
+    assert sorted(data_user_3.keys()) == sorted([u'user_id', u'algorithm', u'issued_at', u'expires', u'oauth_token', u'app_data', u'page'])
+    assert data_user_3['user_id'] == 999
+    assert data_user_3['algorithm'] == 'HMAC-SHA256'
+    assert data_user_3['issued_at'] == 1254459600
+    assert data_user_3['expires'] == int(time.mktime(tomorrow.timetuple()))
+    assert data_user_3['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+    assert data_user_3['app_data'] == {}
+    assert data_user_3['page'] == {
+       'id': '1',
+       'liked': True
+    }
+
+
 def test_get_facebook_profile():
     from fandjango.utils import get_facebook_profile
 
