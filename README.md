@@ -141,7 +141,7 @@ Fandjango looks to your settings file for its configuration.
 
 * `FACEBOOK_APPLICATION_ID` - Your Facebook application's ID.
 * `FACEBOOK_APPLICATION_SECRET_KEY` - Your Facebook application's secret key.
-* `FACEBOOK_APPLICATION_URL` - Your application's URL on Facebook (ex. http://apps.facebook.com/my_application).
+* `FACEBOOK_APPLICATION_URL` - Your application's URL on Facebook (e.g. `http://apps.facebook.com/my_application`).
 
 #### Optional configuration
 
