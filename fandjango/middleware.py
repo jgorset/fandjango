@@ -61,8 +61,10 @@ class FacebookMiddleware():
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
+                        # we also need to remove the expired cookie, and get a new one, so force the cookie to be deleted
                         return redirect_to_facebook_authorization(
-                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
+                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path(),
+                            delete_cookie = True
                         )
 
                 # Initialize a User object and its corresponding OAuth token
