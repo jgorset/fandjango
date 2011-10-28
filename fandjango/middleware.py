@@ -78,6 +78,12 @@ class FacebookMiddleware():
                     )
 
                     profile = get_facebook_profile(oauth_token.token)
+                    if not profile.get('id'):
+                        # Don't have permission anymore, 
+                        # Maybe, removed the "App" from their facebook page
+                        # and tried to access the "App" agoin
+                        request.facebook = False
+                        return
 
                     user = User.objects.create(
                         facebook_id = profile.get('id'),
