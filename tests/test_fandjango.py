@@ -110,6 +110,7 @@ def test_fandjango_registers_user():
     user = User.objects.get(id=1)
 
     assert user.first_name == 'Bob'
+    assert user.middle_name == 'Amcjigiadbid'
     assert user.last_name == 'Alisonberg'
     assert user.full_name == 'Bob Alisonberg'
     assert user.gender == 'male'
