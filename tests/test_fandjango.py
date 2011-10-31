@@ -112,7 +112,7 @@ def test_fandjango_registers_user():
     assert user.first_name == 'Bob'
     assert user.middle_name == 'Amcjigiadbid'
     assert user.last_name == 'Alisonberg'
-    assert user.full_name == 'Bob Alisonberg'
+    assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
     assert user.gender == 'male'
     assert user.profile_url == 'http://www.facebook.com/profile.php?id=100003097914294'
 
