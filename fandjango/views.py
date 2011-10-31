@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from utils import redirect_to_facebook_authorization, parse_signed_request
 from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
 from models import User
+import logging
 
 def authorize_application(request):
     """
@@ -19,6 +20,13 @@ def deauthorize_application(request):
     "deauthorization callback" URL. This view picks up on requests of this sort and marks the corresponding
     users as unauthorized.
     """
+    
+    # not sure why, but I didn't get any data in the post request 
+    if not request.POST.get('signed_request',None):
+        logging.error("Facebook deauthorization callback didn't contain a signed_request ?")
+        logging.error(request.POST)
+        return HttpResponse()
+
     data = parse_signed_request(request.POST['signed_request'], FACEBOOK_APPLICATION_SECRET_KEY)
     
     user = User.objects.get(facebook_id=data['user_id'])
