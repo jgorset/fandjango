@@ -28,49 +28,54 @@ def test_create_signed_request():
     from datetime import datetime, timedelta
     import time
 
-    # test sending only user_id
-    signed_request_user_1 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, user_id=1, issued_at=1254459601)
-    assert signed_request_user_1 == 'Y0ZEAYY9tGklJimbbSGy2dgpYz9qZyVJp18zrI9xQY0=.eyJpc3N1ZWRfYXQiOiAxMjU0NDU5NjAxLCAidXNlcl9pZCI6IDEsICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYifQ=='
+    signed_request = create_signed_request(
+        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+        user_id = 1,
+        issued_at = 1254459601
+    )
 
-    data_user_1 = parse_signed_request(signed_request_user_1, FACEBOOK_APPLICATION_SECRET_KEY)
-    assert sorted(data_user_1.keys()) == sorted([u'user_id', u'algorithm', u'issued_at'])
-    assert data_user_1['user_id'] == 1
-    assert data_user_1['algorithm'] == 'HMAC-SHA256'
+    assert signed_request == 'Y0ZEAYY9tGklJimbbSGy2dgpYz9qZyVJp18zrI9xQY0=.eyJpc3N1ZWRfYXQiOiAx' \
+                             'MjU0NDU5NjAxLCAidXNlcl9pZCI6IDEsICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYifQ=='
 
-    # test not sending a user_id which will default to user_id 1
-    signed_request_user_2 = create_signed_request(FACEBOOK_APPLICATION_SECRET_KEY, issued_at=1254459601)
-    assert signed_request_user_1 == signed_request_user_2
+    parsed_signed_request = parse_signed_request(
+        signed_request = signed_request,
+        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
+    )
 
-    # test sending each available named argument
+    assert 'issued_at' in parsed_signed_request
+    assert parsed_signed_request['user_id'] == 1
+    assert parsed_signed_request['algorithm'] == 'HMAC-SHA256'
+
     today = datetime.now()
     tomorrow = today + timedelta(hours=1)
 
-    signed_request_user_3 = create_signed_request(
-       app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
-       user_id = 999,
-       issued_at = 1254459600,
-       expires = tomorrow,
-       oauth_token = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
-       app_data = {},
-       page = {
-           'id': '1',
-           'liked': True
-       }
-   )
+    signed_request = create_signed_request(
+        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+        user_id = 999,
+        issued_at = today,
+        expires = tomorrow,
+        oauth_token = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
+        app_data = {
+            'foo': 'bar'
+        },
+        page = {
+            'id': '1',
+            'liked': True
+        }
+    )
 
-    data_user_3 = parse_signed_request(signed_request_user_3, FACEBOOK_APPLICATION_SECRET_KEY)
-    assert sorted(data_user_3.keys()) == sorted([u'user_id', u'algorithm', u'issued_at', u'expires', u'oauth_token', u'app_data', u'page'])
-    assert data_user_3['user_id'] == 999
-    assert data_user_3['algorithm'] == 'HMAC-SHA256'
-    assert data_user_3['issued_at'] == 1254459600
-    assert data_user_3['expires'] == int(time.mktime(tomorrow.timetuple()))
-    assert data_user_3['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert data_user_3['app_data'] == {}
-    assert data_user_3['page'] == {
-       'id': '1',
-       'liked': True
-    }
+    parsed_signed_request = parse_signed_request(
+        signed_request = signed_request,
+        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
+    )
 
+    assert parsed_signed_request['user_id'] == 999
+    assert parsed_signed_request['algorithm'] == 'HMAC-SHA256'
+    assert parsed_signed_request['issued_at'] == int(time.mktime(today.timetuple()))
+    assert parsed_signed_request['expires'] == int(time.mktime(tomorrow.timetuple()))
+    assert parsed_signed_request['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
+    assert parsed_signed_request['app_data'] == { 'foo': 'bar' }
+    assert parsed_signed_request['page'] == { 'id': '1', 'liked': True }
 
 def test_get_facebook_profile():
     from fandjango.utils import get_facebook_profile
