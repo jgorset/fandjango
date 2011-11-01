@@ -1,7 +1,15 @@
+from warnings import warn
+
 from django.conf import settings
 
 FACEBOOK_APPLICATION_ID = getattr(settings, 'FACEBOOK_APPLICATION_ID')
 FACEBOOK_APPLICATION_SECRET_KEY = getattr(settings, 'FACEBOOK_APPLICATION_SECRET_KEY')
-FACEBOOK_APPLICATION_URL = getattr(settings, 'FACEBOOK_APPLICATION_URL')
+
+try:
+    FACEBOOK_APPLICATION_CANVAS_URL = getattr(settings, 'FACEBOOK_APPLICATION_CANVAS_URL')
+except AttributeError:
+    FACEBOOK_APPLICATION_CANVAS_URL = getattr(settings, 'FACEBOOK_APPLICATION_URL')
+    warn('FACEBOOK_APPLICATION_URL is deprecated. Please use FACEBOOK_APPLICATION_CANVAS_URL instead.', DeprecationWarning)
+
 DISABLED_PATHS = getattr(settings, 'FANDJANGO_DISABLED_PATHS', [])
 ENABLED_PATHS = getattr(settings, 'FANDJANGO_ENABLED_PATHS', [])

@@ -3,9 +3,10 @@ from functools import wraps
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.handlers.wsgi import WSGIRequest
-from django.conf import settings
 
 from utils import redirect_to_facebook_authorization
+
+from settings import FACEBOOK_APPLICATION_CANVAS_URL
 
 def facebook_authorization_required(redirect_uri=False):
     """
@@ -23,7 +24,7 @@ def facebook_authorization_required(redirect_uri=False):
             
             if not request.facebook or not request.facebook.user:
                     return redirect_to_facebook_authorization(
-                        redirect_uri = redirect_uri or settings.FACEBOOK_APPLICATION_URL + request.get_full_path()
+                        redirect_uri = redirect_uri or FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                     )
                     
             return function(*args, **kwargs)

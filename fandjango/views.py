@@ -1,16 +1,16 @@
 from django.http import HttpResponse
 
 from utils import redirect_to_facebook_authorization, parse_signed_request
-from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY
+from settings import FACEBOOK_APPLICATION_CANVAS_URL, FACEBOOK_APPLICATION_SECRET_KEY
 from models import User
 
 def authorize_application(request):
     """
     Redirect to Facebook authorization, then redirect back to the value of the 'redirect_uri' query string
-    or default to FACEBOOK_APPLICATION_URL.
+    or default to FACEBOOK_APPLICATION_CANVAS_URL.
     """
     return redirect_to_facebook_authorization(
-        redirect_uri = request.GET['redirect_uri'] if request.GET.has_key('redirect_uri') else FACEBOOK_APPLICATION_URL
+        redirect_uri = request.GET['redirect_uri'] if request.GET.has_key('redirect_uri') else FACEBOOK_APPLICATION_CANVAS_URL
     )
 
 def deauthorize_application(request):

@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_disabled_path, is_enabled_path
 from models import Facebook, FacebookPage, User, OAuthToken
-from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
+from settings import FACEBOOK_APPLICATION_CANVAS_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
@@ -62,7 +62,7 @@ class FacebookMiddleware():
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
                         return redirect_to_facebook_authorization(
-                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
+                            redirect_uri = FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                         )
 
                 # Initialize a User object and its corresponding OAuth token
