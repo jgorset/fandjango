@@ -1,5 +1,5 @@
 import pytest
-import mock_django
+
 
 TEST_ACCESS_TOKEN = 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
 
@@ -10,10 +10,16 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
                       'Y2FsZSI6ImVuX1VTIiwiYWdlIjp7Im1pbiI6MjF9fSwidXNlcl9pZCI6IjEwMDAwMzA5NzkxNDI5NCJ9'
 
 def test_parse_signed_request():
-    from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
+    """
+    Test parsing signed requests.
+    """
+    from django.conf import settings
     from fandjango.utils import parse_signed_request
 
-    data = parse_signed_request(TEST_SIGNED_REQUEST, FACEBOOK_APPLICATION_SECRET_KEY)
+    data = parse_signed_request(
+        signed_request = TEST_SIGNED_REQUEST,
+        app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
+    )
 
     assert data['user_id'] == '100003097914294'
     assert data['algorithm'] == 'HMAC-SHA256'
@@ -22,14 +28,17 @@ def test_parse_signed_request():
     assert data['issued_at'] == 1320069627
 
 def test_create_signed_request():
-    from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
+    """
+    Test creating faux signed requests.
+    """
+    from django.conf import settings
     from fandjango.utils import create_signed_request
     from fandjango.utils import parse_signed_request
     from datetime import datetime, timedelta
     import time
 
     signed_request = create_signed_request(
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+        app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY,
         user_id = 1,
         issued_at = 1254459601
     )
@@ -39,7 +48,7 @@ def test_create_signed_request():
 
     parsed_signed_request = parse_signed_request(
         signed_request = signed_request,
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
+        app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
     )
 
     assert 'issued_at' in parsed_signed_request
@@ -50,7 +59,7 @@ def test_create_signed_request():
     tomorrow = today + timedelta(hours=1)
 
     signed_request = create_signed_request(
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+        app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY,
         user_id = 999,
         issued_at = today,
         expires = tomorrow,
@@ -66,7 +75,7 @@ def test_create_signed_request():
 
     parsed_signed_request = parse_signed_request(
         signed_request = signed_request,
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
+        app_secret = settings.FACEBOOK_APPLICATION_SECRET_KEY
     )
 
     assert parsed_signed_request['user_id'] == 999
@@ -78,6 +87,9 @@ def test_create_signed_request():
     assert parsed_signed_request['page'] == { 'id': '1', 'liked': True }
 
 def test_get_facebook_profile():
+    """
+    Test querying Facebook's Graph API for a profile.
+    """
     from fandjango.utils import get_facebook_profile
 
     data = get_facebook_profile(TEST_ACCESS_TOKEN)
@@ -90,22 +102,33 @@ def test_get_facebook_profile():
     assert data['gender'] == 'male'
     assert data['link'] == 'http://www.facebook.com/profile.php?id=100003097914294'
 
-def test_facebook_post_method_override():    
+def test_facebook_post_method_override():
+    """
+    Verify that the request method is overridden
+    from POST to GET if it contains a signed request.
+    """
     from django.test.client import RequestFactory
+    from django.core.urlresolvers import reverse
     from fandjango.middleware import FacebookMiddleware
 
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
+    # We can't test that the request method is overriden with django.test.client.Client,
+    # so we'll need to generate the request and process it manually (not cool, Django).
+    request = RequestFactory().post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
     FacebookMiddleware().process_request(request)
 
     assert request.method == 'GET'
 
 def test_fandjango_registers_user():
-    from django.test.client import RequestFactory
+    """
+    Verify that a user is registered.
+    """
+    from django.test.client import Client
+    from django.core.urlresolvers import reverse
     from fandjango.middleware import FacebookMiddleware
     from fandjango.models import User
 
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
-    FacebookMiddleware().process_request(request)
+    client = Client()
+    client.post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
 
     user = User.objects.get(id=1)
 
@@ -117,16 +140,20 @@ def test_fandjango_registers_user():
     assert user.profile_url == 'http://www.facebook.com/profile.php?id=100003097914294'
 
 def test_fandjango_registers_oauth_token():
-    from django.test.client import RequestFactory
+    """
+    Verify that an OAuth token is registered.
+    """
+    from django.test.client import Client
+    from django.core.urlresolvers import reverse
     from fandjango.middleware import FacebookMiddleware
     from fandjango.models import OAuthToken
     from datetime import datetime
 
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
-    FacebookMiddleware().process_request(request)
+    client = Client()
+    client.post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
 
     token = OAuthToken.objects.get(id=1)
 
-    assert token.token == 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
-    assert token.issued_at == datetime(2011, 10, 31, 9, 0, 27)
+    assert token.token == TEST_ACCESS_TOKEN
+    assert token.issued_at == datetime(2011, 10, 31, 15, 0, 27)
     assert token.expires_at == None
