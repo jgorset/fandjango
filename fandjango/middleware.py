@@ -43,36 +43,36 @@ class FacebookMiddleware():
 
             request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
 
-            facebook_data = parse_signed_request(
+            parsed_signed_request = parse_signed_request(
                 signed_request = request.facebook.signed_request,
                 app_secret = FACEBOOK_APPLICATION_SECRET_KEY
             )
 
             # The application is accessed from a tab on a Facebook page...
-            if 'page' in facebook_data:
+            if 'page' in parsed_signed_request:
                 request.facebook.page = FacebookPage(
-                    id = facebook_data['page']['id'],
-                    is_admin = facebook_data['page']['admin'],
-                    is_liked = facebook_data['page']['liked']
+                    id = parsed_signed_request['page']['id'],
+                    is_admin = parsed_signed_request['page']['admin'],
+                    is_liked = parsed_signed_request['page']['liked']
                 )
 
             # User has authorized the application...
-            if 'user_id' in facebook_data:
+            if 'user_id' in parsed_signed_request:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
-                if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
+                if parsed_signed_request.get('expires') and datetime.fromtimestamp(parsed_signed_request['expires']) < datetime.now():
                         return redirect_to_facebook_authorization(
                             redirect_uri = FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                         )
 
                 # Initialize a User object and its corresponding OAuth token
                 try:
-                    user = User.objects.get(facebook_id=facebook_data['user_id'])
+                    user = User.objects.get(facebook_id=parsed_signed_request['user_id'])
                 except User.DoesNotExist:
                     oauth_token = OAuthToken.objects.create(
-                        token = facebook_data['oauth_token'],
-                        issued_at = datetime.fromtimestamp(facebook_data['issued_at']),
-                        expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
+                        token = parsed_signed_request['oauth_token'],
+                        issued_at = datetime.fromtimestamp(parsed_signed_request['issued_at']),
+                        expires_at = datetime.fromtimestamp(parsed_signed_request.get('expires')) if parsed_signed_request.get('expires') else None
                     )
 
                     profile = get_facebook_profile(oauth_token.token)
@@ -102,10 +102,10 @@ class FacebookMiddleware():
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
-                    if facebook_data.has_key('oauth_token'):
-                        user.oauth_token.token = facebook_data['oauth_token']
-                        user.oauth_token.issued_at = datetime.fromtimestamp(facebook_data['issued_at'])
-                        user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
+                    if parsed_signed_request.has_key('oauth_token'):
+                        user.oauth_token.token = parsed_signed_request['oauth_token']
+                        user.oauth_token.issued_at = datetime.fromtimestamp(parsed_signed_request['issued_at'])
+                        user.oauth_token.expires_at = datetime.fromtimestamp(parsed_signed_request['expires']) if parsed_signed_request.get('expires') else None
                         user.oauth_token.save()
                     user.save()
 
