@@ -6,7 +6,8 @@ from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
-from fandjango.utils import redirect_to_facebook_authorization, is_disabled_path, is_enabled_path
+from fandjango.utils import is_disabled_path, is_enabled_path
+from fandjango.views import authorize_application
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
 
@@ -53,7 +54,7 @@ class FacebookMiddleware():
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if request.facebook.signed_request.oauth_token.has_expired:
-                    return redirect_to_facebook_authorization(
+                    return authorize_application(
                         redirect_uri = FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                     )
 

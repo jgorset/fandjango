@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <script type="text/javascript">
+            window.parent.location = "{{ url|safe }}";
+        </script>
+    </head>
+    
+    <body>
+        <noscript>
+            You must <a href="{{ url|safe }}">authorize the application</a> in order to continue.
+        </noscript>
+    </body>
+
+</html>
