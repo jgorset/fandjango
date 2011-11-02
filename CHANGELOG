@@ -1,5 +1,9 @@
 CHANGELOG
 
+v3.7.4
+- Added support for reverse-engineering signed requests.
+- Added User#middle_name, User#timezone and User#quotes.
+
 v3.7.3
 - Fixed a bug that produced HTTP 500, causing 'User#picture' to fail.
 - 'request.POST' is now reset to an empty QueryDict instance after
