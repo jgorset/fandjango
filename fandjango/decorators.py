@@ -17,9 +17,7 @@ def facebook_authorization_required(redirect_uri=False):
     """
     def decorator(function):
         @wraps(function)
-        def wrapper(*args, **kwargs):
-
-            request = [arg for arg in args if arg.__class__ is WSGIRequest][0]
+        def wrapper(request, *args, **kwargs):
 
             if not request.facebook or not request.facebook.user:
                     return authorize_application(
