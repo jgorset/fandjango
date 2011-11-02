@@ -25,6 +25,6 @@ def facebook_authorization_required(redirect_uri=False):
                         redirect_uri = redirect_uri or FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                     )
 
-            return function(*args, **kwargs)
+            return function(request, *args, **kwargs)
         return wrapper
     return decorator
