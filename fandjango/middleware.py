@@ -56,6 +56,11 @@ class FacebookMiddleware():
                     is_liked = facebook_data['page']['liked']
                 )
 
+            request.facebook.app_data = None
+            if 'app_data' in facebook_data:
+                request.facebook.app_data = facebook_data['app_data']
+
+
             # User has authorized the application...
             if 'user_id' in facebook_data:
 
