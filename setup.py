@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 import fandjango
 
@@ -14,5 +14,6 @@ setup(
     packages = ['fandjango', 'fandjango.migrations', 'fandjango.templatetags'],
     package_data = {
         'fandjango': ['templates/*']
-    }
+    },
+    install_requires = ['facepy>=0.4.0']
 )

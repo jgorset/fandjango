@@ -3,8 +3,6 @@ from datetime import datetime
 
 from django.db import models
 
-from utils import get_facebook_profile
-
 class Facebook:
     """
     Facebook instances hold information on the current user and
@@ -18,23 +16,6 @@ class Facebook:
     """
     
     user, page, signed_request = [None] * 3
-
-class FacebookPage:
-    """
-    FacebookPage instances represent Facebook Pages.
-    
-    Properties:
-    id -- An integer describing the id of the page.
-    is_admin -- A boolean describing whether or not the current user is an administrator of the page.
-    is_liked -- A boolean describing whether or not the current user likes the page.
-    url -- A string describing the URL to the page.
-    """
-    
-    def __init__(self, id, is_admin, is_liked):
-        self.id = id
-        self.is_admin = is_admin
-        self.is_liked = is_liked
-        self.url = 'http://facebook.com/pages/-/%s' % self.id
 
 class User(models.Model):
     """
