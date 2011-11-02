@@ -95,7 +95,7 @@ class FacebookMiddleware():
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
-                    
+
                     if request.facebook.signed_request.oauth_token:
                         user.oauth_token.token = request.facebook.signed_request.oauth_token.token
                         user.oauth_token.issued_at = request.facebook.signed_request.oauth_token.issued_at
