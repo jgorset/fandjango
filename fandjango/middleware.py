@@ -56,13 +56,20 @@ class FacebookMiddleware():
                     is_liked = facebook_data['page']['liked']
                 )
 
+            request.facebook.app_data = None
+            if 'app_data' in facebook_data:
+                request.facebook.app_data = facebook_data['app_data']
+
+
             # User has authorized the application...
             if 'user_id' in facebook_data:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
+                        # we also need to remove the expired cookie, and get a new one, so force the cookie to be deleted
                         return redirect_to_facebook_authorization(
-                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
+                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path(),
+                            delete_cookie = True
                         )
 
                 # Initialize a User object and its corresponding OAuth token
@@ -76,6 +83,12 @@ class FacebookMiddleware():
                     )
 
                     profile = get_facebook_profile(oauth_token.token)
+                    if not profile.get('id'):
+                        # Don't have permission anymore, 
+                        # Maybe, removed the "App" from their facebook page
+                        # and tried to access the "App" agoin
+                        request.facebook = False
+                        return
 
                     user = User.objects.create(
                         facebook_id = profile.get('id'),

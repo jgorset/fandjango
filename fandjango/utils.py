@@ -18,7 +18,7 @@ from django.conf import settings
 
 from settings import DISABLED_PATHS, ENABLED_PATHS
 
-def redirect_to_facebook_authorization(redirect_uri):
+def redirect_to_facebook_authorization(redirect_uri, delete_cookie=False):
     """
     Redirect the user to authorize the application.
     
@@ -54,7 +54,11 @@ def redirect_to_facebook_authorization(redirect_uri):
         
         </html>
     """ % (urlencoded_request_variables, urlencoded_request_variables)
-    
+
+    response =  HttpResponse(html)
+    # if the cookie has expired, want to remove it, so we get a new one
+    if delete_cookie:
+        response.delete_cookie('signed_request')
     return HttpResponse(html)
     
 def parse_signed_request(signed_request, app_secret):
@@ -194,3 +198,4 @@ def is_enabled_path(path):
         if match:
             return True
     return False
+

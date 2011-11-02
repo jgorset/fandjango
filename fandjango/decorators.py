@@ -7,7 +7,7 @@ from django.conf import settings
 
 from utils import redirect_to_facebook_authorization
 
-def facebook_authorization_required(redirect_uri=False):
+def facebook_authorization_required(redirect_uri=False, app_data=''):
     """
     Redirect Facebook canvas views to authorization if required.
     
@@ -21,11 +21,20 @@ def facebook_authorization_required(redirect_uri=False):
             
             request = [arg for arg in args if arg.__class__ is WSGIRequest][0]
             
+            page_tab = None
             if not request.facebook or not request.facebook.user:
-                    return redirect_to_facebook_authorization(
-                        redirect_uri = redirect_uri or settings.FACEBOOK_APPLICATION_URL + request.get_full_path()
-                    )
+                page_tab = request.facebook.page.url + "?sk=app_%s&app_data=%s" % (settings.FACEBOOK_APPLICATION_ID, request.get_full_path())
+
+                return redirect_to_facebook_authorization(
+                        redirect_uri = redirect_uri or page_tab or settings.FACEBOOK_APPLICATION_URL + request.get_full_path()
                     
             return function(*args, **kwargs)
         return wrapper
     return decorator
+
+
+
+
+                                                                                                                                            )   
+
+
