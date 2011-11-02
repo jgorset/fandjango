@@ -34,7 +34,7 @@ class FacebookMiddleware():
             # If the request method is POST and its body only contains the signed request,
             # chances are it's a request from the Facebook platform and we'll override
             # the request method to HTTP GET to rectify their misinterpretation
-            # of the HTTP protocol standard.
+            # of the HTTP standard.
             #
             # References:
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
