@@ -15,5 +15,5 @@ setup(
     package_data = {
         'fandjango': ['templates/*']
     },
-    install_requires = ['facepy>=0.4.1']
+    install_requires = ['facepy>=0.4.2']
 )
