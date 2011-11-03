@@ -4,6 +4,7 @@ from datetime import datetime
 from django.db import models
 
 from utils import get_facebook_profile
+from django.utils import simplejson
 
 class Facebook:
     """
@@ -62,7 +63,19 @@ class User(models.Model):
     created_at - A datetime object describing when the user was registered.
     oauth_token -- An OAuth Token object.
     timezone - Integer timezone representation, i.e. "GMT+2" would be just 2
+    languages - Comma-separated list of languages
+    activities - Comma-separated list of activities
+    interests - Comma-separated list of interests
+    inspirational_people - Comma-separated list of inspirational people
+    sports - Comma-separated list of favorite  sports
+    music - Comma-separated list of music
+    movies - Comma-separated list of movies
+    books - Comma-separated list of books
+    television - Comma-separated list of television
+    games - Comma-separated list of games
+    geolocation - char field for more precise location, eg latitude/longitude
     quotes - Multiline string with favorite quotes
+    likes - Multiline string with likes and cetegories
     """
     
     facebook_id = models.BigIntegerField()
@@ -87,7 +100,19 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now_add=True)
     timezone = models.IntegerField(blank=True, null=True)
+    languages = models.CharField(max_length=255, blank=True, null=True)
+    activities = models.CharField(max_length=255, blank=True, null=True)
+    interests = models.CharField(max_length=255, blank=True, null=True)
+    inspirational_people = models.CharField(max_length=255, blank=True, null=True)
+    sports = models.CharField(max_length=255, blank=True, null=True)
+    music = models.CharField(max_length=255, blank=True, null=True)
+    movies = models.CharField(max_length=255, blank=True, null=True)
+    books = models.CharField(max_length=255, blank=True, null=True)
+    television = models.CharField(max_length=255, blank=True, null=True)
+    games = models.CharField(max_length=255, blank=True, null=True)
+    geolocation = models.CharField(max_length=255, blank=True, null=True)
     quotes = models.TextField(blank=True, null=True)
+    likes = models.TextField(blank=True, null=True)
     
     @property
     def full_name(self):
@@ -102,6 +127,43 @@ class User(models.Model):
         connection.request('GET', '/%s/picture' % self.facebook_id)
         response = connection.getresponse()
         return response.getheader('Location')
+        
+    @property
+    def picture_large(self):
+        " returns 200px wide, variable height image"
+        connection = HTTPConnection('graph.facebook.com')
+        connection.request('GET', '/%s/picture?type=large' % self.facebook_id)
+        response = connection.getresponse()
+        return response.getheader('Location')
+    
+    @property
+    def picture_normal(self):
+        "returns 100px wide, variable height image"
+        connection = HTTPConnection('graph.facebook.com')
+        connection.request('GET', '/%s/picture?type=normal' % self.facebook_id)
+        response = connection.getresponse()
+        return response.getheader('Location')
+    
+    @property
+    def picture_small(self):
+        "returns 50px wide, variable height image"
+        connection = HTTPConnection('graph.facebook.com')
+        connection.request('GET', '/%s/picture?type=small' % self.facebook_id)
+        response = connection.getresponse()
+        return response.getheader('Location')
+    
+    @property
+    def picture_square(self):
+        "returns 50x50px image"
+        connection = HTTPConnection('graph.facebook.com')
+        connection.request('GET', '/%s/picture?type=square' % self.facebook_id)
+        response = connection.getresponse()
+        return response.getheader('Location')
+    
+    @property
+    def age(self):
+        age = datetime.now().year - self.birthday.year if self.birthday else None
+        return age
         
     def synchronize(self):
         """Synchronize the user with Facebook's Graph API."""
@@ -129,7 +191,19 @@ class User(models.Model):
         self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
         self.timezone = profile.get('timezone', None)
         self.quotes = profile.get('quotes', None)
-        
+        self.inspirational_people = ', '.join([element['name'] for element in profile['inspirational_people']]) if profile.has_key('inspirational_people') else None
+        self.languages = ', '.join([element['name'] for element in profile['languages']]) if profile.has_key('languages') else None
+        self.sports = ', '.join([element['name'] for element in profile['sports']]) if profile.has_key('sports') else None
+        # getting extra objects using graph api
+        self.activities = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/activities')])
+        self.interests = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/interests')])
+        self.music = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/music')])
+        self.books = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/books')])
+        self.movies = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/movies')])
+        self.television = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/television')])
+        self.games = ', '.join([element['name'] for element in self.graph.get(self.facebook_id + '/games')])
+        self.likes = "\n".join(["%s (%s)" % (element['name'], element['category']) for element in self.graph.get(str(self.facebook_id) + '/likes')])
+        self.geolocation = ','.join([str(element[1]) for element in self.graph.get(str(profile['location']['id']))['location'].items() if element[0] in ['latitude','longitude']]) if profile.has_key('location') else None
         self.save()
     
     @property
