@@ -3,6 +3,8 @@ from datetime import datetime
 
 from django.db import models
 
+from facepy import GraphAPI
+
 class Facebook:
     """
     Facebook instances hold information on the current user and
