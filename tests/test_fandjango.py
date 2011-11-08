@@ -44,7 +44,7 @@ def test_fandjango_registers_user():
     assert user.last_name == 'Alisonberg'
     assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
     assert user.gender == 'male'
-    assert user.profile_url == 'http://www.facebook.com/profile.php?id=100003097914294'
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
 
 def test_fandjango_registers_oauth_token():
     """

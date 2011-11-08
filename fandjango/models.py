@@ -3,6 +3,8 @@ from datetime import datetime
 
 from django.db import models
 
+from fandjango.utils import cached_property as cached
+
 from facepy import GraphAPI
 
 class Facebook:
@@ -28,24 +30,11 @@ class User(models.Model):
     first_name -- A string describing the user's first name.
     middle_name -- A string describing the user's middle name.
     last_name -- A string describing the user's last name.
-    profile_url -- A string describing the URL to the user's Facebook profile.
-    gender -- A string describing the user's gender.
-    hometown - A string describing the user's home town (requires 'user_hometown' extended permission).
-    location - A string describing the user's current location (requires 'user_location' extended permission).
-    bio - A string describing the user's "about me" field on Facebook (requires 'user_about_me' extended permission).
-    relationship_status - A string describing the user's relationship status (requires 'user_relationships' extended permission).
-    political_views - A string describing the user's political views (requires 'user_religion_politics' extended permission).
-    email - A string describing the user's email address (requires 'email' extended permission).
-    website - A string describing the user's website (requires 'user_website' extended permission).
-    locale - A string describing the user's locale.
     verified - A boolean describing whether or not the user is verified by Facebook.
     birthday - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
     authorized - A boolean describing whether or not the user has currently authorized your application.
     oauth_token - An OAuth Token object.
     created_at - A datetime object describing when the user was registered.
-    oauth_token -- An OAuth Token object.
-    timezone - Integer timezone representation, i.e. "GMT+2" would be just 2
-    quotes - Multiline string with favorite quotes
     """
 
     facebook_id = models.BigIntegerField()
@@ -53,67 +42,138 @@ class User(models.Model):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
-    profile_url = models.CharField(max_length=255, blank=True, null=True)
-    gender = models.CharField(max_length=255, blank=True, null=True)
-    hometown = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
-    relationship_status = models.CharField(max_length=255, blank=True, null=True)
-    political_views = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    website = models.CharField(max_length=255, blank=True, null=True)
-    locale = models.CharField(max_length=255, blank=True, null=True)
     verified = models.NullBooleanField()
     birthday = models.DateField(blank=True, null=True)
     authorized = models.BooleanField(default=True)
     oauth_token = models.OneToOneField('OAuthToken')
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now_add=True)
-    timezone = models.IntegerField(blank=True, null=True)
-    quotes = models.TextField(blank=True, null=True)
 
     @property
     def full_name(self):
+        """Return the user's first name."""
         if self.first_name and self.middle_name and self.last_name:
             return "%s %s %s" % (self.first_name, self.middle_name, self.last_name)
         if self.first_name and self.last_name:
             return "%s %s" % (self.first_name, self.last_name)
 
     @property
+    @cached(seconds=60*60*24)
+    def url(self):
+        """
+        Return a string describing the URL to the user's Facebook profile (see `Facebook Graph API Reference`_).
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('link', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def gender(self):
+        """
+        Return a string describing the user's gender (see `Facebook Graph API Reference`_).
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('gender', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def hometown(self):
+        """
+        Return a dictionary describing the user's hometown (see `Facebook Graph API Reference`_).
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('hometown', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def location(self):
+        """
+        Return a dictionary describing the user's location (see `Facebook Graph API Reference`_).
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('location', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def bio(self):
+        """
+        Return a string describing the user's bio (see `Facebook Graph API Reference`_).
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('bio', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def relationship_status(self):
+        """
+        Return a dictionary describing the user's relationship status (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('relationship_status', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def political_views(self):
+        """
+        Return a string describing the user's political views (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('political', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def email(self):
+        """
+        Return a string describing the user's email (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('email', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def website(self):
+        """
+        Return a string describing the user's website (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('website', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def locale(self):
+        """
+        Return a string describing the user's locale (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('locale', None)
+
+    @property
+    @cached(seconds=60*60*24)
+    def timezone(self):
+        """
+        Return an integer describing the user's timezone (see `Facebook Graph API Reference`_)
+
+        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        """
+        return self.graph.get('me').get('timezone', None)
+
+    @property
+    @cached(seconds=60*60*24)
     def picture(self):
-        connection = HTTPConnection('graph.facebook.com')
-        connection.request('GET', '/%s/picture' % self.facebook_id)
-        response = connection.getresponse()
-        return response.getheader('Location')
-
-    def synchronize(self):
-        """Synchronize the user with Facebook's Graph API."""
-        if self.oauth_token.expired:
-            raise ValueError('Signed request expired.')
-
-        profile = get_facebook_profile(self.oauth_token.token)
-
-        self.facebook_id = profile.get('id')
-        self.facebook_username = profile.get('username')
-        self.first_name = profile.get('first_name')
-        self.middle_name = profile.get('middle_name', None)
-        self.last_name = profile.get('last_name')
-        self.profile_url = profile.get('link')
-        self.gender = profile.get('gender')
-        self.hometown = profile['hometown']['name'] if profile.has_key('hometown') else None
-        self.location = profile['location']['name'] if profile.has_key('location') else None
-        self.bio = profile.get('bio')
-        self.relationship_status = profile.get('relationship_status')
-        self.political_views = profile.get('political')
-        self.email = profile.get('email')
-        self.website = profile.get('website')
-        self.locale = profile.get('locale')
-        self.verified = profile.get('verified')
-        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
-        self.timezone = profile.get('timezone', None)
-        self.quotes = profile.get('quotes', None)
-
-        self.save()
+        """
+        Return a string describing the URL to the user's profile picture.
+        """
+        return requests.get('http://graph.facebook.com/%s/picture' % self.facebook_id).url
 
     @property
     def graph(self):
