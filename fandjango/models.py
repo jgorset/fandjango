@@ -15,11 +15,11 @@ class Facebook:
 
     Properties:
     user -- A User instance.
-    page -- A FacebookPage instance.
     signed_request -- A string describing the raw signed request.
     """
 
-    user, page, signed_request = [None] * 3
+    user = None
+    signed_request = None
 
 class User(models.Model):
     """
