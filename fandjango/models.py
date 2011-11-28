@@ -187,6 +187,17 @@ class User(models.Model):
         """Return a GraphAPI instance with the user's access token."""
         return GraphAPI(self.oauth_token.token)
 
+    def synchronize(self):
+        """Synchronize model fields."""
+        profile = self.graph.get('me')
+
+        self.facebook_username = profile.get('username')
+        self.first_name = profile.get('first_name')
+        self.middle_name = profile.get('middle_name')
+        self.last_name = profile.get('last_name')
+        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
+        self.save()
+
     def __unicode__(self):
         if self.full_name:
             return u'%s' % self.full_name
