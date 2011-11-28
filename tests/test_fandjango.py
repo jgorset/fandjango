@@ -48,7 +48,7 @@ def test_fandjango_redirects_to_authorization():
     client = Client()
     response = client.get(reverse('home'))
 
-    assert response.status_code == 100
+    assert response.status_code == 303
 
 def test_fandjango_registers_user():
     """

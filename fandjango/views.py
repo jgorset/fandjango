@@ -30,7 +30,7 @@ def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL)
         dictionary = {
             'url': 'https://graph.facebook.com/oauth/authorize?%s' % urlencode(query)
         },
-        status = 100
+        status = 303
     )
 
 def authorization_denied(request):
