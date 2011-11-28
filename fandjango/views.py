@@ -1,7 +1,7 @@
 from urllib import urlencode
 
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 
 from fandjango.settings import FACEBOOK_APPLICATION_ID
 from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL
@@ -24,11 +24,13 @@ def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL)
     if FACEBOOK_APPLICATION_INITIAL_PERMISSIONS:
         query['scope'] = ', '.join(FACEBOOK_APPLICATION_INITIAL_PERMISSIONS)
 
-    return render_to_response(
+    return render(
+        request = request,
         template_name = 'authorize_application.html',
         dictionary = {
             'url': 'https://graph.facebook.com/oauth/authorize?%s' % urlencode(query)
-        }
+        },
+        status = 100
     )
 
 def deauthorize_application(request):
