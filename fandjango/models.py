@@ -42,7 +42,6 @@ class User(models.Model):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
-    verified = models.NullBooleanField()
     birthday = models.DateField(blank=True, null=True)
     authorized = models.BooleanField(default=True)
     oauth_token = models.OneToOneField('OAuthToken')
@@ -174,6 +173,14 @@ class User(models.Model):
         Return a string describing the URL to the user's profile picture.
         """
         return requests.get('http://graph.facebook.com/%s/picture' % self.facebook_id).url
+
+    @property
+    @cached(seconds=60*60*24)
+    def verified(self):
+        """
+        Return a boolean describing whether the user is verified by Facebook.
+        """
+        return self.graph.get('me').get('verified', None)
 
     @property
     def graph(self):
