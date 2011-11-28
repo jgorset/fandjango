@@ -25,6 +25,31 @@ def test_facebook_post_method_override():
 
     assert request.method == 'GET'
 
+def test_authorization_denied():
+    """
+    Verify that users who refuse to authorize the application
+    receive HTTP 403 Forbidden.
+    """
+    from django.test.client import Client
+    from django.core.urlresolvers import reverse
+
+    client = Client()
+    response = client.get(reverse('home'), {'error': 'access_denied'})
+
+    assert response.status_code == 403
+
+def test_fandjango_redirects_to_authorization():
+    """
+    Verify that the user is redirected to application authorization.
+    """
+    from django.test.client import Client
+    from django.core.urlresolvers import reverse
+
+    client = Client()
+    response = client.get(reverse('home'))
+
+    assert response.status_code == 100
+
 def test_fandjango_registers_user():
     """
     Verify that a user is registered.
