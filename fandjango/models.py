@@ -37,7 +37,7 @@ class User(models.Model):
     created_at - A datetime object describing when the user was registered.
     """
 
-    facebook_id = models.BigIntegerField()
+    facebook_id = models.BigIntegerField(unique=True)
     facebook_username = models.CharField(max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     middle_name = models.CharField(max_length=255, blank=True, null=True)
