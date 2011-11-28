@@ -1,5 +1,17 @@
 import pytest
 
+from datetime import datetime, timedelta
+
+from django.test.client import Client
+from django.test.client import RequestFactory
+from django.core.urlresolvers import reverse
+from django.conf import settings
+
+from fandjango.middleware import FacebookMiddleware
+from fandjango.models import User
+from fandjango.models import OAuthToken
+
+from facepy import SignedRequest
 
 TEST_ACCESS_TOKEN = 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
 
@@ -9,14 +21,13 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
                       'REpiTk53d1FsWkJjWkE3ajhyRkxZc1VmZjhFeVVKUVpEWkQiLCJ1c2VyIjp7ImNvdW50cnkiOiJubyIsImxv' \
                       'Y2FsZSI6ImVuX1VTIiwiYWdlIjp7Im1pbiI6MjF9fSwidXNlcl9pZCI6IjEwMDAwMzA5NzkxNDI5NCJ9'
 
+client = Client()
+
 def test_facebook_post_method_override():
     """
     Verify that the request method is overridden
     from POST to GET if it contains a signed request.
     """
-    from django.test.client import RequestFactory
-    from django.core.urlresolvers import reverse
-    from fandjango.middleware import FacebookMiddleware
 
     # We can't test that the request method is overriden with django.test.client.Client,
     # so we'll need to generate the request and process it manually (not cool, Django).
@@ -27,61 +38,56 @@ def test_facebook_post_method_override():
 
 def test_authorization_denied():
     """
-    Verify that users who refuse to authorize the application
-    receive HTTP 403 Forbidden.
+    Verify that the user receives HTTP 403 Forbidden upon
+    refusing to authorize the application.
     """
-    from django.test.client import Client
-    from django.core.urlresolvers import reverse
-
-    client = Client()
     response = client.get(reverse('home'), {'error': 'access_denied'})
 
     assert response.status_code == 403
 
 def test_fandjango_renews_signed_request():
     """
-    Verify that the signed request is renewed if its access token
-    has expired.
+    Verify that the user is redirected to renew his/her
+    signed request if its access token has expired.
     """
-    from datetime import datetime, timedelta
-    from django.conf import settings
-    from django.test.client import Client
-    from django.core.urlresolvers import reverse
-    from facepy import SignedRequest
 
     # Create an expired signed request
     parsed_signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, settings.FACEBOOK_APPLICATION_SECRET_KEY)
     parsed_signed_request.oauth_token.expires_at = datetime.now() - timedelta(days=1)
     expired_signed_request = parsed_signed_request.generate(settings.FACEBOOK_APPLICATION_SECRET_KEY)
 
-    client = Client()
-    response = client.get(reverse('home'), {'signed_request': expired_signed_request})
+    response = client.get(
+        path = reverse('home'),
+        data = {
+            'signed_request': expired_signed_request
+        }
+    )
 
     assert response.status_code == 303
 
 def test_fandjango_redirects_to_authorization():
     """
-    Verify that the user is redirected to application authorization.
+    Verify that the user is redirected to authorize the application
+    upon querying a view decorated by ``facebook_authorization_required``
+    sans signed request.
     """
-    from django.test.client import Client
-    from django.core.urlresolvers import reverse
-
-    client = Client()
-    response = client.get(reverse('home'))
+    response = client.get(
+        path = reverse('home')
+    )
 
     assert response.status_code == 303
 
 def test_fandjango_registers_user():
     """
-    Verify that a user is registered.
+    Verify that a user is registered upon querying the application
+    with a signed request.
     """
-    from django.test.client import Client
-    from django.core.urlresolvers import reverse
-    from fandjango.middleware import FacebookMiddleware
-    from fandjango.models import User
-
-    client = Client()
-    client.post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
 
     user = User.objects.get(id=1)
 
@@ -94,16 +100,15 @@ def test_fandjango_registers_user():
 
 def test_fandjango_registers_oauth_token():
     """
-    Verify that an OAuth token is registered.
+    Verify that an OAuth token is registered upon querying the application
+    with a signed request.
     """
-    from django.test.client import Client
-    from django.core.urlresolvers import reverse
-    from fandjango.middleware import FacebookMiddleware
-    from fandjango.models import OAuthToken
-    from datetime import datetime
-
-    client = Client()
-    client.post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
 
     token = OAuthToken.objects.get(id=1)
 
