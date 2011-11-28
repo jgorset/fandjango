@@ -38,6 +38,27 @@ def test_authorization_denied():
 
     assert response.status_code == 403
 
+def test_fandjango_renews_signed_request():
+    """
+    Verify that the signed request is renewed if its access token
+    has expired.
+    """
+    from datetime import datetime, timedelta
+    from django.conf import settings
+    from django.test.client import Client
+    from django.core.urlresolvers import reverse
+    from facepy import SignedRequest
+
+    # Create an expired signed request
+    parsed_signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, settings.FACEBOOK_APPLICATION_SECRET_KEY)
+    parsed_signed_request.oauth_token.expires_at = datetime.now() - timedelta(days=1)
+    expired_signed_request = parsed_signed_request.generate(settings.FACEBOOK_APPLICATION_SECRET_KEY)
+
+    client = Client()
+    response = client.get(reverse('home'), {'signed_request': expired_signed_request})
+
+    assert response.status_code == 303
+
 def test_fandjango_redirects_to_authorization():
     """
     Verify that the user is redirected to application authorization.
