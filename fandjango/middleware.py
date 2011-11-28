@@ -55,6 +55,7 @@ class FacebookMiddleware():
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if request.facebook.signed_request.oauth_token.has_expired:
                     return authorize_application(
+                        request = request,
                         redirect_uri = FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
                     )
 
