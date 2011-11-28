@@ -25,7 +25,7 @@ def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL)
         query['scope'] = ', '.join(FACEBOOK_APPLICATION_INITIAL_PERMISSIONS)
 
     return render_to_response(
-        template_name = 'redirect_to_facebook_authorization.html',
+        template_name = 'authorize_application.html',
         dictionary = {
             'url': 'https://graph.facebook.com/oauth/authorize?%s' % urlencode(query)
         }
