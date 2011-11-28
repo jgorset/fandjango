@@ -68,19 +68,13 @@ class FacebookMiddleware():
                         expires_at = request.facebook.signed_request.oauth_token.expires_at
                     )
 
-                    api = GraphAPI(request.facebook.signed_request.oauth_token.token)
-                    profile = api.get('me')
-
                     user = User.objects.create(
-                        facebook_id = profile.get('id'),
-                        facebook_username = profile.get('username'),
-                        first_name = profile.get('first_name'),
-                        middle_name = profile.get('middle_name'),
-                        last_name = profile.get('last_name'),
-                        verified = profile.get('verified'),
-                        birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None,
+                        facebook_id = request.facebook.signed_request.user.id,
                         oauth_token = oauth_token
                     )
+
+                    user.synchronize()
+
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
