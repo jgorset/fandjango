@@ -7,7 +7,7 @@ from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.utils import is_disabled_path, is_enabled_path
-from fandjango.views import authorize_application
+from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
 
@@ -27,6 +27,10 @@ class FacebookMiddleware():
 
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
+
+        # The user refused to authorize the application...
+        if 'error' in request.GET and request.GET['error'] == 'access_denied':
+            return authorization_denied(request)
 
         # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:

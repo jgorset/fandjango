@@ -33,6 +33,16 @@ def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL)
         status = 100
     )
 
+def authorization_denied(request):
+    """
+    Render a template for users that refuse to authorize the application.
+    """
+    return render(
+        request = request,
+        template_name = 'authorization_denied.html',
+        status = 403
+    )
+
 def deauthorize_application(request):
     """
     When a user deauthorizes an application, Facebook sends a HTTP POST request to the application's
