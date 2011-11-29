@@ -59,7 +59,7 @@ class User(models.Model):
             return "%s %s" % (self.first_name, self.last_name)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def url(self):
         """
         Return a string describing the URL to the user's Facebook profile (see `Facebook Graph API Reference`_).
@@ -69,7 +69,7 @@ class User(models.Model):
         return self.graph.get('me').get('link', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def gender(self):
         """
         Return a string describing the user's gender (see `Facebook Graph API Reference`_).
@@ -79,7 +79,7 @@ class User(models.Model):
         return self.graph.get('me').get('gender', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def hometown(self):
         """
         Return a dictionary describing the user's hometown (see `Facebook Graph API Reference`_).
@@ -89,7 +89,7 @@ class User(models.Model):
         return self.graph.get('me').get('hometown', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def location(self):
         """
         Return a dictionary describing the user's location (see `Facebook Graph API Reference`_).
@@ -99,7 +99,7 @@ class User(models.Model):
         return self.graph.get('me').get('location', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def bio(self):
         """
         Return a string describing the user's bio (see `Facebook Graph API Reference`_).
@@ -109,7 +109,7 @@ class User(models.Model):
         return self.graph.get('me').get('bio', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def relationship_status(self):
         """
         Return a dictionary describing the user's relationship status (see `Facebook Graph API Reference`_)
@@ -119,7 +119,7 @@ class User(models.Model):
         return self.graph.get('me').get('relationship_status', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def political_views(self):
         """
         Return a string describing the user's political views (see `Facebook Graph API Reference`_)
@@ -129,7 +129,7 @@ class User(models.Model):
         return self.graph.get('me').get('political', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def email(self):
         """
         Return a string describing the user's email (see `Facebook Graph API Reference`_)
@@ -139,7 +139,7 @@ class User(models.Model):
         return self.graph.get('me').get('email', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def website(self):
         """
         Return a string describing the user's website (see `Facebook Graph API Reference`_)
@@ -149,7 +149,7 @@ class User(models.Model):
         return self.graph.get('me').get('website', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def locale(self):
         """
         Return a string describing the user's locale (see `Facebook Graph API Reference`_)
@@ -159,7 +159,7 @@ class User(models.Model):
         return self.graph.get('me').get('locale', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def timezone(self):
         """
         Return an integer describing the user's timezone (see `Facebook Graph API Reference`_)
@@ -169,7 +169,7 @@ class User(models.Model):
         return self.graph.get('me').get('timezone', None)
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def picture(self):
         """
         Return a string describing the URL to the user's profile picture.
@@ -177,7 +177,7 @@ class User(models.Model):
         return requests.get('http://graph.facebook.com/%s/picture' % self.facebook_id).url
 
     @property
-    @cached(seconds=60*60*24)
+    @cached(days=1)
     def verified(self):
         """
         Return a boolean describing whether the user is verified by Facebook.

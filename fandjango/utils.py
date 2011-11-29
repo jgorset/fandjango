@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from functools import wraps
 
 from django.core.cache import cache
@@ -33,7 +35,7 @@ def is_enabled_path(path):
             return True
     return False
 
-def cached_property(seconds):
+def cached_property(**kwargs):
     """Cache the return value of a property."""
     def decorator(function):
         @wraps(function)
@@ -46,9 +48,11 @@ def cached_property(seconds):
 
             cached_value = cache.get(key)
 
+            delta = timedelta(**kwargs)
+
             if cached_value is None:
                 value = function(self)
-                cache.set(key, value, seconds)
+                cache.set(key, value, delta.days * 86400 + delta.seconds)
             else:
                 value = cached_value
 
