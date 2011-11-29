@@ -7,6 +7,8 @@ from fandjango.utils import cached_property as cached
 
 from facepy import GraphAPI
 
+import requests
+
 class Facebook:
     """
     Facebook instances hold information on the current user and
