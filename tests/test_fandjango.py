@@ -103,6 +103,48 @@ def test_fandjango_registers_user():
     assert user.gender == 'male'
     assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
 
+def test_user_details():
+    """
+    Verify that user details may be queried from Facebook.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
+    assert user.gender == 'male'
+    assert user.hometown == None
+    assert user.location == None
+    assert user.bio == None
+    assert user.relationship_status == None
+    assert user.political_views == None
+    assert user.email == None
+    assert user.website == None
+    assert user.locale == 'en_US'
+    assert user.timezone == None
+    assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
+    assert user.verified == None
+
+def test_user_synchronization():
+    """
+    Verify that users may be synchronized.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    user.synchronize()
+
 def test_fandjango_registers_oauth_token():
     """
     Verify that an OAuth token is registered upon querying the application
