@@ -41,7 +41,12 @@ def test_authorization_denied():
     Verify that the user receives HTTP 403 Forbidden upon
     refusing to authorize the application.
     """
-    response = client.get(reverse('home'), {'error': 'access_denied'})
+    response = client.get(
+        path = reverse('home'),
+        data = {
+            'error': 'access_denied'
+        }
+    )
 
     assert response.status_code == 403
 

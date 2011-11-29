@@ -28,7 +28,14 @@ class FacebookMiddleware():
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
 
-        # The user refused to authorize the application...
+        # An error occured during authorization...        
+        if 'error' in request.GET:
+            error = request.GET['error']
+
+            # The user refused to authorize the application...
+            if error == 'access_denied':
+                return authorization_denied(request)
+
         if 'error' in request.GET and request.GET['error'] == 'access_denied':
             return authorization_denied(request)
 
