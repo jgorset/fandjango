@@ -23,7 +23,7 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
 
 client = Client()
 
-def test_facebook_post_method_override():
+def test_method_override():
     """
     Verify that the request method is overridden
     from POST to GET if it contains a signed request.
@@ -50,7 +50,19 @@ def test_authorization_denied():
 
     assert response.status_code == 403
 
-def test_fandjango_renews_signed_request():
+def test_application_authorization():
+    """
+    Verify that the user is redirected to authorize the application
+    upon querying a view decorated by ``facebook_authorization_required``
+    sans signed request.
+    """
+    response = client.get(
+        path = reverse('home')
+    )
+
+    assert response.status_code == 303
+
+def test_signed_request_renewal():
     """
     Verify that the user is redirected to renew his/her
     signed request if its access token has expired.
@@ -70,19 +82,7 @@ def test_fandjango_renews_signed_request():
 
     assert response.status_code == 303
 
-def test_fandjango_redirects_to_authorization():
-    """
-    Verify that the user is redirected to authorize the application
-    upon querying a view decorated by ``facebook_authorization_required``
-    sans signed request.
-    """
-    response = client.get(
-        path = reverse('home')
-    )
-
-    assert response.status_code == 303
-
-def test_fandjango_registers_user():
+def test_user_registration():
     """
     Verify that a user is registered upon querying the application
     with a signed request.
@@ -102,6 +102,24 @@ def test_fandjango_registers_user():
     assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
     assert user.gender == 'male'
     assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
+
+def test_oauth_token_registration():
+    """
+    Verify that an OAuth token is registered upon querying the application
+    with a signed request.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    token = OAuthToken.objects.get(id=1)
+
+    assert token.token == TEST_ACCESS_TOKEN
+    assert token.issued_at == datetime(2011, 10, 31, 15, 0, 27)
+    assert token.expires_at == None
 
 def test_user_details():
     """
@@ -144,21 +162,3 @@ def test_user_synchronization():
     user = User.objects.get(id=1)
 
     user.synchronize()
-
-def test_fandjango_registers_oauth_token():
-    """
-    Verify that an OAuth token is registered upon querying the application
-    with a signed request.
-    """
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
-
-    token = OAuthToken.objects.get(id=1)
-
-    assert token.token == TEST_ACCESS_TOKEN
-    assert token.issued_at == datetime(2011, 10, 31, 15, 0, 27)
-    assert token.expires_at == None
