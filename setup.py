@@ -7,7 +7,7 @@ import fandjango
 setup(
     name = 'fandjango',
     version = fandjango.__version__,
-    description = "Fandjango makes it easy to create Facebook applications powered by Django",
+    description = "Fandjango makes it easy to create Facebook applications with Django.",
     author = "Johannes Gorset",
     author_email = "jgorset@gmail.com",
     url = "http://github.com/jgorset/fandjango",
