@@ -13,5 +13,6 @@ except AttributeError:
 
 DISABLED_PATHS = getattr(settings, 'FANDJANGO_DISABLED_PATHS', [])
 ENABLED_PATHS = getattr(settings, 'FANDJANGO_ENABLED_PATHS', [])
+AUTHORIZATION_DENIED_VIEW = getattr(settings, 'AUTHORIZATION_DENIED_VIEW', 'fandjango.views.authorization_denied')
 
 FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = getattr(settings, 'FACEBOOK_APPLICATION_INITIAL_PERMISSIONS', None)
