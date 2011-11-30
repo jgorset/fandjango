@@ -3,11 +3,11 @@ from urllib import urlencode
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from fandjango.settings import FACEBOOK_APPLICATION_ID
-from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL
-from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY
-from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 from fandjango.models import User
+from fandjango.settings import (
+    FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_CANVAS_URL,
+    FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
+)
 
 def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL):
     """
