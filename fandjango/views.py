@@ -3,6 +3,8 @@ from urllib import urlencode
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from facepy import SignedRequest
+
 from fandjango.models import User
 from fandjango.settings import (
     FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_CANVAS_URL,
@@ -49,9 +51,9 @@ def deauthorize_application(request):
     "deauthorization callback" URL. This view picks up on requests of this sort and marks the corresponding
     users as unauthorized.
     """
-    data = parse_signed_request(request.POST['signed_request'], FACEBOOK_APPLICATION_SECRET_KEY)
-
-    user = User.objects.get(facebook_id=data['user_id'])
+    user = User.objects.get(
+        facebook_id = request.facebook.signed_request.user.id
+    )
     user.authorized = False
     user.save()
 
