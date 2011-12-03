@@ -3,6 +3,7 @@ from urllib import urlencode
 import time
 
 from django.conf import settings
+from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
 from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_disabled_path, is_enabled_path
@@ -37,6 +38,7 @@ class FacebookMiddleware():
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
             # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
             if request.method == 'POST' and 'signed_request' in request.POST:
+                request.POST = QueryDict('')
                 request.method = 'GET'
 
             request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
@@ -79,6 +81,7 @@ class FacebookMiddleware():
                         facebook_id = profile.get('id'),
                         facebook_username = profile.get('username'),
                         first_name = profile.get('first_name'),
+                        middle_name = profile.get('middle_name'),
                         last_name = profile.get('last_name'),
                         profile_url = profile.get('link'),
                         gender = profile.get('gender'),
@@ -92,6 +95,8 @@ class FacebookMiddleware():
                         locale = profile.get('locale'),
                         verified = profile.get('verified'),
                         birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None,
+                        timezone = profile.get('timezone'),
+                        quotes = profile.get('quotes'),
                         oauth_token = oauth_token
                     )
                 else:

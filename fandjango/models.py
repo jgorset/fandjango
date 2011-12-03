@@ -43,10 +43,10 @@ class User(models.Model):
     Properties:
     facebook_id -- An integer describing the user's Facebook ID.
     first_name -- A string describing the user's first name.
+    middle_name -- A string describing the user's middle name.
     last_name -- A string describing the user's last name.
     profile_url -- A string describing the URL to the user's Facebook profile.
     gender -- A string describing the user's gender.
-    hometown -- A string describing the user's home town.
     hometown - A string describing the user's home town (requires 'user_hometown' extended permission).
     location - A string describing the user's current location (requires 'user_location' extended permission).
     bio - A string describing the user's "about me" field on Facebook (requires 'user_about_me' extended permission).
@@ -61,11 +61,14 @@ class User(models.Model):
     oauth_token - An OAuth Token object.
     created_at - A datetime object describing when the user was registered.
     oauth_token -- An OAuth Token object.
+    timezone - Integer timezone representation, i.e. "GMT+2" would be just 2
+    quotes - Multiline string with favorite quotes
     """
     
     facebook_id = models.BigIntegerField()
     facebook_username = models.CharField(max_length=255, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
+    middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     profile_url = models.CharField(max_length=255, blank=True, null=True)
     gender = models.CharField(max_length=255, blank=True, null=True)
@@ -83,16 +86,20 @@ class User(models.Model):
     oauth_token = models.OneToOneField('OAuthToken')
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen_at = models.DateTimeField(auto_now_add=True)
+    timezone = models.IntegerField(blank=True, null=True)
+    quotes = models.TextField(blank=True, null=True)
     
     @property
     def full_name(self):
+        if self.first_name and self.middle_name and self.last_name:
+            return "%s %s %s" % (self.first_name, self.middle_name, self.last_name)
         if self.first_name and self.last_name:
             return "%s %s" % (self.first_name, self.last_name)
-        
+
     @property
     def picture(self):
         connection = HTTPConnection('graph.facebook.com')
-        connection.request('GET', '%s/picture' % self.facebook_id)
+        connection.request('GET', '/%s/picture' % self.facebook_id)
         response = connection.getresponse()
         return response.getheader('Location')
         
@@ -106,6 +113,7 @@ class User(models.Model):
         self.facebook_id = profile.get('id')
         self.facebook_username = profile.get('username')
         self.first_name = profile.get('first_name')
+        self.middle_name = profile.get('middle_name', None)
         self.last_name = profile.get('last_name')
         self.profile_url = profile.get('link')
         self.gender = profile.get('gender')
@@ -119,6 +127,8 @@ class User(models.Model):
         self.locale = profile.get('locale')
         self.verified = profile.get('verified')
         self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
+        self.timezone = profile.get('timezone', None)
+        self.quotes = profile.get('quotes', None)
         
         self.save()
     
