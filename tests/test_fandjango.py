@@ -38,6 +38,18 @@ def test_method_override():
 
     assert request.method == 'GET'
 
+def test_application_authorization():
+    """
+    Verify that the user is redirected to authorize the application
+    upon querying a view decorated by ``facebook_authorization_required``
+    sans signed request.
+    """
+    response = client.get(
+        path = reverse('home')
+    )
+
+    assert response.status_code == 303
+
 def test_authorization_denied():
     """
     Verify that the user receives HTTP 403 Forbidden upon
@@ -52,19 +64,11 @@ def test_authorization_denied():
 
     assert response.status_code == 403
 
-def test_application_authorization():
+def test_application_deauthorization():
     """
-    Verify that the user is redirected to authorize the application
-    upon querying a view decorated by ``facebook_authorization_required``
-    sans signed request.
+    Verify that the user is marked as deauthorized upon
+    deauthorizing the application.
     """
-    response = client.get(
-        path = reverse('home')
-    )
-
-    assert response.status_code == 303
-
-def test_deauthorization_callback():
     client.post(
         path = reverse('home'),
         data = {
@@ -105,10 +109,10 @@ def test_signed_request_renewal():
 
     assert response.status_code == 303
 
-def test_user_registration():
+def test_registration():
     """
-    Verify that a user is registered upon querying the application
-    with a signed request.
+    Verify that a user and an OAuth token is registered upon
+    querying the application with a signed request.
     """
     client.post(
         path = reverse('home'),
@@ -125,19 +129,7 @@ def test_user_registration():
     assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
     assert user.gender == 'male'
     assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
-
-def test_oauth_token_registration():
-    """
-    Verify that an OAuth token is registered upon querying the application
-    with a signed request.
-    """
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
-
+    
     token = OAuthToken.objects.get(id=1)
 
     assert token.token == TEST_ACCESS_TOKEN
