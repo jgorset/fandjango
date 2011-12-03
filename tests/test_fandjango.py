@@ -20,6 +20,8 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
                       'UUxHcUFaQWpoSVhaQUlYMGt3WkI4eHNHOEl0YUVJRUs2RUZaQ3ZLYW9WS2hDQU9XdEJ4YUhaQVhYTmxwUDln' \
                       'REpiTk53d1FsWkJjWkE3ajhyRkxZc1VmZjhFeVVKUVpEWkQiLCJ1c2VyIjp7ImNvdW50cnkiOiJubyIsImxv' \
                       'Y2FsZSI6ImVuX1VTIiwiYWdlIjp7Im1pbiI6MjF9fSwidXNlcl9pZCI6IjEwMDAwMzA5NzkxNDI5NCJ9'
+                      
+TEST_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
 client = Client()
 
@@ -61,6 +63,27 @@ def test_application_authorization():
     )
 
     assert response.status_code == 303
+
+def test_deauthorization_callback():
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+    
+    user = User.objects.get(id=1)
+    assert user.authorized == True
+
+    response = client.post(
+        path = reverse('deauthorize_application'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+    
+    user = User.objects.get(id=1)
+    assert user.authorized == False
 
 def test_signed_request_renewal():
     """
