@@ -23,3 +23,4 @@ settings.configure(
 )
 
 call_command('syncdb')
+call_command('migrate')
