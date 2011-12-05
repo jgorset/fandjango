@@ -10,6 +10,7 @@ settings.configure(
     },
     INSTALLED_APPS = [
         'fandjango',
+        'south',
         'tests.app'
     ],
     ROOT_URLCONF = 'tests.app.urls',
