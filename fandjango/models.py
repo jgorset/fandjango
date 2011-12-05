@@ -217,7 +217,7 @@ class OAuthToken(models.Model):
     expires_at -- A datetime object describing when the token expires (or None if it doesn't)
     """
 
-    token = models.CharField(max_length=255)
+    token = models.TextField()
     issued_at = models.DateTimeField()
     expires_at = models.DateTimeField(null=True, blank=True)
 
