@@ -11,9 +11,8 @@ def facebook_authorization_required(redirect_uri=False):
     """
     Redirect Facebook canvas views to authorization if required.
 
-    Arguments:
-    redirect_uri -- A string describing an URI to redirect to after authorization is complete.
-                    Defaults to current URI in Facebook canvas (ex. http://apps.facebook.com/myapp/path/).
+    :param redirect_uri: A string describing an URI to redirect to after authorization is complete. Defaults
+                         to current URI in Facebook canvas (ex. http://apps.facebook.com/myapp/path/).
     """
     def decorator(function):
         @wraps(function)

@@ -21,7 +21,7 @@ class FacebookMiddleware():
     """Middleware for Facebook applications."""
 
     def process_request(self, request):
-        """Populate request.facebook."""
+        """Process the signed request."""
 
         if ENABLED_PATHS and DISABLED_PATHS:
             raise ImproperlyConfigured('You may configure either FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, but not both.')
@@ -114,7 +114,6 @@ class FacebookMiddleware():
         # ... no signed request found.
         else:
             request.facebook = False
-
 
     def process_response(self, request, response):
         """

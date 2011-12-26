@@ -12,12 +12,10 @@ import requests
 class Facebook:
     """
     Facebook instances hold information on the current user and
-    the page he/she is accessing the application from, as well as
-    the signed request that information is derived from.
+    his/her signed request.
 
-    Properties:
-    user -- A User instance.
-    signed_request -- A string describing the raw signed request.
+    :param user: A ``User`` instance.
+    :param signed_request: A ``SignedRequest`` instance.
     """
 
     user = None
@@ -27,16 +25,15 @@ class User(models.Model):
     """
     Instances of the User class represent Facebook users who have authorized the application.
 
-    Properties:
-    facebook_id -- An integer describing the user's Facebook ID.
-    first_name -- A string describing the user's first name.
-    middle_name -- A string describing the user's middle name.
-    last_name -- A string describing the user's last name.
-    verified - A boolean describing whether or not the user is verified by Facebook.
-    birthday - A datetime object describing the user's birthday (requires 'user_birthday' extended permission)
-    authorized - A boolean describing whether or not the user has currently authorized your application.
-    oauth_token - An OAuth Token object.
-    created_at - A datetime object describing when the user was registered.
+    :param facebook_id: An integer describing the user's Facebook ID.
+    :param first_name: A string describing the user's first name.
+    :param middle_name: A string describing the user's middle name.
+    :param last_name: A string describing the user's last name.
+    :param verified: A boolean describing whether or not the user is verified by Facebook.
+    :param birthday: A ``datetime`` object describing the user's birthday (requires 'user_birthday' extended permission)
+    :param authorized: A boolean describing whether or not the user has currently authorized your application.
+    :param oauth_token: An ``OAuthToken`` object.
+    :param created_at: A ``datetime`` object describing when the user was registered.
     """
 
     facebook_id = models.BigIntegerField(unique=True)
@@ -186,7 +183,7 @@ class User(models.Model):
 
     @property
     def graph(self):
-        """Return a GraphAPI instance with the user's access token."""
+        """Return a ``GraphAPI`` instance with the user's access token."""
         return GraphAPI(self.oauth_token.token)
 
     def synchronize(self):
@@ -212,9 +209,9 @@ class OAuthToken(models.Model):
     """
     Instances of the OAuthToken class are credentials used to query the Facebook API on behalf of a user.
 
-    token -- A string describing the OAuth token itself.
-    issued_at -- A datetime object describing when the token was issued.
-    expires_at -- A datetime object describing when the token expires (or None if it doesn't)
+    :param token: A string describing the OAuth token itself.
+    :param issued_at: A ``datetime`` object describing when the token was issued.
+    :param expires_at: A ``datetime`` object describing when the token expires (or ``None`` if it doesn't)
     """
 
     token = models.CharField(max_length=255)
