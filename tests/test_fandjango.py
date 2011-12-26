@@ -133,7 +133,7 @@ def test_registration():
     token = OAuthToken.objects.get(id=1)
 
     assert token.token == TEST_ACCESS_TOKEN
-    assert token.issued_at == datetime(2011, 10, 31, 15, 0, 27)
+    assert token.issued_at == datetime(2011, 10, 31, 9, 0, 27)
     assert token.expires_at == None
 
 def test_user_details():
@@ -159,7 +159,7 @@ def test_user_details():
     assert user.email == None
     assert user.website == None
     assert user.locale == 'en_US'
-    assert user.timezone == None
+    assert user.timezone == -5
     assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
     assert user.verified == None
 
