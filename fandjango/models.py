@@ -2,6 +2,7 @@ from httplib import HTTPConnection
 from datetime import datetime
 
 from django.db import models
+from django.utils.translation import ugettext as _
 
 from fandjango.utils import cached_property as cached
 
@@ -36,16 +37,16 @@ class User(models.Model):
     :param created_at: A ``datetime`` object describing when the user was registered.
     """
 
-    facebook_id = models.BigIntegerField(unique=True)
-    facebook_username = models.CharField(max_length=255, blank=True, null=True)
-    first_name = models.CharField(max_length=255, blank=True, null=True)
-    middle_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255, blank=True, null=True)
-    birthday = models.DateField(blank=True, null=True)
-    authorized = models.BooleanField(default=True)
-    oauth_token = models.OneToOneField('OAuthToken')
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_seen_at = models.DateTimeField(auto_now_add=True)
+    facebook_id = models.BigIntegerField(_('facebook id'), unique=True)
+    facebook_username = models.CharField(_('facebook username'), max_length=255, blank=True, null=True)
+    first_name = models.CharField(_('first name'), max_length=255, blank=True, null=True)
+    middle_name = models.CharField(_('middle name'), max_length=255, blank=True, null=True)
+    last_name = models.CharField(_('last name'), max_length=255, blank=True, null=True)
+    birthday = models.DateField(_('birthday'), blank=True, null=True)
+    authorized = models.BooleanField(_('authorized'), default=True)
+    oauth_token = models.OneToOneField('OAuthToken', verbose_name=_('OAuth token'))
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    last_seen_at = models.DateTimeField(_('last seen at'), auto_now_add=True)
 
     @property
     def full_name(self):
@@ -204,6 +205,10 @@ class User(models.Model):
             return u'%s' % self.facebook_username
         else:
             return u'%s' % self.facebook_id
+            
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
 
 class OAuthToken(models.Model):
     """
@@ -214,14 +219,14 @@ class OAuthToken(models.Model):
     :param expires_at: A ``datetime`` object describing when the token expires (or ``None`` if it doesn't)
     """
 
-    token = models.TextField()
-    issued_at = models.DateTimeField()
-    expires_at = models.DateTimeField(null=True, blank=True)
+    token = models.TextField(_('token'))
+    issued_at = models.DateTimeField(_('issued at'))
+    expires_at = models.DateTimeField(_('expires at'), null=True, blank=True)
 
     @property
     def expired(self):
         return self.expires_at < datetime.now() if self.expires_at else False
 
     class Meta:
-        verbose_name = 'OAuth token'
-        verbose_name_plural = 'OAuth tokens'
+        verbose_name = _('OAuth token')
+        verbose_name_plural = _('OAuth tokens')
