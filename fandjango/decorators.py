@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.core.handlers.wsgi import WSGIRequest
 
 from fandjango.views import authorize_application
-from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL
+from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE
 
 def facebook_authorization_required(redirect_uri=False):
     """
@@ -19,10 +19,14 @@ def facebook_authorization_required(redirect_uri=False):
         def wrapper(request, *args, **kwargs):
 
             if not request.facebook or not request.facebook.user:
-                    return authorize_application(
-                        request = request,
-                        redirect_uri = redirect_uri or FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
-                    )
+                return authorize_application(
+                    request = request,
+                    redirect_uri = redirect_uri or 'http://%(domain)s/%(namespace)s%(url)s' % {
+                        'domain': FACEBOOK_APPLICATION_DOMAIN,
+                        'namespace': FACEBOOK_APPLICATION_NAMESPACE,
+                        'url': request.get_full_path()
+                    }
+                )
 
             return function(request, *args, **kwargs)
         return wrapper

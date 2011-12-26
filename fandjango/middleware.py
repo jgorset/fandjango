@@ -11,8 +11,9 @@ from fandjango.utils import is_disabled_path, is_enabled_path
 from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import (
-    FACEBOOK_APPLICATION_CANVAS_URL, FACEBOOK_APPLICATION_SECRET_KEY,
-    DISABLED_PATHS, ENABLED_PATHS, AUTHORIZATION_DENIED_VIEW
+    FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE,
+    FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS,
+    AUTHORIZATION_DENIED_VIEW
 )
 
 from facepy import SignedRequest, GraphAPI
@@ -77,7 +78,11 @@ class FacebookMiddleware():
                 if request.facebook.signed_request.oauth_token.has_expired:
                     return authorize_application(
                         request = request,
-                        redirect_uri = FACEBOOK_APPLICATION_CANVAS_URL + request.get_full_path()
+                        redirect_uri = 'http://%(domain)s/%(namespace)s%(url)s' % {
+                            'domain': FACEBOOK_APPLICATION_DOMAIN,
+                            'namespace': FACEBOOK_APPLICATION_NAMESPACE,
+                            'url': request.get_full_path()
+                        }
                     )
 
                 # Initialize a User object and its corresponding OAuth token

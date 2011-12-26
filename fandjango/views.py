@@ -7,11 +7,12 @@ from facepy import SignedRequest
 
 from fandjango.models import User
 from fandjango.settings import (
-    FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_CANVAS_URL,
-    FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
+    FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_DOMAIN,
+    FACEBOOK_APPLICATION_NAMESPACE, FACEBOOK_APPLICATION_SECRET_KEY,
+    FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 )
 
-def authorize_application(request, redirect_uri=FACEBOOK_APPLICATION_CANVAS_URL):
+def authorize_application(request, redirect_uri='https://%s/%s' % (FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE)):
     """
     Redirect the user to authorize the application.
 
