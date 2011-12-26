@@ -1,4 +1,4 @@
-import pytest
+from nose.tools import with_setup
 
 from datetime import datetime, timedelta
 
@@ -26,9 +26,12 @@ TEST_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
 client = Client()
 
-def setup_module():
-    call_command('syncdb')
-    call_command('migrate')
+def setup():
+    call_command('syncdb', interactive=False)
+    call_command('migrate', interactive=False)
+
+def flush_database():
+    call_command('flush', interactive=False)
 
 def test_method_override():
     """
@@ -43,6 +46,7 @@ def test_method_override():
 
     assert request.method == 'GET'
 
+@with_setup(setup=None, teardown=flush_database)
 def test_application_authorization():
     """
     Verify that the user is redirected to authorize the application
@@ -55,6 +59,7 @@ def test_application_authorization():
 
     assert response.status_code == 303
 
+@with_setup(setup=None, teardown=flush_database)
 def test_authorization_denied():
     """
     Verify that the user receives HTTP 403 Forbidden upon
@@ -69,6 +74,7 @@ def test_authorization_denied():
 
     assert response.status_code == 403
 
+@with_setup(setup=None, teardown=flush_database)
 def test_application_deauthorization():
     """
     Verify that the user is marked as deauthorized upon
@@ -94,6 +100,7 @@ def test_application_deauthorization():
     user = User.objects.get(id=1)
     assert user.authorized == False
 
+@with_setup(setup=None, teardown=flush_database)
 def test_signed_request_renewal():
     """
     Verify that the user is redirected to renew his/her
@@ -114,6 +121,7 @@ def test_signed_request_renewal():
 
     assert response.status_code == 303
 
+@with_setup(setup=None, teardown=flush_database)
 def test_registration():
     """
     Verify that a user and an OAuth token is registered upon
@@ -141,6 +149,7 @@ def test_registration():
     assert token.issued_at == datetime(2011, 10, 31, 9, 0, 27)
     assert token.expires_at == None
 
+@with_setup(setup=None, teardown=flush_database)
 def test_user_details():
     """
     Verify that user details may be queried from Facebook.
@@ -168,6 +177,7 @@ def test_user_details():
     assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
     assert user.verified == None
 
+@with_setup(setup=None, teardown=flush_database)
 def test_user_synchronization():
     """
     Verify that users may be synchronized.
