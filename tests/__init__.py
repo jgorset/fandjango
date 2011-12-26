@@ -10,6 +10,7 @@ settings.configure(
     },
     INSTALLED_APPS = [
         'fandjango',
+        'south',
         'tests.app'
     ],
     ROOT_URLCONF = 'tests.app.urls',
@@ -22,3 +23,4 @@ settings.configure(
 )
 
 call_command('syncdb')
+call_command('migrate')
