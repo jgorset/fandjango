@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
 from django.conf import settings
 
 from fandjango.middleware import FacebookMiddleware
@@ -24,6 +25,10 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
 TEST_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
 client = Client()
+
+def setup_module():
+    call_command('syncdb')
+    call_command('migrate')
 
 def test_method_override():
     """
