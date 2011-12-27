@@ -42,7 +42,7 @@ references the current user in ``request.facebook.user``::
         if request.facebook.user:
             greeting = "Hi, %s!" % request.facebook.user.first_name
         else:
-            greeting = "Go away, I don't know you."
+            greeting = "Go away, I don't know you and I don't want to know you."
             
         return HttpResponse(greeting)
 
