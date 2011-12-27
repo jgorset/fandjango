@@ -1,5 +1,21 @@
 CHANGELOG
 
+v4.0.0
+- User#graph no longer supports Facebook's Python SDK.
+- User#full_name, User#url, User#gender, User#hometown, User#location, User#bio, User#relationship_status,
+  User#political_views, User#email, User#website, User#locale, User#timezone, User#picture and User#verified
+  are no longer persisted, but queried from Facebook and cached for 24 hours.
+- The request object's 'facebook' attribute now has a 'signed_request' attribute that contains the result
+  of parsing the signed request with Facepy.
+- The request object's 'facebook' attribute no longer has a 'page' attribute with information on
+  the Facebook page the application was loaded from.
+- Fixed a race condition that caused multiple records to be registered for the same user.
+- Users that refuse to authorize the application will now be directed to the view referenced by
+  the FANDJANGO_AUTHORIZATION_DENIED_VIEW setting.
+- FACEBOOK_APPLICATION_CANVAS_URL is now FACEBOOK_APPLICATION_NAMESPACE.
+- Facilitated for internationalization.
+- Fandjango is now available in Norwegian.
+
 v3.7.4
 - Added support for reverse-engineering signed requests.
 - Added User#middle_name, User#timezone and User#quotes.
