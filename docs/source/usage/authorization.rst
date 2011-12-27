@@ -37,14 +37,14 @@ Users
 Fandjango saves users that have authorized your application in its ``User`` model and
 references the current user in ``request.facebook.user``::
 
-    def hello(request):
+    def greet(request):
         """Greet the user (or not)."""
         if request.facebook.user:
             greeting = "Hi, %s!" % request.facebook.user.first_name
         else:
             greeting = "Go away, I don't know you."
             
-        return HttpResponse(string)
+        return HttpResponse(greeting)
 
 .. autoclass:: fandjango.models.User
     :members:
