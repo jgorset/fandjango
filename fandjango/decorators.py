@@ -9,10 +9,11 @@ from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION
 
 def facebook_authorization_required(redirect_uri=None):
     """
-    Redirect Facebook canvas views to authorization if required.
+    Require the user to authorize the application.
 
-    :param redirect_uri: A string describing an URI to redirect to after authorization is complete. Defaults
-                         to current URI in Facebook canvas (ex. http://apps.facebook.com/myapp/path/).
+    :param redirect_uri: A string describing an URI to redirect to after authorization is complete.
+                         Defaults to the current URI in the Facebook canvas (e.g.
+                         ``http://apps.facebook.com/myapp/current/path``).
     """
     
     def decorator(function):
