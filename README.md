@@ -2,7 +2,9 @@
 
 ## About
 
-Fandjango makes it stupidly easy to create Facebook applications with Django:
+Fandjango makes it stupidly easy to create Facebook applications with Django.
+
+## Usage
 
     @facebook_authorization_required
     def view(request):
@@ -10,3 +12,7 @@ Fandjango makes it stupidly easy to create Facebook applications with Django:
 
 If you'd like to create an application that's a little more elaborate, you should read
 [the documentation](http://readthedocs.org/docs/fandjango).
+
+## Installation
+
+    $ pip install fandjango
