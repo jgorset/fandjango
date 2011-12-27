@@ -11,5 +11,9 @@ Fandjango provides a template tag for loading and initializing Facebook's `JavaS
         // This code will be run once the JavaScript SDK has been loaded and initialized.
         alert('It worked!');
     {% endfacebook %}
+    
+.. admonition:: See also
+
+    `Facebook's documentation on the JavaScript SDK <http://developers.facebook.com/docs/reference/javascript/>`_
 
 .. _JavaScript SDK: http://developers.facebook.com/docs/reference/javascript/

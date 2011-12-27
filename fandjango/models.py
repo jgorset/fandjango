@@ -14,48 +14,49 @@ class Facebook:
     """
     Facebook instances hold information on the current user and
     his/her signed request.
-
-    * user: A ``User`` instance.
-    * signed_request: A ``SignedRequest`` instance.
     """
 
     user = None
+    """A ``User`` instance."""
+    
     signed_request = None
+    """A ``SignedRequest`` instance."""
 
 class User(models.Model):
     """
-    Instances of the User class represent Facebook users who have authorized the application.
-
-    facebook_id
-        An integer describing the user's Facebook ID.
-    first_name
-        A string describing the user's first name.
-    middle_name
-        A string describing the user's middle name.
-    last_name
-        A string describing the user's last name.
-    verified
-        A boolean describing whether or not the user is verified by Facebook.
-    birthday
-        A ``datetime`` object describing the user's birthday (requires 'user_birthday' extended permission)
-    authorized
-        A boolean describing whether or not the user has currently authorized your application.
-    oauth_token
-        An ``OAuthToken`` object.
-    created_at
-        A ``datetime`` object describing when the user was registered.
+    Instances of the User class represent Facebook users who
+    have authorized the application.
     """
 
     facebook_id = models.BigIntegerField(_('facebook id'), unique=True)
+    """An integer describing the user's Facebook ID."""
+    
     facebook_username = models.CharField(_('facebook username'), max_length=255, blank=True, null=True)
+    """A string describing the user's Facebook username."""
+    
     first_name = models.CharField(_('first name'), max_length=255, blank=True, null=True)
+    """A string describing the user's first name."""
+    
     middle_name = models.CharField(_('middle name'), max_length=255, blank=True, null=True)
+    """A string describing the user's middle name."""
+
     last_name = models.CharField(_('last name'), max_length=255, blank=True, null=True)
+    """A string describing the user's last name."""
+    
     birthday = models.DateField(_('birthday'), blank=True, null=True)
+    """A ``datetime`` object describing the user's birthday."""
+    
     authorized = models.BooleanField(_('authorized'), default=True)
+    """A boolean describing whether the user has currently authorized the application."""
+    
     oauth_token = models.OneToOneField('OAuthToken', verbose_name=_('OAuth token'))
+    """An ``OAuthToken`` object."""
+    
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    """A ``datetime`` object describing when the user was registered."""
+    
     last_seen_at = models.DateTimeField(_('last seen at'), auto_now_add=True)
+    """A ``datetime`` object describing when the user was last seen."""
 
     @property
     def full_name(self):
@@ -200,7 +201,8 @@ class User(models.Model):
 
     def synchronize(self):
         """
-        Synchronize model fields.
+        Synchronize ``facebook_username``, ``first_name``, ``middle_name``,
+        ``last_name`` and ``birthday`` with Facebook.
         """
         profile = self.graph.get('me')
 
@@ -225,16 +227,18 @@ class User(models.Model):
 
 class OAuthToken(models.Model):
     """
-    Instances of the OAuthToken class are credentials used to query the Facebook API on behalf of a user.
-
-    * token: A string describing the OAuth token itself.
-    * issued_at: A ``datetime`` object describing when the token was issued.
-    * expires_at: A ``datetime`` object describing when the token expires (or ``None`` if it doesn't)
+    Instances of the OAuthToken class are credentials used to query
+    the Facebook API on behalf of a user.
     """
 
     token = models.TextField(_('token'))
+    """A string describing the OAuth token itself."""
+    
     issued_at = models.DateTimeField(_('issued at'))
+    """A ``datetime`` object describing when the token was issued."""
+    
     expires_at = models.DateTimeField(_('expires at'), null=True, blank=True)
+    """A ``datetime`` object describing when the token expires (or ``None`` if it doesn't)"""
 
     @property
     def expired(self):
