@@ -17,7 +17,7 @@ setup(
         'fandjango.templatetags'
     ],
     package_data = {
-        'fandjango': ['templates/*']
+        'fandjango': ['templates/*', 'locale/*']
     },
     install_requires = [
         'facepy>=0.4.2',
