@@ -195,7 +195,9 @@ class User(models.Model):
     @property
     def graph(self):
         """
-        A ``GraphAPI`` instance with the user's access token.
+        A ``Facepy.GraphAPI`` instance initialized with the user's access token (See `Facepy`).
+
+        .. _Facepy: http://github.com/jgorset/facepy
         """
         return GraphAPI(self.oauth_token.token)
 
