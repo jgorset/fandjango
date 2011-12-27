@@ -70,9 +70,7 @@ class User(models.Model):
     @cached(days=1)
     def url(self):
         """
-        A string describing the URL to the user's Facebook profile (see `Facebook Graph API Reference`_).
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the URL to the user's Facebook profile.
         """
         return self.graph.get('me').get('link', None)
 
@@ -80,9 +78,7 @@ class User(models.Model):
     @cached(days=1)
     def gender(self):
         """
-        A string describing the user's gender (see `Facebook Graph API Reference`_).
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's gender.
         """
         return self.graph.get('me').get('gender', None)
 
@@ -90,9 +86,7 @@ class User(models.Model):
     @cached(days=1)
     def hometown(self):
         """
-        A dictionary describing the user's hometown (see `Facebook Graph API Reference`_).
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A dictionary describing the user's hometown.
         """
         return self.graph.get('me').get('hometown', None)
 
@@ -100,9 +94,7 @@ class User(models.Model):
     @cached(days=1)
     def location(self):
         """
-        A dictionary describing the user's location (see `Facebook Graph API Reference`_).
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A dictionary describing the user's location.
         """
         return self.graph.get('me').get('location', None)
 
@@ -110,9 +102,7 @@ class User(models.Model):
     @cached(days=1)
     def bio(self):
         """
-        A string describing the user's bio (see `Facebook Graph API Reference`_).
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's bio.
         """
         return self.graph.get('me').get('bio', None)
 
@@ -120,9 +110,7 @@ class User(models.Model):
     @cached(days=1)
     def relationship_status(self):
         """
-        A dictionary describing the user's relationship status (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A dictionary describing the user's relationship status.
         """
         return self.graph.get('me').get('relationship_status', None)
 
@@ -130,9 +118,7 @@ class User(models.Model):
     @cached(days=1)
     def political_views(self):
         """
-        A string describing the user's political views (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's political views.
         """
         return self.graph.get('me').get('political', None)
 
@@ -140,9 +126,7 @@ class User(models.Model):
     @cached(days=1)
     def email(self):
         """
-        A string describing the user's email (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's email.
         """
         return self.graph.get('me').get('email', None)
 
@@ -150,9 +134,7 @@ class User(models.Model):
     @cached(days=1)
     def website(self):
         """
-        A string describing the user's website (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's website.
         """
         return self.graph.get('me').get('website', None)
 
@@ -160,9 +142,7 @@ class User(models.Model):
     @cached(days=1)
     def locale(self):
         """
-        A string describing the user's locale (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        A string describing the user's locale.
         """
         return self.graph.get('me').get('locale', None)
 
@@ -170,9 +150,7 @@ class User(models.Model):
     @cached(days=1)
     def timezone(self):
         """
-        An integer describing the user's timezone (see `Facebook Graph API Reference`_)
-
-        .. _Facebook Graph API Reference: https://developers.facebook.com/docs/reference/api/user/
+        An integer describing the user's timezone.
         """
         return self.graph.get('me').get('timezone', None)
 
