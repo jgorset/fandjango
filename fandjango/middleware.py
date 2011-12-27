@@ -5,16 +5,24 @@ import time
 from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
-from utils import redirect_to_facebook_authorization, parse_signed_request, get_facebook_profile, is_disabled_path, is_enabled_path
-from models import Facebook, FacebookPage, User, OAuthToken
-from settings import FACEBOOK_APPLICATION_URL, FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
+from fandjango.utils import is_disabled_path, is_enabled_path
+from fandjango.views import authorize_application, authorization_denied
+from fandjango.models import Facebook, User, OAuthToken
+from fandjango.settings import (
+    FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE,
+    FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS,
+    AUTHORIZATION_DENIED_VIEW
+)
+
+from facepy import SignedRequest, GraphAPI
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
 
     def process_request(self, request):
-        """Populate request.facebook."""
+        """Process the signed request."""
 
         if ENABLED_PATHS and DISABLED_PATHS:
             raise ImproperlyConfigured('You may configure either FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, but not both.')
@@ -25,6 +33,23 @@ class FacebookMiddleware():
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
 
+        # An error occured during authorization...        
+        if 'error' in request.GET:
+            error = request.GET['error']
+
+            # The user refused to authorize the application...
+            if error == 'access_denied':
+                authorization_denied_module_name = AUTHORIZATION_DENIED_VIEW.rsplit('.', 1)[0]
+                authorization_denied_view_name = AUTHORIZATION_DENIED_VIEW.split('.')[-1]
+
+                authorization_denied_module = import_module(authorization_denied_module_name)
+                authorization_denied_view = getattr(authorization_denied_module, authorization_denied_view_name)
+
+                return authorization_denied_view(request)
+
+        if 'error' in request.GET and request.GET['error'] == 'access_denied':
+            return authorization_denied(request)
+
         # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
             request.facebook = Facebook()
@@ -32,7 +57,7 @@ class FacebookMiddleware():
             # If the request method is POST and its body only contains the signed request,
             # chances are it's a request from the Facebook platform and we'll override
             # the request method to HTTP GET to rectify their misinterpretation
-            # of the HTTP protocol standard.
+            # of the HTTP standard.
             #
             # References:
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
@@ -41,72 +66,52 @@ class FacebookMiddleware():
                 request.POST = QueryDict('')
                 request.method = 'GET'
 
-            request.facebook.signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request')
-
-            facebook_data = parse_signed_request(
-                signed_request = request.facebook.signed_request,
-                app_secret = FACEBOOK_APPLICATION_SECRET_KEY
+            request.facebook.signed_request = SignedRequest.parse(
+                signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
+                application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
             )
 
-            # The application is accessed from a tab on a Facebook page...
-            if 'page' in facebook_data:
-                request.facebook.page = FacebookPage(
-                    id = facebook_data['page']['id'],
-                    is_admin = facebook_data['page']['admin'],
-                    is_liked = facebook_data['page']['liked']
-                )
-
             # User has authorized the application...
-            if 'user_id' in facebook_data:
+            if request.facebook.signed_request.user.has_authorized_application:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
-                if facebook_data.get('expires') and datetime.fromtimestamp(facebook_data.get('expires')) < datetime.now():
-                        return redirect_to_facebook_authorization(
-                            redirect_uri = FACEBOOK_APPLICATION_URL + request.get_full_path()
-                        )
+                if request.facebook.signed_request.oauth_token.has_expired:
+                    return authorize_application(
+                        request = request,
+                        redirect_uri = 'http://%(domain)s/%(namespace)s%(url)s' % {
+                            'domain': FACEBOOK_APPLICATION_DOMAIN,
+                            'namespace': FACEBOOK_APPLICATION_NAMESPACE,
+                            'url': request.get_full_path()
+                        }
+                    )
 
                 # Initialize a User object and its corresponding OAuth token
                 try:
-                    user = User.objects.get(facebook_id=facebook_data['user_id'])
+                    user = User.objects.get(facebook_id=request.facebook.signed_request.user.id)
                 except User.DoesNotExist:
                     oauth_token = OAuthToken.objects.create(
-                        token = facebook_data['oauth_token'],
-                        issued_at = datetime.fromtimestamp(facebook_data['issued_at']),
-                        expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
+                        token = request.facebook.signed_request.oauth_token.token,
+                        issued_at = request.facebook.signed_request.oauth_token.issued_at,
+                        expires_at = request.facebook.signed_request.oauth_token.expires_at
                     )
-
-                    profile = get_facebook_profile(oauth_token.token)
 
                     user = User.objects.create(
-                        facebook_id = profile.get('id'),
-                        facebook_username = profile.get('username'),
-                        first_name = profile.get('first_name'),
-                        middle_name = profile.get('middle_name'),
-                        last_name = profile.get('last_name'),
-                        profile_url = profile.get('link'),
-                        gender = profile.get('gender'),
-                        hometown = profile['hometown'].get('name') if profile.has_key('hometown') else None,
-                        location = profile['location'].get('name') if profile.has_key('location') else None,
-                        bio = profile.get('bio'),
-                        relationship_status = profile.get('relationship_status'),
-                        political_views = profile.get('political'),
-                        email = profile.get('email'),
-                        website = profile.get('website'),
-                        locale = profile.get('locale'),
-                        verified = profile.get('verified'),
-                        birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None,
-                        timezone = profile.get('timezone'),
-                        quotes = profile.get('quotes'),
+                        facebook_id = request.facebook.signed_request.user.id,
                         oauth_token = oauth_token
                     )
+
+                    user.synchronize()
+
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
-                    if facebook_data.has_key('oauth_token'):
-                        user.oauth_token.token = facebook_data['oauth_token']
-                        user.oauth_token.issued_at = datetime.fromtimestamp(facebook_data['issued_at'])
-                        user.oauth_token.expires_at = datetime.fromtimestamp(facebook_data.get('expires')) if facebook_data.get('expires') else None
+
+                    if request.facebook.signed_request.oauth_token:
+                        user.oauth_token.token = request.facebook.signed_request.oauth_token.token
+                        user.oauth_token.issued_at = request.facebook.signed_request.oauth_token.issued_at
+                        user.oauth_token.expires_at = request.facebook.signed_request.oauth_token.expires_at
                         user.oauth_token.save()
+
                     user.save()
 
                 request.facebook.user = user
@@ -114,7 +119,6 @@ class FacebookMiddleware():
         # ... no signed request found.
         else:
             request.facebook = False
-
 
     def process_response(self, request, response):
         """

@@ -1,0 +1,94 @@
+.. _installation:
+
+Installation and configuration
+==============================
+
+Fandjango is best installed with `pip`_::
+
+    $ pip install fandjango
+    
+.. _pip: http://www.pip-installer.org/en/latest/
+    
+.. _configuration:
+
+Configuration
+-------------
+
+In your ``settings`` module...
+
+* Add ``fandjango`` to ``INSTALLED_APPS``
+* Add ``fandjango.middleware.FacebookMiddleware`` to ``MIDDLEWARE_CLASSES``
+* Add ``url(r'^fandjango/', include('fandjango.urls'))`` to your patterns.
+
+.. note::
+
+    If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's
+    middleware precedes it. Otherwise, Facebook's requests to your application will qualify
+    as cross-site request forgeries.
+    
+Finally, specify your Facebook application's id, secret key and namespace::
+    
+    FACEBOOK_APPLICATION_ID = '...'
+    FACEBOOK_APPLICATION_SECRET_KEY = '...'
+    FACEBOOK_APPLICATION_NAMESPACE = '...'
+
+.. _dependencies:
+
+Dependencies
+------------
+
+In order to install and use Fandjango, you will need five primary pieces of software:
+
+* `Python`_
+* `Setuptools`_
+* `Django`_
+* `Facepy`_
+* `Requests`_
+
+.. _Python: http://python.org/
+.. _Setuptools: http://pypi.python.org/pypi/setuptools
+.. _Django: http://djangoproject.com
+.. _Requests: http://github.com/kennethreitz/requests
+.. _Facepy: http://github.com/jgorset/facepy
+
+.. _development dependencies:
+
+Development dependencies
+------------------------
+
+If you are interested in contributing to Fandjango, you will also need to install
+some or all of the following packages:
+
+* `Nose`_
+* `Sphinx`_
+* `South`_
+
+For an up-to-date list of exact testing/development requirements, including version numbers, please
+see the ``DEPENDENCIES`` file included with the source distribution. This file is intended to be used
+with ``pip``, e.g. ``pip install -r DEPENDENCIES``.
+
+.. _South: http://south.aeracode.org/
+.. _Nose: http://readthedocs.org/docs/nose/en/latest/
+.. _Sphinx: http://www.pip-installer.org/en/latest/
+
+ .. _upgrading:
+ 
+Upgrading
+---------
+
+You may have to change your database schema when you upgrade Fandjango. Thankfully,
+Fandjango bundles `South`_ migrations and so upgrading your database is as simple as
+running ``python manage.py migrate fandjango``.
+
+If you're not using South, you're on your own.
+
+.. _South: http://south.aeracode.org/
+
+.. _source-code-checkouts:
+
+Source code checkouts
+---------------------
+
+To follow Fandjango's development via Git instead of downloading official releases, please see our `Github mirror`_.
+
+.. _Github mirror: http://github.com/jgorset/fandjango/

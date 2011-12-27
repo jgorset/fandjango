@@ -20,7 +20,7 @@ class FacebookNode(template.Node):
         self.nodelist = nodelist
 
     def render(self, context):
-        t = template.loader.get_template('facebook_init.html')
+        t = template.loader.get_template('fandjango/facebook_init.html')
         code = self.nodelist.render(context)
         custom_context = context
         custom_context['code'] = code

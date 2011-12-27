@@ -1,5 +1,18 @@
-import pytest
-import mock_django
+from nose.tools import with_setup
+
+from datetime import datetime, timedelta
+
+from django.test.client import Client
+from django.test.client import RequestFactory
+from django.core.urlresolvers import reverse
+from django.core.management import call_command
+from django.conf import settings
+
+from fandjango.middleware import FacebookMiddleware
+from fandjango.models import User
+from fandjango.models import OAuthToken
+
+from facepy import SignedRequest
 
 TEST_ACCESS_TOKEN = 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
 
@@ -8,104 +21,118 @@ TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0a
                       'UUxHcUFaQWpoSVhaQUlYMGt3WkI4eHNHOEl0YUVJRUs2RUZaQ3ZLYW9WS2hDQU9XdEJ4YUhaQVhYTmxwUDln' \
                       'REpiTk53d1FsWkJjWkE3ajhyRkxZc1VmZjhFeVVKUVpEWkQiLCJ1c2VyIjp7ImNvdW50cnkiOiJubyIsImxv' \
                       'Y2FsZSI6ImVuX1VTIiwiYWdlIjp7Im1pbiI6MjF9fSwidXNlcl9pZCI6IjEwMDAwMzA5NzkxNDI5NCJ9'
+                      
+TEST_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
-def test_parse_signed_request():
-    from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
-    from fandjango.utils import parse_signed_request
+client = Client()
 
-    data = parse_signed_request(TEST_SIGNED_REQUEST, FACEBOOK_APPLICATION_SECRET_KEY)
+def setup():
+    call_command('syncdb', interactive=False)
+    call_command('migrate', interactive=False)
 
-    assert data['user_id'] == '100003097914294'
-    assert data['algorithm'] == 'HMAC-SHA256'
-    assert data['expires'] == 0
-    assert data['oauth_token'] == 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
-    assert data['issued_at'] == 1320069627
+def flush_database():
+    call_command('flush', interactive=False)
 
-def test_create_signed_request():
-    from mock_django.settings import FACEBOOK_APPLICATION_SECRET_KEY
-    from fandjango.utils import create_signed_request
-    from fandjango.utils import parse_signed_request
-    from datetime import datetime, timedelta
-    import time
+def test_method_override():
+    """
+    Verify that the request method is overridden
+    from POST to GET if it contains a signed request.
+    """
 
-    signed_request = create_signed_request(
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
-        user_id = 1,
-        issued_at = 1254459601
-    )
-
-    assert signed_request == 'Y0ZEAYY9tGklJimbbSGy2dgpYz9qZyVJp18zrI9xQY0=.eyJpc3N1ZWRfYXQiOiAx' \
-                             'MjU0NDU5NjAxLCAidXNlcl9pZCI6IDEsICJhbGdvcml0aG0iOiAiSE1BQy1TSEEyNTYifQ=='
-
-    parsed_signed_request = parse_signed_request(
-        signed_request = signed_request,
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
-    )
-
-    assert 'issued_at' in parsed_signed_request
-    assert parsed_signed_request['user_id'] == 1
-    assert parsed_signed_request['algorithm'] == 'HMAC-SHA256'
-
-    today = datetime.now()
-    tomorrow = today + timedelta(hours=1)
-
-    signed_request = create_signed_request(
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY,
-        user_id = 999,
-        issued_at = today,
-        expires = tomorrow,
-        oauth_token = '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk',
-        app_data = {
-            'foo': 'bar'
-        },
-        page = {
-            'id': '1',
-            'liked': True
-        }
-    )
-
-    parsed_signed_request = parse_signed_request(
-        signed_request = signed_request,
-        app_secret = FACEBOOK_APPLICATION_SECRET_KEY
-    )
-
-    assert parsed_signed_request['user_id'] == 999
-    assert parsed_signed_request['algorithm'] == 'HMAC-SHA256'
-    assert parsed_signed_request['issued_at'] == int(time.mktime(today.timetuple()))
-    assert parsed_signed_request['expires'] == int(time.mktime(tomorrow.timetuple()))
-    assert parsed_signed_request['oauth_token'] == '181259711925270|1570a553ad6605705d1b7a5f.1-499729129|8XqMRhCWDKtpG-i_zRkHBDSsqqk'
-    assert parsed_signed_request['app_data'] == { 'foo': 'bar' }
-    assert parsed_signed_request['page'] == { 'id': '1', 'liked': True }
-
-def test_get_facebook_profile():
-    from fandjango.utils import get_facebook_profile
-
-    data = get_facebook_profile(TEST_ACCESS_TOKEN)
-
-    assert data['id'] == '100003097914294'
-    assert data['first_name'] == 'Bob'
-    assert data['middle_name'] == 'Amcjigiadbid'
-    assert data['last_name'] == 'Alisonberg'
-    assert data['name'] == 'Bob Amcjigiadbid Alisonberg'
-    assert data['gender'] == 'male'
-    assert data['link'] == 'http://www.facebook.com/profile.php?id=100003097914294'
-
-def test_facebook_post_method_override():    
-    from django.test.client import RequestFactory
-    from fandjango.middleware import FacebookMiddleware
-
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
+    # We can't test that the request method is overriden with django.test.client.Client,
+    # so we'll need to generate the request and process it manually (not cool, Django).
+    request = RequestFactory().post(reverse('home'), {'signed_request': TEST_SIGNED_REQUEST})
     FacebookMiddleware().process_request(request)
 
     assert request.method == 'GET'
 
-def test_fandjango_registers_user():
-    from django.test.client import RequestFactory
-    from fandjango.middleware import FacebookMiddleware
-    from fandjango.models import User
+@with_setup(setup=None, teardown=flush_database)
+def test_application_authorization():
+    """
+    Verify that the user is redirected to authorize the application
+    upon querying a view decorated by ``facebook_authorization_required``
+    sans signed request.
+    """
+    response = client.get(
+        path = reverse('home')
+    )
 
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
-    FacebookMiddleware().process_request(request)
+    assert response.status_code == 303
+
+@with_setup(setup=None, teardown=flush_database)
+def test_authorization_denied():
+    """
+    Verify that the user receives HTTP 403 Forbidden upon
+    refusing to authorize the application.
+    """
+    response = client.get(
+        path = reverse('home'),
+        data = {
+            'error': 'access_denied'
+        }
+    )
+
+    assert response.status_code == 403
+
+@with_setup(setup=None, teardown=flush_database)
+def test_application_deauthorization():
+    """
+    Verify that the user is marked as deauthorized upon
+    deauthorizing the application.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+    
+    user = User.objects.get(id=1)
+    assert user.authorized == True
+
+    response = client.post(
+        path = reverse('deauthorize_application'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+    
+    user = User.objects.get(id=1)
+    assert user.authorized == False
+
+@with_setup(setup=None, teardown=flush_database)
+def test_signed_request_renewal():
+    """
+    Verify that the user is redirected to renew his/her
+    signed request if its access token has expired.
+    """
+
+    # Create an expired signed request
+    parsed_signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, settings.FACEBOOK_APPLICATION_SECRET_KEY)
+    parsed_signed_request.oauth_token.expires_at = datetime.now() - timedelta(days=1)
+    expired_signed_request = parsed_signed_request.generate(settings.FACEBOOK_APPLICATION_SECRET_KEY)
+
+    response = client.get(
+        path = reverse('home'),
+        data = {
+            'signed_request': expired_signed_request
+        }
+    )
+
+    assert response.status_code == 303
+
+@with_setup(setup=None, teardown=flush_database)
+def test_registration():
+    """
+    Verify that a user and an OAuth token is registered upon
+    querying the application with a signed request.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
 
     user = User.objects.get(id=1)
 
@@ -114,19 +141,54 @@ def test_fandjango_registers_user():
     assert user.last_name == 'Alisonberg'
     assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
     assert user.gender == 'male'
-    assert user.profile_url == 'http://www.facebook.com/profile.php?id=100003097914294'
-
-def test_fandjango_registers_oauth_token():
-    from django.test.client import RequestFactory
-    from fandjango.middleware import FacebookMiddleware
-    from fandjango.models import OAuthToken
-    from datetime import datetime
-
-    request = RequestFactory().post('/', {'signed_request': TEST_SIGNED_REQUEST})
-    FacebookMiddleware().process_request(request)
-
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
+    
     token = OAuthToken.objects.get(id=1)
 
-    assert token.token == 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
+    assert token.token == TEST_ACCESS_TOKEN
     assert token.issued_at == datetime(2011, 10, 31, 9, 0, 27)
     assert token.expires_at == None
+
+@with_setup(setup=None, teardown=flush_database)
+def test_user_details():
+    """
+    Verify that user details may be queried from Facebook.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
+    assert user.gender == 'male'
+    assert user.hometown == None
+    assert user.location == None
+    assert user.bio == None
+    assert user.relationship_status == None
+    assert user.political_views == None
+    assert user.email == None
+    assert user.website == None
+    assert user.locale == 'en_US'
+    assert user.timezone == -5
+    assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
+    assert user.verified == None
+
+@with_setup(setup=None, teardown=flush_database)
+def test_user_synchronization():
+    """
+    Verify that users may be synchronized.
+    """
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    user.synchronize()
