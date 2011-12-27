@@ -20,7 +20,7 @@ setup(
         'fandjango': ['templates/*', 'locale/*']
     },
     install_requires = [
-        'facepy>=0.4.2',
+        'facepy==0.5.1',
         'requests==0.7.6'
     ],
     classifiers = [
