@@ -59,5 +59,12 @@ references the current user in ``request.facebook.user``::
     ``authorized``, ``oauth_token``, ``created_at`` and ``last_seen_at`` attributes are
     persisted. The remaining attributes are queried from Facebook and cached for 24
     hours.
+    
+.. note::
+
+    In order to track whether users have currently authorized your application, you must
+    configure your Facebook application's "Deauthorize Callback" to the URL of Fandjango's
+    ``deauthorize_application`` view
+    (e.g. ``http://example.com/fandjango/deauthorize_application.html).
 
 If the user has not authorized your application, ``request.facebook.user`` is ``None``.
