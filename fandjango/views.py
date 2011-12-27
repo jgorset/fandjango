@@ -29,7 +29,7 @@ def authorize_application(request, redirect_uri='https://%s/%s' % (FACEBOOK_APPL
 
     return render(
         request = request,
-        template_name = 'authorize_application.html',
+        template_name = 'fandjango/authorize_application.html',
         dictionary = {
             'url': 'https://graph.facebook.com/oauth/authorize?%s' % urlencode(query)
         },
@@ -42,7 +42,7 @@ def authorization_denied(request):
     """
     return render(
         request = request,
-        template_name = 'authorization_denied.html',
+        template_name = 'fandjango/authorization_denied.html',
         status = 403
     )
 
