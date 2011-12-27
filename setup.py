@@ -2,16 +2,20 @@
 
 from setuptools import setup
 
-import fandjango
+from fandjango import __version__
 
 setup(
     name = 'fandjango',
-    version = fandjango.__version__,
-    description = "Fandjango makes it easy to create Facebook applications with Django.",
+    version = __version__,
+    description = "Fandjango makes it stupidly easy to create Facebook applications with Django.",
     author = "Johannes Gorset",
     author_email = "jgorset@gmail.com",
     url = "http://github.com/jgorset/fandjango",
-    packages = ['fandjango', 'fandjango.migrations', 'fandjango.templatetags'],
+    packages = [
+        'fandjango',
+        'fandjango.migrations',
+        'fandjango.templatetags'
+    ],
     package_data = {
         'fandjango': ['templates/*']
     },
