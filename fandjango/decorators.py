@@ -7,13 +7,14 @@ from django.core.handlers.wsgi import WSGIRequest
 from fandjango.views import authorize_application
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE
 
-def facebook_authorization_required(redirect_uri=False):
+def facebook_authorization_required(redirect_uri=None):
     """
     Redirect Facebook canvas views to authorization if required.
 
     :param redirect_uri: A string describing an URI to redirect to after authorization is complete. Defaults
                          to current URI in Facebook canvas (ex. http://apps.facebook.com/myapp/path/).
     """
+    
     def decorator(function):
         @wraps(function)
         def wrapper(request, *args, **kwargs):
@@ -30,4 +31,11 @@ def facebook_authorization_required(redirect_uri=False):
 
             return function(request, *args, **kwargs)
         return wrapper
-    return decorator
+
+    if callable(redirect_uri):
+        function = redirect_uri
+        redirect_uri = None
+
+        return decorator(function)
+    else:
+        return decorator
