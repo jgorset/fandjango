@@ -18,7 +18,10 @@ setup(
         'fandjango.templatetags'
     ],
     package_data = {
-        'fandjango': ['templates/*', 'locale/*']
+        'fandjango': [
+            'templates/fandjango/*',
+            'locale/no_NB/LC_MESSAGES/*'
+        ]
     },
     install_requires = [
         'facepy==0.5.1',
