@@ -14,14 +14,17 @@ from fandjango.models import OAuthToken
 
 from facepy import SignedRequest
 
-TEST_ACCESS_TOKEN = 'AAACk2tC9zBYBAOHQLGqAZAjhIXZAIX0kwZB8xsG8ItaEIEK6EFZCvKaoVKhCAOWtBxaHZAXXNlpP9gDJbNNwwQlZBcZA7j8rFLYsUff8EyUJQZDZD'
+TEST_ACCESS_TOKEN = 'AAACk2tC9zBYBAMQkPqG12toWs00QScH035lOvh9WURUQj8KTfo8FJTpqB9BAOSnrk7oR8WPUAhnrm8FGYIjyWNdcALANnZCzZCgXEYzVdRBNjgSPDC'
 
-TEST_SIGNED_REQUEST = '3JpMRg1-xmZAo9L7jZ2RhgSjVi8LCt5YkIxSSaNrGvE.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4' \
-                      'cGlyZXMiOjAsImlzc3VlZF9hdCI6MTMyMDA2OTYyNywib2F1dGhfdG9rZW4iOiJBQUFDazJ0Qzl6QllCQU9I' \
-                      'UUxHcUFaQWpoSVhaQUlYMGt3WkI4eHNHOEl0YUVJRUs2RUZaQ3ZLYW9WS2hDQU9XdEJ4YUhaQVhYTmxwUDln' \
-                      'REpiTk53d1FsWkJjWkE3ajhyRkxZc1VmZjhFeVVKUVpEWkQiLCJ1c2VyIjp7ImNvdW50cnkiOiJubyIsImxv' \
-                      'Y2FsZSI6ImVuX1VTIiwiYWdlIjp7Im1pbiI6MjF9fSwidXNlcl9pZCI6IjEwMDAwMzA5NzkxNDI5NCJ9'
-                      
+TEST_SIGNED_REQUEST = 'Dvr1fXNUwE6CzKkUT3wpLo_7Izpq6i3XtQEf96sfgss.eyJhbGdvcml0aG0' \
+                      'iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEzMjU1MjM2MDAsImlzc3VlZF' \
+                      '9hdCI6MTMyNTUxODQ3MSwib2F1dGhfdG9rZW4iOiJBQUFDazJ0Qzl6QllCQ' \
+                      'U1Ra1BxRzEydG9XczAwUVNjSDAzNWxPdmg5V1VSVVFqOEtUZm84RkpUcHFC' \
+                      'OUJBT1Nucms3b1I4V1BVQWhucm04RkdZSWp5V05kY0FMQU5uWkN6WkNnWEV' \
+                      'ZelZkUkJOamdTUERDIiwidXNlciI6eyJjb3VudHJ5Ijoibm8iLCJsb2NhbG' \
+                      'UiOiJlbl9HQiIsImFnZSI6eyJtaW4iOjIxfX0sInVzZXJfaWQiOiIxMDAwM' \
+                      'DMzMjIzMjk1OTEifQ'
+
 TEST_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 
 client = Client()
@@ -136,18 +139,18 @@ def test_registration():
 
     user = User.objects.get(id=1)
 
-    assert user.first_name == 'Bob'
-    assert user.middle_name == 'Amcjigiadbid'
-    assert user.last_name == 'Alisonberg'
-    assert user.full_name == 'Bob Amcjigiadbid Alisonberg'
-    assert user.gender == 'male'
-    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
+    assert user.first_name == 'Lisa'
+    assert user.middle_name == 'Amccbbcbieia'
+    assert user.last_name == 'Panditstein'
+    assert user.full_name == 'Lisa Amccbbcbieia Panditstein'
+    assert user.gender == 'female'
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003322329591'
     
     token = OAuthToken.objects.get(id=1)
 
     assert token.token == TEST_ACCESS_TOKEN
-    assert token.issued_at == datetime(2011, 10, 31, 9, 0, 27)
-    assert token.expires_at == None
+    assert token.issued_at == datetime(2012, 01, 02, 9, 34, 31)
+    assert token.expires_at == datetime(2012, 01, 02, 11, 00, 00)
 
 @with_setup(setup=None, teardown=flush_database)
 def test_user_details():
@@ -163,8 +166,8 @@ def test_user_details():
 
     user = User.objects.get(id=1)
 
-    assert user.url == 'http://www.facebook.com/profile.php?id=100003097914294'
-    assert user.gender == 'male'
+    assert user.url == 'http://www.facebook.com/profile.php?id=100003322329591'
+    assert user.gender == 'female'
     assert user.hometown == None
     assert user.location == None
     assert user.bio == None
@@ -172,9 +175,9 @@ def test_user_details():
     assert user.political_views == None
     assert user.email == None
     assert user.website == None
-    assert user.locale == 'en_US'
-    assert user.timezone == -5
-    assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/yo/r/UlIqmHJn-SK.gif'
+    assert user.locale == 'en_GB', user.locale
+    assert user.timezone == 1
+    assert user.picture == 'http://profile.ak.fbcdn.net/static-ak/rsrc.php/v1/y9/r/IB7NOFmPw2a.gif'
     assert user.verified == None
 
 @with_setup(setup=None, teardown=flush_database)
