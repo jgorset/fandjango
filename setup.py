@@ -8,7 +8,6 @@ setup(
     name = 'fandjango',
     version = __version__,
     description = "Fandjango makes it stupidly easy to create Facebook applications with Django.",
-    long_description = open('README.rst').read(),
     author = "Johannes Gorset",
     author_email = "jgorset@gmail.com",
     url = "http://github.com/jgorset/fandjango",
@@ -19,9 +18,8 @@ setup(
     ],
     package_data = {
         'fandjango': [
-            'templates/*',
-            'locale/*'
-            'migrations/*'
+            'templates/fandjango/*',
+            'locale/no_NB/LC_MESSAGES/*'
         ]
     },
     install_requires = [

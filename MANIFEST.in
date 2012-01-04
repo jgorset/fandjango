@@ -1,0 +1,6 @@
+include CHANGELOG
+include DEPENDENCIES
+include LICENSE
+include README.rst
+include setup.py
+recursive-include fandjango *
