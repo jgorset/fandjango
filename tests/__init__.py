@@ -1,4 +1,4 @@
-from django.core.management  import setup_environ
+from django.core.management import setup_environ
 
 from project import settings
 
