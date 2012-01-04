@@ -47,9 +47,6 @@ class FacebookMiddleware():
 
                 return authorization_denied_view(request)
 
-        if 'error' in request.GET and request.GET['error'] == 'access_denied':
-            return authorization_denied(request)
-
         # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
             request.facebook = Facebook()
