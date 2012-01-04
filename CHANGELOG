@@ -1,5 +1,10 @@
 CHANGELOG
 
+4.0.1
+
+- Fixed a bug that caused an ImportError with FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS.
+- Fixed a bug prevented templates from being installed.
+
 4.0.0
 
 - User#graph no longer supports Facebook's Python SDK.
