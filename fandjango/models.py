@@ -18,7 +18,7 @@ class Facebook:
 
     user = None
     """A ``User`` instance."""
-    
+
     signed_request = None
     """A ``SignedRequest`` instance."""
 
@@ -30,31 +30,31 @@ class User(models.Model):
 
     facebook_id = models.BigIntegerField(_('facebook id'), unique=True)
     """An integer describing the user's Facebook ID."""
-    
+
     facebook_username = models.CharField(_('facebook username'), max_length=255, blank=True, null=True)
     """A string describing the user's Facebook username."""
-    
+
     first_name = models.CharField(_('first name'), max_length=255, blank=True, null=True)
     """A string describing the user's first name."""
-    
+
     middle_name = models.CharField(_('middle name'), max_length=255, blank=True, null=True)
     """A string describing the user's middle name."""
 
     last_name = models.CharField(_('last name'), max_length=255, blank=True, null=True)
     """A string describing the user's last name."""
-    
+
     birthday = models.DateField(_('birthday'), blank=True, null=True)
     """A ``datetime`` object describing the user's birthday."""
-    
+
     authorized = models.BooleanField(_('authorized'), default=True)
     """A boolean describing whether the user has currently authorized the application."""
-    
+
     oauth_token = models.OneToOneField('OAuthToken', verbose_name=_('OAuth token'))
     """An ``OAuthToken`` object."""
-    
+
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     """A ``datetime`` object describing when the user was registered."""
-    
+
     last_seen_at = models.DateTimeField(_('last seen at'), auto_now_add=True)
     """A ``datetime`` object describing when the user was last seen."""
 
