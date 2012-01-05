@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 from django.test.client import Client
 from django.test.client import RequestFactory
-from django.test.utils import setup_test_environment
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.conf import settings
@@ -17,8 +16,6 @@ from facepy import GraphAPI, SignedRequest
 
 TEST_APPLICATION_ID = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
-
-setup_test_environment()
 
 call_command('syncdb', interactive=False)
 call_command('migrate', interactive=False)
