@@ -31,7 +31,7 @@ In your ``settings`` module...
     middleware precedes it. Otherwise, Facebook's requests to your application will qualify
     as cross-site request forgeries.
 
-Finally, synchronize your database:
+Finally, synchronize your database::
 
     $ python manage.py syncdb
     
