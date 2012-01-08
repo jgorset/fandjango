@@ -23,6 +23,14 @@ There are a number of ways to get involved with Fandjango:
 
 * **Submit patches or new features.** Create a fork and send me a pull request on `Github`_!
 
+Tests
+-----
+
+Fandjango has an exhaustive test suite for `nose`_::
+
+    $ export DJANGO_SETTINGS_MODULE=tests.project.settings
+    $ nosetests
+
 Releases
 --------
 
@@ -60,6 +68,7 @@ Major and minor releases do not mark the end of the previous line or lines of de
   may also continue to get bugfixes – but there’s no longer a guarantee of any kind. Thus, if a bug
   were found in 1.1 that affected 0.9 and could be easily applied, a new 0.9.x version might be released.
 
+.. _nose: http://readthedocs.org/docs/nose/en/latest/
 .. _issue tracker: https://github.com/jgorset/fandjango/issues
 .. _Github: http://github.com
 .. _PEP-8: http://www.python.org/dev/peps/pep-0008/
