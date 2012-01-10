@@ -23,8 +23,8 @@ setup(
         ]
     },
     install_requires = [
-        'facepy==0.5.1',
-        'requests==0.7.6'
+        'facepy, >= 0.6.2, < 0.7',
+        'requests >= 0.8, < 0.9'
     ],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
