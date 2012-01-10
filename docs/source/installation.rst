@@ -19,18 +19,25 @@ In your ``settings`` module...
 * Add ``fandjango`` to ``INSTALLED_APPS``
 * Add ``fandjango.middleware.FacebookMiddleware`` to ``MIDDLEWARE_CLASSES``
 * Add ``url(r'^fandjango/', include('fandjango.urls'))`` to your patterns.
+* Specify your Facebook application's id, secret key and namespace::
+
+    FACEBOOK_APPLICATION_ID = '...'
+    FACEBOOK_APPLICATION_SECRET_KEY = '...'
+    FACEBOOK_APPLICATION_NAMESPACE = '...'
 
 .. note::
 
     If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's
     middleware precedes it. Otherwise, Facebook's requests to your application will qualify
     as cross-site request forgeries.
+
+Finally, synchronize your database::
+
+    $ python manage.py syncdb
     
-Finally, specify your Facebook application's id, secret key and namespace::
-    
-    FACEBOOK_APPLICATION_ID = '...'
-    FACEBOOK_APPLICATION_SECRET_KEY = '...'
-    FACEBOOK_APPLICATION_NAMESPACE = '...'
+.. note::
+
+    If you're using `South`_, run schema migrations instead.
 
 .. _dependencies:
 
