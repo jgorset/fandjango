@@ -4,10 +4,14 @@ from setuptools import setup
 
 from fandjango import __version__
 
+readme = open('README.rst').read()
+history = open('HISTORY.rst').read()
+
 setup(
     name = 'fandjango',
     version = __version__,
     description = "Fandjango makes it stupidly easy to create Facebook applications with Django.",
+    long_description = readme + '\n\n' + history,
     author = "Johannes Gorset",
     author_email = "jgorset@gmail.com",
     url = "http://github.com/jgorset/fandjango",
