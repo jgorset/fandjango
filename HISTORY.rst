@@ -60,7 +60,7 @@ History
 +++++
 
 * You may now find an instance of your favourite Graph API client (provided your favourite is either
-Facepy or Facebook's official Python SDK) initialized with the user's access token in 'User#graph'.
+  Facepy or Facebook's official Python SDK) initialized with the user's access token in 'User#graph'.
 * You may now initialize Facebook's JavaScript SDK with the 'facebook_init' template tag.
 
 3.6.3
@@ -78,7 +78,7 @@ Facepy or Facebook's official Python SDK) initialized with the user's access tok
 +++++
 
 * Fixed a bug that caused the "facebook_authorization_required" decorator to be incompatible with Django libraries that modify
-the order of arguments given to views.
+  the order of arguments given to views.
 
 3.6.0
 +++++
