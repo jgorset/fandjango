@@ -1,5 +1,11 @@
 CHANGELOG
 
+4.0.2
+
+- Fixed a bug that caused an AttributeError upon issuing a HTTP GET request to the deauthorization view.
+- Fixed a bug that caused application deauthorization to fail.
+- Fixed a bug that prevented the norwegian localization from being applied.
+
 4.0.1
 
 - Fixed a bug that caused an ImportError with FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS.
