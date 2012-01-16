@@ -38,12 +38,12 @@ def setup_module(module):
             id = user['id'],
             age = range(0, 100),
             locale = 'en_US',
-            country = 'Norway',
-            oauth_token = SignedRequest.User.OAuthToken(
-                token = user['access_token'],
-                issued_at = datetime.now(),
-                expires_at = None
-            )
+            country = 'Norway'
+        ),
+        oauth_token = SignedRequest.OAuthToken(
+            token = user['access_token'],
+            issued_at = datetime.now(),
+            expires_at = None
         )
     ).generate(TEST_APPLICATION_SECRET)
 
