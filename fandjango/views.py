@@ -52,10 +52,14 @@ def deauthorize_application(request):
     "deauthorization callback" URL. This view picks up on requests of this sort and marks the corresponding
     users as unauthorized.
     """
-    user = User.objects.get(
-        facebook_id = request.facebook.signed_request.user.id
-    )
-    user.authorized = False
-    user.save()
+    if request.facebook:
+        user = User.objects.get(
+            facebook_id = request.facebook.signed_request.user.id
+        )
 
-    return HttpResponse()
+        user.authorized = False
+        user.save()
+
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)
