@@ -42,6 +42,9 @@ Finally, synchronize your database::
 Optional settings
 ^^^^^^^^^^^^^^^^^
 
+``FACEBOOK_APPLICATION_CANVAS_URL``
+    A string describing the Facebook application's canvas URL.
+
 ``FANDJANGO_DISABLED_PATHS``
     A list of regular expressions describing paths on which Fandjango should be disabled.
 
