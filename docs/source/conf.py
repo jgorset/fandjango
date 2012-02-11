@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Fandjango'
-copyright = u'2011, Johannes Gorset'
+copyright = u'2012, Johannes Gorset'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
