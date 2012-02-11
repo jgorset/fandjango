@@ -6,9 +6,9 @@ Installation and configuration
 Fandjango is best installed with `pip`_::
 
     $ pip install fandjango
-    
+
 .. _pip: http://www.pip-installer.org/en/latest/
-    
+
 .. _configuration:
 
 Configuration
@@ -34,10 +34,26 @@ In your ``settings`` module...
 Finally, synchronize your database::
 
     $ python manage.py syncdb
-    
+
 .. note::
 
     If you're using `South`_, run schema migrations instead.
+
+Optional settings
+^^^^^^^^^^^^^^^^^
+
+``FANDJANGO_DISABLED_PATHS``
+    A list of regular expressions describing paths on which Fandjango should be disabled.
+
+``FANDJANGO_ENABLED_PATHS``
+    A list of regular expressions describing paths on which Fandjango should be enabled.
+
+``AUTHORIZATION_DENIED_VIEW``
+    A string describing a view that will be rendered for users that refuse to authorize the application.
+
+``FACEBOOK_APPLICATION_INITIAL_PERMISSIONS``
+    A list of strings describing `permissions <http://developers.facebook.com/docs/reference/api/permissions/>`_
+    that will be requested upon authorizing the application.
 
 .. _dependencies:
 
@@ -79,7 +95,7 @@ with ``pip``, e.g. ``pip install -r DEPENDENCIES``.
 .. _Sphinx: http://www.pip-installer.org/en/latest/
 
  .. _upgrading:
- 
+
 Upgrading
 ---------
 
