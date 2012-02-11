@@ -5,6 +5,9 @@ from django.conf import settings
 # A string describing the Facebook application's ID.
 FACEBOOK_APPLICATION_ID = getattr(settings, 'FACEBOOK_APPLICATION_ID')
 
+# A string describing the Facebook application's canvas URL.
+FACEBOOK_APPLICATION_CANVAS_URL = getattr(settings, 'FACEBOOK_APPLICATION_CANVAS_URL', None)
+
 # A string describing the Facebook application's secret key.
 FACEBOOK_APPLICATION_SECRET_KEY = getattr(settings, 'FACEBOOK_APPLICATION_SECRET_KEY')
 

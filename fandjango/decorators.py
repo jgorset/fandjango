@@ -23,11 +23,7 @@ def facebook_authorization_required(redirect_uri=None):
             if not request.facebook or not request.facebook.user:
                 return authorize_application(
                     request = request,
-                    redirect_uri = redirect_uri or 'http://%(domain)s/%(namespace)s%(url)s' % {
-                        'domain': FACEBOOK_APPLICATION_DOMAIN,
-                        'namespace': FACEBOOK_APPLICATION_NAMESPACE,
-                        'url': request.get_full_path()
-                    }
+                    redirect_uri = get_post_authorization_redirect_url(request)
                 )
 
             return function(request, *args, **kwargs)

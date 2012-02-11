@@ -11,6 +11,7 @@ from django.conf import settings
 from fandjango.middleware import FacebookMiddleware
 from fandjango.models import User
 from fandjango.models import OAuthToken
+from fandjango.utils import get_post_authorization_redirect_url
 
 from facepy import GraphAPI, SignedRequest
 
@@ -19,6 +20,8 @@ TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
 
 call_command('syncdb', interactive=False)
 call_command('migrate', interactive=False)
+
+request_factory = RequestFactory()
 
 def setup_module(module):
     """
@@ -61,7 +64,6 @@ def test_method_override():
     Verify that the request method is overridden
     from POST to GET if it contains a signed request.
     """
-    request_factory = RequestFactory()
     facebook_middleware = FacebookMiddleware()
 
     request = request_factory.post(
@@ -224,3 +226,13 @@ def test_user_permissions():
     user = User.objects.get(id=1)
 
     assert 'installed' in user.permissions
+
+@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+def test_get_post_authorization_redirect_url():
+    """
+    Verify that Fandjango redirects the user correctly upon authorizing the application.
+    """
+    request = request_factory.get('/foo/bar/baz')
+    redirect_url = get_post_authorization_redirect_url(request)
+
+    assert redirect_url == 'http://apps.facebook.com/fandjango-test/bar/baz'

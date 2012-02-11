@@ -6,12 +6,12 @@ from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
-from fandjango.utils import is_disabled_path, is_enabled_path, authorization_denied_view
 from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
-from fandjango.settings import (
-    FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE,
-    FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
+from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
+from fandjango.utils import (
+    is_disabled_path, is_enabled_path,
+    authorization_denied_view, get_post_authorization_redirect_url
 )
 
 from facepy import SignedRequest, GraphAPI
@@ -67,11 +67,7 @@ class FacebookMiddleware():
                 if request.facebook.signed_request.oauth_token.has_expired:
                     return authorize_application(
                         request = request,
-                        redirect_uri = 'http://%(domain)s/%(namespace)s%(url)s' % {
-                            'domain': FACEBOOK_APPLICATION_DOMAIN,
-                            'namespace': FACEBOOK_APPLICATION_NAMESPACE,
-                            'url': request.get_full_path()
-                        }
+                        redirect_uri = get_post_authorization_redirect_url(request)
                     )
 
                 # Initialize a User object and its corresponding OAuth token

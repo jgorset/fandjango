@@ -1,10 +1,14 @@
 import re
 from datetime import timedelta
+from urlparse import urlparse
 from functools import wraps
 
 from django.core.cache import cache
 from django.utils.importlib import import_module
 
+from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL
+from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
+from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import DISABLED_PATHS
 from fandjango.settings import ENABLED_PATHS
 from fandjango.settings import AUTHORIZATION_DENIED_VIEW
@@ -70,3 +74,17 @@ def authorization_denied_view(request):
 
     return authorization_denied_view(request)
 
+def get_post_authorization_redirect_url(request):
+    """Determine the URL users should be redirected to upon authorization the application."""
+    path = request.get_full_path()
+
+    if FACEBOOK_APPLICATION_CANVAS_URL:
+        path = path.replace(urlparse(FACEBOOK_APPLICATION_CANVAS_URL).path, '')
+
+    redirect_uri = 'http://%(domain)s/%(namespace)s%(path)s' % {
+        'domain': FACEBOOK_APPLICATION_DOMAIN,
+        'namespace': FACEBOOK_APPLICATION_NAMESPACE,
+        'path': path
+    }
+
+    return redirect_uri
