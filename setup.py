@@ -2,7 +2,7 @@
 
 from setuptools import setup
 
-from fandjango import __version__
+execfile('fandjango/version.py')
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read()
