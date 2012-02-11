@@ -171,6 +171,22 @@ class User(models.Model):
         return self.graph.get('me').get('verified', None)
 
     @property
+    def permissions(self):
+        """
+        A list of strings describing `permissions`_ the user has granted your application.
+
+        .. _permissions: http://developers.facebook.com/docs/reference/api/permissions/
+        """
+        records = self.graph.get('me/permissions')['data'][0]
+
+        permissions = []
+        for permission, status in records.items():
+            if status:
+                permissions.append(permission)
+
+        return permissions
+
+    @property
     def graph(self):
         """
         A ``Facepy.GraphAPI`` instance initialized with the user's access token (See `Facepy`_).
@@ -200,7 +216,7 @@ class User(models.Model):
             return u'%s' % self.facebook_username
         else:
             return u'%s' % self.facebook_id
-            
+
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
@@ -213,10 +229,10 @@ class OAuthToken(models.Model):
 
     token = models.TextField(_('token'))
     """A string describing the OAuth token itself."""
-    
+
     issued_at = models.DateTimeField(_('issued at'))
     """A ``datetime`` object describing when the token was issued."""
-    
+
     expires_at = models.DateTimeField(_('expires at'), null=True, blank=True)
     """A ``datetime`` object describing when the token expires (or ``None`` if it doesn't)"""
 

@@ -25,9 +25,9 @@ def setup_module(module):
     Create a Facebook test user.
     """
     global TEST_SIGNED_REQUEST
-    
+
     graph = GraphAPI('%s|%s' % (TEST_APPLICATION_ID, TEST_APPLICATION_SECRET))
-    
+
     user = graph.post('%s/accounts/test-users' % TEST_APPLICATION_ID,
         installed = True,
         permissions = ['publish_stream, read_stream']
@@ -91,7 +91,7 @@ def test_application_authorization():
     # There's no way to derive the view the response originated from in Django,
     # so verifying its status code will have to suffice.
     assert response.status_code == 303
-    
+
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_authorization_denied():
     """
@@ -181,7 +181,7 @@ def test_registration():
     assert user.middle_name == user.graph.get('me')['middle_name']
     assert user.last_name == user.graph.get('me')['last_name']
     assert user.url == user.graph.get('me')['link']
-    
+
     token = OAuthToken.objects.get(id=1)
     signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
 
@@ -206,3 +206,21 @@ def test_user_synchronization():
     user = User.objects.get(id=1)
 
     user.synchronize()
+
+@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+def test_user_permissions():
+    """
+    Verify that users maintain a list of permissions granted to the application.
+    """
+    client = Client()
+
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    assert 'installed' in user.permissions
