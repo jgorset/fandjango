@@ -5,15 +5,13 @@ import time
 from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
 
-from fandjango.utils import is_disabled_path, is_enabled_path
+from fandjango.utils import is_disabled_path, is_enabled_path, authorization_denied_view
 from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import (
     FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE,
-    FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS,
-    AUTHORIZATION_DENIED_VIEW
+    FACEBOOK_APPLICATION_SECRET_KEY, DISABLED_PATHS, ENABLED_PATHS
 )
 
 from facepy import SignedRequest, GraphAPI
@@ -39,12 +37,6 @@ class FacebookMiddleware():
 
             # The user refused to authorize the application...
             if error == 'access_denied':
-                authorization_denied_module_name = AUTHORIZATION_DENIED_VIEW.rsplit('.', 1)[0]
-                authorization_denied_view_name = AUTHORIZATION_DENIED_VIEW.split('.')[-1]
-
-                authorization_denied_module = import_module(authorization_denied_module_name)
-                authorization_denied_view = getattr(authorization_denied_module, authorization_denied_view_name)
-
                 return authorization_denied_view(request)
 
         # Signed request found in either GET, POST or COOKIES...

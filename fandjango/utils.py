@@ -3,9 +3,11 @@ from datetime import timedelta
 from functools import wraps
 
 from django.core.cache import cache
+from django.utils.importlib import import_module
 
 from fandjango.settings import DISABLED_PATHS
 from fandjango.settings import ENABLED_PATHS
+from fandjango.settings import AUTHORIZATION_DENIED_VIEW
 
 def is_disabled_path(path):
     """
@@ -57,3 +59,14 @@ def cached_property(**kwargs):
             return value
         return wrapper
     return decorator
+
+def authorization_denied_view(request):
+    """Proxy for the view referenced in ``FANDJANGO_AUTHORIZATION_DENIED_VIEW``."""
+    authorization_denied_module_name = AUTHORIZATION_DENIED_VIEW.rsplit('.', 1)[0]
+    authorization_denied_view_name = AUTHORIZATION_DENIED_VIEW.split('.')[-1]
+
+    authorization_denied_module = import_module(authorization_denied_module_name)
+    authorization_denied_view = getattr(authorization_denied_module, authorization_denied_view_name)
+
+    return authorization_denied_view(request)
+
