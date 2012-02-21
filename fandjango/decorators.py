@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.handlers.wsgi import WSGIRequest
 
+from fandjango.utils import get_post_authorization_redirect_url
 from fandjango.views import authorize_application
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE
 
