@@ -145,20 +145,3 @@ class FacebookMiddleware():
                 delta = timedelta(seconds=int(extended_token["expires"][0]))
                 user.oauth_token.expires_at = datetime.now() + delta
                 user.oauth_token.token = extended_token["access_token"][0]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
