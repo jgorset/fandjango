@@ -12,7 +12,11 @@ from fandjango.settings import (
     FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 )
 
-def authorize_application(request, redirect_uri='https://%s/%s' % (FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE)):
+def authorize_application(
+    request,
+    redirect_uri = 'https://%s/%s' % (FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE),
+    permissions = FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
+    ):
     """
     Redirect the user to authorize the application.
 
@@ -24,8 +28,8 @@ def authorize_application(request, redirect_uri='https://%s/%s' % (FACEBOOK_APPL
         'redirect_uri': redirect_uri
     }
 
-    if FACEBOOK_APPLICATION_INITIAL_PERMISSIONS:
-        query['scope'] = ', '.join(FACEBOOK_APPLICATION_INITIAL_PERMISSIONS)
+    if permissions:
+        query['scope'] = ', '.join(permissions)
 
     return render(
         request = request,

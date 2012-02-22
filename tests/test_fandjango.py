@@ -95,6 +95,23 @@ def test_application_authorization():
     assert response.status_code == 303
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+def test_application_authorization_with_additional_permissions():
+    """
+    Verify that the user is redirected to authorize the application upon querying a view
+    decorated by ``facebook_authorization_required`` and a list of additional
+    permissions sans signed request.
+    """
+    client = Client()
+
+    response = client.get(
+        path = reverse('places')
+    )
+
+    # There's no way to derive the view the response originated from in Django,
+    # so verifying its status code will have to suffice.
+    assert response.status_code == 303
+
+@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_authorization_denied():
     """
     Verify that the view referred to by AUTHORIZATION_DENIED_VIEW is

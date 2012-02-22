@@ -16,14 +16,23 @@ decorator::
 
     `Facebook's documentation on authorization <http://developers.facebook.com/docs/authentication/>`_
 
-You may govern which permissions the application will request upon authorization
-by configuring the ``FACEBOOK_APPLICATION_INITIAL_PERMISSIONS`` setting::
+You may govern which permissions the application requests by default by configuring the
+``FACEBOOK_APPLICATION_INITIAL_PERMISSIONS`` setting::
 
     FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = ['read_stream', publish_stream']
 
 .. admonition:: See also
 
     `Facebook's documentation on permissions <http://developers.facebook.com/docs/reference/api/permissions/>`_
+
+You can request permissions besides the defaults by passing a list of permissions to the
+``facebook_authorization_required`` decorator for a particular view::
+
+    from fandjango.decorators import facebook_authorization_required
+
+    @facebook_authorization_required(permissions=["user_events", "user_checkins"])
+    def stalk(request):
+        ...
 
 Users that refuse to authorize your application will be directed to the view referenced by the
 ``FANDJANGO_AUTHORIZATION_DENIED_VIEW`` setting, which defaults to rendering the template
@@ -43,15 +52,15 @@ references the current user in ``request.facebook.user``::
             greeting = "Hi, %s!" % request.facebook.user.first_name
         else:
             greeting = "Go away, I don't know you and I don't want to know you."
-            
+
         return HttpResponse(greeting)
 
 .. autoclass:: fandjango.models.User
     :members:
-    
+
 .. autoclass:: fandjango.models.OAuthToken
     :members:
-    
+
 
 .. note::
 
@@ -59,7 +68,7 @@ references the current user in ``request.facebook.user``::
     ``authorized``, ``oauth_token``, ``created_at`` and ``last_seen_at`` attributes are
     persisted. The remaining attributes are queried from Facebook and cached for 24
     hours.
-    
+
 .. note::
 
     In order to track whether users have currently authorized your application, you must
