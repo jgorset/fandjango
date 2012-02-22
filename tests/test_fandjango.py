@@ -184,13 +184,6 @@ def test_registration():
     assert user.last_name == user.graph.get('me')['last_name']
     assert user.url == user.graph.get('me')['link']
 
-    token = OAuthToken.objects.get(id=1)
-    signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
-
-    assert token.token == signed_request.oauth_token.token
-    assert token.issued_at == signed_request.oauth_token.issued_at
-    assert token.expires_at == signed_request.oauth_token.expires_at
-
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_user_synchronization():
     """
@@ -226,6 +219,28 @@ def test_user_permissions():
     user = User.objects.get(id=1)
 
     assert 'installed' in user.permissions
+
+@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+def test_extend_oauth_token():
+    """
+    Verify that OAuth access tokens may be extended.
+    """
+    client = Client()
+
+    client.post(
+        path = reverse('home'),
+        data = {
+            'signed_request': TEST_SIGNED_REQUEST
+        }
+    )
+
+    user = User.objects.get(id=1)
+
+    user.oauth_token.extend()
+
+    # Facebook doesn't extend access tokens for test users, so asserting
+    # the expiration time will have to suffice.
+    assert user.oauth_token.expires_at
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_get_post_authorization_redirect_url():
