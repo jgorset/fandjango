@@ -6,6 +6,7 @@ from django.core.handlers.wsgi import WSGIRequest
 
 from fandjango.views import authorize_application
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN, FACEBOOK_APPLICATION_NAMESPACE
+from fandjango.utils import get_post_authorization_redirect_url
 
 def facebook_authorization_required(redirect_uri=None):
     """
@@ -15,7 +16,7 @@ def facebook_authorization_required(redirect_uri=None):
                          Defaults to the current URI in the Facebook canvas (e.g.
                          ``http://apps.facebook.com/myapp/current/path``).
     """
-    
+
     def decorator(function):
         @wraps(function)
         def wrapper(request, *args, **kwargs):
