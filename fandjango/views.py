@@ -31,7 +31,7 @@ def authorize_application(request, redirect_uri='https://%s/%s' % (FACEBOOK_APPL
         request = request,
         template_name = 'fandjango/authorize_application.html',
         dictionary = {
-            'url': 'https://graph.facebook.com/oauth/authorize?%s' % urlencode(query)
+            'url': 'https://www.facebook.com/dialog/oauth?%s' % urlencode(query)
         },
         status = 303
     )
