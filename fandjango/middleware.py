@@ -97,6 +97,8 @@ class FacebookMiddleware():
                         user.oauth_token.save()
 
                     user.save()
+                finally:
+                    user.oauth_token.extend()
 
                 request.facebook.user = user
 
