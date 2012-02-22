@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta
-from urllib import urlencode, urlopen
-import urlparse
+from datetime import datetime
 import time
 
 from django.conf import settings
@@ -9,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
-from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID, DISABLED_PATHS, ENABLED_PATHS, FACEBOOK_EXTEND_ACCESS_TOKEN
+from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID, DISABLED_PATHS, ENABLED_PATHS
 from fandjango.utils import (
     is_disabled_path, is_enabled_path,
     authorization_denied_view, get_post_authorization_redirect_url
@@ -86,7 +84,6 @@ class FacebookMiddleware():
                         oauth_token = oauth_token
                     )
 
-                    self.extend_token(user)
                     user.synchronize()
 
                 else:
@@ -97,7 +94,6 @@ class FacebookMiddleware():
                         user.oauth_token.token = request.facebook.signed_request.oauth_token.token
                         user.oauth_token.issued_at = request.facebook.signed_request.oauth_token.issued_at
                         user.oauth_token.expires_at = request.facebook.signed_request.oauth_token.expires_at
-                        self.extend_token(user)
                         user.oauth_token.save()
 
                     user.save()
@@ -120,28 +116,3 @@ class FacebookMiddleware():
             response.set_cookie('signed_request', request.REQUEST['signed_request'])
         response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         return response
-
-    def extend_token(self, user):
-        """
-        This method will ask a new token with an extended expiration date.
-        https://developers.facebook.com/docs/offline-access-deprecation/
-        """
-        if FACEBOOK_EXTEND_ACCESS_TOKEN:
-            uri = str("https://graph.facebook.com/oauth/access_token?"
-                        "client_id=%(client_id)s&"
-                        "client_secret=%(client_secret)s&"
-                        "grant_type=fb_exchange_token&"
-                        "fb_exchange_token=%(token)s" % 
-                        {
-                            'client_id': FACEBOOK_APPLICATION_ID,
-                            'client_secret': FACEBOOK_APPLICATION_SECRET_KEY,
-                            'token': user.oauth_token.token
-                        })
-
-            content = urlopen(uri)
-            extended_token = urlparse.parse_qs(content.read())
-
-            if "expires" in extended_token and "access_token" in extended_token: 
-                delta = timedelta(seconds=int(extended_token["expires"][0]))
-                user.oauth_token.expires_at = datetime.now() + delta
-                user.oauth_token.token = extended_token["access_token"][0]

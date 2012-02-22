@@ -1,10 +1,12 @@
 from httplib import HTTPConnection
-from datetime import datetime
+from datetime import datetime, timedelta
+from urlparse import parse_qs
 
 from django.db import models
 from django.utils.translation import ugettext as _
 
 from fandjango.utils import cached_property as cached
+from fandjango.settings import FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_SECRET_KEY
 
 from facepy import GraphAPI
 
@@ -239,6 +241,24 @@ class OAuthToken(models.Model):
     @property
     def expired(self):
         return self.expires_at < datetime.now() if self.expires_at else False
+
+    def extend(self):
+        """Extend the OAuth token."""
+        graph = GraphAPI()
+
+        response = graph.get('oauth/access_token',
+            client_id = FACEBOOK_APPLICATION_ID,
+            client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+            grant_type = 'fb_exchange_token',
+            fb_exchange_token = self.token
+        )
+
+        components = parse_qs(response)
+
+        self.token = components['access_token'][0]
+        self.expires_at = datetime.now() + timedelta(seconds = int(components['expires'][0]))
+
+        self.save()
 
     class Meta:
         verbose_name = _('OAuth token')
