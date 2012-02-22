@@ -29,3 +29,7 @@ FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = getattr(settings, 'FACEBOOK_APPLICATI
 
 # A string describing the Facebook's application's domain
 FACEBOOK_APPLICATION_DOMAIN = getattr(settings, 'FACEBOOK_APPLICATION_DOMAIN', 'apps.facebook.com')
+
+# A boolean telling if the application must resquest an extended access token
+FACEBOOK_EXTEND_ACCESS_TOKEN = getattr(settings, 'FACEBOOK_EXTEND_ACCESS_TOKEN', False)
+
