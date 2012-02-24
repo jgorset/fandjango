@@ -20,7 +20,7 @@ Documentation
 Overview
 ^^^^^^^^
 
-If you're new to Facebook applications, you should read Facebook's strangely
+If you're new to Facebook applications, you should read Facebook's surprisingly
 excellent `documentation <http://developers.facebook.com/docs/guides/canvas/>`_
 before continuing. The rest of the documentation will assume you're at least
 passingly familiar with the material contained within.

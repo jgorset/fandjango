@@ -27,7 +27,7 @@ In your ``settings`` module...
 
 .. note::
 
-    If you're using Django's built-in CSRF protection middleware, you need to make sure Fandjango's
+    If you're using Django's CSRF protection middleware, you need to make sure Fandjango's
     middleware precedes it. Otherwise, Facebook's requests to your application will qualify
     as cross-site request forgeries.
 

@@ -4,7 +4,7 @@ Fandjango
 About
 -----
 
-Fandjango makes it stupidly easy to create Facebook applications with Django.
+Fandjango makes it really easy to create Facebook applications with Django.
 
 Usage
 -----
@@ -24,3 +24,17 @@ Installation
 ::
 
     $ pip install fandjango
+
+Contribute
+----------
+
+* Fork the repository.
+* Do your thing.
+* Open a pull request.
+* Receive cake.
+
+I love you
+----------
+
+Johannes Gorset made this. You should `tweet me <http://twitter.com/jgorset>`_ if you can't get it
+to work. In fact, you should tweet me anyway.
