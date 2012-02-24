@@ -1,9 +1,6 @@
 Fandjango
 =========
 
-About
------
-
 Fandjango makes it really easy to create Facebook applications with Django.
 
 Usage
