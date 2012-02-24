@@ -3,8 +3,8 @@
 Authorization
 =============
 
-You may require users to authorize your application with the ``facebook_authorization_required``
-decorator::
+You can require users to authorize your application by decorating views with
+``facebook_authorization_required``::
 
     from fandjango.decorators import facebook_authorization_required
 
@@ -16,10 +16,10 @@ decorator::
 
     `Facebook's documentation on authorization <http://developers.facebook.com/docs/authentication/>`_
 
-You may govern which permissions the application requests by default by configuring the
+You can govern which permissions the application requests by default by configuring the
 ``FACEBOOK_APPLICATION_INITIAL_PERMISSIONS`` setting::
 
-    FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = ['read_stream', publish_stream']
+    FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = ['read_stream', 'publish_stream']
 
 .. admonition:: See also
 
@@ -30,7 +30,7 @@ You can request permissions besides the defaults by passing a list of permission
 
     from fandjango.decorators import facebook_authorization_required
 
-    @facebook_authorization_required(permissions=["user_events", "user_checkins"])
+    @facebook_authorization_required(permissions=['user_photos', 'user_relationships'])
     def stalk(request):
         ...
 
