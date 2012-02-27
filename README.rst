@@ -6,6 +6,8 @@ Fandjango makes it really easy to create Facebook applications with Django.
 Usage
 -----
 
+::
+
     @facebook_authorization_required
     def greet(request):
         return HttpResponse('Hi, %s!' % request.facebook.user.first_name)
