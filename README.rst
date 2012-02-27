@@ -1,6 +1,8 @@
 Fandjango
 =========
 
+.. image:: https://secure.travis-ci.org/jgorset/fandjango.png?branch=master
+
 Fandjango makes it really easy to create Facebook applications with Django.
 
 Usage
