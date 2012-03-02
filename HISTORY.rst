@@ -1,6 +1,17 @@
 History
 -------
 
+4.0.3
++++++
+
+* You may now set view-specific permissions.
+* Added User#permissions.
+* Added FACEBOOK_APPLICATION_CANVAS_URL setting.
+* OAuth tokens are now extended (see `Deprecation of Offline Access Permission`_)
+* Fixed an issue that prevented users from authorizing applications under Internet Explorer.
+
+.. _Deprecation of Offline Access Permission: http://developers.facebook.com/docs/offline-access-deprecation/
+
 4.0.2
 +++++
 
