@@ -92,7 +92,7 @@ def test_application_authorization():
 
     # There's no way to derive the view the response originated from in Django,
     # so verifying its status code will have to suffice.
-    assert response.status_code == 303
+    assert response.status_code == 401
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_application_authorization_with_additional_permissions():
@@ -109,7 +109,7 @@ def test_application_authorization_with_additional_permissions():
 
     # There's no way to derive the view the response originated from in Django,
     # so verifying its status code will have to suffice.
-    assert response.status_code == 303
+    assert response.status_code == 401
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_authorization_denied():
@@ -178,7 +178,7 @@ def test_signed_request_renewal():
 
     # There's no way to derive the view the response originated from in Django,
     # so verifying its status code will have to suffice.
-    assert response.status_code == 303
+    assert response.status_code == 401
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_registration():

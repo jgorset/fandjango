@@ -37,7 +37,7 @@ def authorize_application(
         dictionary = {
             'url': 'https://www.facebook.com/dialog/oauth?%s' % urlencode(query)
         },
-        status = 303
+        status = 401
     )
 
 def authorization_denied(request):
