@@ -86,6 +86,7 @@ class FacebookMiddleware():
 
                     user.synchronize()
 
+                # Update the user's details and OAuth token
                 else:
                     user.last_seen_at = datetime.now()
                     user.authorized = True
@@ -97,8 +98,8 @@ class FacebookMiddleware():
                         user.oauth_token.save()
 
                     user.save()
-                finally:
-                    user.oauth_token.extend()
+
+                user.oauth_token.extend()
 
                 request.facebook.user = user
 
