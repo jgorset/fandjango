@@ -1,6 +1,12 @@
 History
 -------
 
+4.0.4
++++++
+
+* Fixed a bug that caused the 'redirect_uri' argument to 'facebook_authorization_required'
+  to be ignored.
+
 4.0.3
 +++++
 
