@@ -13,6 +13,8 @@ from fandjango.models import User
 from fandjango.models import OAuthToken
 from fandjango.utils import get_post_authorization_redirect_url
 
+from .helpers import assert_contains
+
 from facepy import GraphAPI, SignedRequest
 
 TEST_APPLICATION_ID = '181259711925270'
@@ -93,6 +95,14 @@ def test_application_authorization():
     # There's no way to derive the view the response originated from in Django,
     # so verifying its status code will have to suffice.
     assert response.status_code == 401
+
+    response = client.get(
+        path = reverse('redirect')
+    )
+
+    # Verify that the URL the user is redirected to will in turn redirect to
+    # "http://example.org".
+    assert_contains("example.org", response.content)
 
 @with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
 def test_application_authorization_with_additional_permissions():

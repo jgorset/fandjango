@@ -9,3 +9,7 @@ def home(request):
 @facebook_authorization_required(permissions=["checkins"])
 def places(request):
     return HttpResponse()
+
+@facebook_authorization_required(redirect_uri="http://example.org")
+def redirect(request):
+  return HttpResponse()

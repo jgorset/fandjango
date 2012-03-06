@@ -35,7 +35,7 @@ def facebook_authorization_required(redirect_uri=None, permissions=None):
                 if outstanding_permissions:
                     return authorize_application(
                         request = request,
-                        redirect_uri = get_post_authorization_redirect_url(request),
+                        redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
                         permissions = outstanding_permissions
                     )
 
@@ -45,7 +45,7 @@ def facebook_authorization_required(redirect_uri=None, permissions=None):
             if not request.facebook or not request.facebook.user:
                 return authorize_application(
                     request = request,
-                    redirect_uri = get_post_authorization_redirect_url(request),
+                    redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
                     permissions = (FACEBOOK_APPLICATION_INITIAL_PERMISSIONS or []) + (permissions or [])
                 )
 
