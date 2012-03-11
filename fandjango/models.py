@@ -69,7 +69,7 @@ class User(models.Model):
             return "%s %s" % (self.first_name, self.last_name)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def url(self):
         """
         A string describing the URL to the user's Facebook profile.
@@ -77,7 +77,7 @@ class User(models.Model):
         return self.graph.get('me').get('link', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def gender(self):
         """
         A string describing the user's gender.
@@ -85,7 +85,7 @@ class User(models.Model):
         return self.graph.get('me').get('gender', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def hometown(self):
         """
         A dictionary describing the user's hometown.
@@ -93,7 +93,7 @@ class User(models.Model):
         return self.graph.get('me').get('hometown', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def location(self):
         """
         A dictionary describing the user's location.
@@ -101,7 +101,7 @@ class User(models.Model):
         return self.graph.get('me').get('location', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def bio(self):
         """
         A string describing the user's bio.
@@ -109,7 +109,7 @@ class User(models.Model):
         return self.graph.get('me').get('bio', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def relationship_status(self):
         """
         A dictionary describing the user's relationship status.
@@ -117,7 +117,7 @@ class User(models.Model):
         return self.graph.get('me').get('relationship_status', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def political_views(self):
         """
         A string describing the user's political views.
@@ -125,7 +125,7 @@ class User(models.Model):
         return self.graph.get('me').get('political', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def email(self):
         """
         A string describing the user's email.
@@ -133,7 +133,7 @@ class User(models.Model):
         return self.graph.get('me').get('email', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def website(self):
         """
         A string describing the user's website.
@@ -141,7 +141,7 @@ class User(models.Model):
         return self.graph.get('me').get('website', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def locale(self):
         """
         A string describing the user's locale.
@@ -149,7 +149,7 @@ class User(models.Model):
         return self.graph.get('me').get('locale', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def timezone(self):
         """
         An integer describing the user's timezone.
@@ -157,7 +157,7 @@ class User(models.Model):
         return self.graph.get('me').get('timezone', None)
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def picture(self):
         """
         A string describing the URL to the user's profile picture.
@@ -165,7 +165,7 @@ class User(models.Model):
         return requests.get('http://graph.facebook.com/%s/picture' % self.facebook_id).url
 
     @property
-    @cached(days=1)
+    @cached(days=30)
     def verified(self):
         """
         A boolean describing whether the user is verified by Facebook.
