@@ -1,6 +1,11 @@
 History
 -------
 
+4.0.5
++++++
+
+* Fandjango will now ignore internal Facebook Errors upon attempting to extend an access token.
+
 4.0.4
 +++++
 
