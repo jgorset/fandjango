@@ -240,7 +240,13 @@ class OAuthToken(models.Model):
 
     @property
     def expired(self):
+        """Determine whether the OAuth token has expired."""
         return self.expires_at < datetime.now() if self.expires_at else False
+
+    @property
+    def extended(self):
+        """Determine whether the OAuth token has been extended."""
+        return self.expires_at - self.issued_at > timedelta(days=30)
 
     def extend(self):
         """Extend the OAuth token."""

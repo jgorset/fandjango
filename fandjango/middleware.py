@@ -98,15 +98,16 @@ class FacebookMiddleware():
                         user.oauth_token.save()
 
                     user.save()
-                
-                # Attempt to extend the OAuth token, but ignore exceptions raised by
-                # bug #102727766518358 in the Facebook Platform.
-                #
-                # http://developers.facebook.com/bugs/102727766518358/
-                try:
-                    user.oauth_token.extend()
-                except:
-                    pass
+
+                if not user.oauth_token.extended:
+                    # Attempt to extend the OAuth token, but ignore exceptions raised by
+                    # bug #102727766518358 in the Facebook Platform.
+                    #
+                    # http://developers.facebook.com/bugs/102727766518358/
+                    try:
+                        user.oauth_token.extend()
+                    except:
+                        pass
 
                 request.facebook.user = user
 
