@@ -1,6 +1,11 @@
 History
 -------
 
+4.0.6
++++++
+
+* Fandjango will now only extend OAuth tokens that have not already been extended.
+
 4.0.5
 +++++
 
