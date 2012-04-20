@@ -54,13 +54,17 @@ class FacebookMiddleware():
                 request.POST = QueryDict('')
                 request.method = 'GET'
 
-            request.facebook.signed_request = SignedRequest.parse(
-                signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
-                application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
-            )
+            try:
+                request.facebook.signed_request = SignedRequest.parse(
+                    signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
+                    application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
+                )
+            except:
+                # Malformed or manipulated signed request
+                request.facebook = False
 
-            # User has authorized the application...
-            if request.facebook.signed_request.user.has_authorized_application:
+            # Valid signed request and user has authorized the application
+            if request.facebook and request.facebook.signed_request.user.has_authorized_application:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
                 if request.facebook.signed_request.oauth_token.has_expired:
