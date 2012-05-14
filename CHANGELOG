@@ -1,5 +1,9 @@
 CHANGELOG
 
+v3.7.5
+- Fixed a bug that caused intermittent ValueErrors upon querying the
+  user's Facebook profile.
+
 v3.7.4
 - Added support for reverse-engineering signed requests.
 - Added User#middle_name, User#timezone and User#quotes.
