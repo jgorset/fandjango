@@ -163,7 +163,7 @@ def get_facebook_profile(oauth_token):
     oauth_token -- A string describing the user's OAuth token.
     """
     connection = HTTPSConnection('graph.facebook.com')
-    connection.request('GET', 'me?access_token=%s' % oauth_token)
+    connection.request('GET', '/me?access_token=%s' % oauth_token)
     
     return json.loads(connection.getresponse().read())
     
