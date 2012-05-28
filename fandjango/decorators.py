@@ -9,7 +9,6 @@ from fandjango.views import authorize_application
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
 from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
-from fandjango.utils import get_post_authorization_redirect_url
 
 def facebook_authorization_required(redirect_uri=None, permissions=None):
     """
