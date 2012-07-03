@@ -27,7 +27,7 @@ setup(
         ]
     },
     install_requires = [
-        'facepy >= 0.6.5, < 0.7',
+        'facepy >= 0.6.5, < 0.8',
         'requests >=0.8, < 0.14'
     ],
     classifiers = [
