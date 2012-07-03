@@ -15,6 +15,8 @@ INSTALLED_APPS = [
     'tests.project.app'
 ]
 
+SOUTH_TESTS_MIGRATE = False
+
 ROOT_URLCONF = 'tests.project.urls'
 
 FACEBOOK_APPLICATION_ID = 181259711925270
