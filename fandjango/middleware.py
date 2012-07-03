@@ -59,8 +59,7 @@ class FacebookMiddleware():
                     signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
                     application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
                 )
-            except:
-                # Malformed or manipulated signed request
+            except SignedRequest.Error:
                 request.facebook = False
 
             # Valid signed request and user has authorized the application
