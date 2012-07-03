@@ -28,8 +28,8 @@ Tests
 
 Fandjango has an exhaustive test suite for `nose`_::
 
-    $ export DJANGO_SETTINGS_MODULE=tests.project.settings
-    $ nosetests
+    $ pip install -r requirements.txt
+    $ make test
 
 Releases
 --------
