@@ -55,7 +55,7 @@ class FacebookMiddleware():
                 request.method = 'GET'
 
             try:
-                request.facebook.signed_request = SignedRequest.parse(
+                request.facebook.signed_request = SignedRequest(
                     signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
                     application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
                 )
@@ -67,7 +67,7 @@ class FacebookMiddleware():
             if request.facebook and request.facebook.signed_request.user.has_authorized_application:
 
                 # Redirect to Facebook Authorization if the OAuth token has expired
-                if request.facebook.signed_request.oauth_token.has_expired:
+                if request.facebook.signed_request.user.oauth_token.has_expired:
                     return authorize_application(
                         request = request,
                         redirect_uri = get_post_authorization_redirect_url(request)
@@ -78,9 +78,9 @@ class FacebookMiddleware():
                     user = User.objects.get(facebook_id=request.facebook.signed_request.user.id)
                 except User.DoesNotExist:
                     oauth_token = OAuthToken.objects.create(
-                        token = request.facebook.signed_request.oauth_token.token,
-                        issued_at = request.facebook.signed_request.oauth_token.issued_at,
-                        expires_at = request.facebook.signed_request.oauth_token.expires_at
+                        token = request.facebook.signed_request.user.oauth_token.token,
+                        issued_at = request.facebook.signed_request.user.oauth_token.issued_at,
+                        expires_at = request.facebook.signed_request.user.oauth_token.expires_at
                     )
 
                     user = User.objects.create(
@@ -95,10 +95,10 @@ class FacebookMiddleware():
                     user.last_seen_at = datetime.now()
                     user.authorized = True
 
-                    if request.facebook.signed_request.oauth_token:
-                        user.oauth_token.token = request.facebook.signed_request.oauth_token.token
-                        user.oauth_token.issued_at = request.facebook.signed_request.oauth_token.issued_at
-                        user.oauth_token.expires_at = request.facebook.signed_request.oauth_token.expires_at
+                    if request.facebook.signed_request.user.oauth_token:
+                        user.oauth_token.token = request.facebook.signed_request.user.oauth_token.token
+                        user.oauth_token.issued_at = request.facebook.signed_request.user.oauth_token.issued_at
+                        user.oauth_token.expires_at = request.facebook.signed_request.user.oauth_token.expires_at
                         user.oauth_token.save()
 
                     user.save()

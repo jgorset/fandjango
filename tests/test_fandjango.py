@@ -17,50 +17,24 @@ from .helpers import assert_contains
 
 from facepy import GraphAPI, SignedRequest
 
-TEST_APPLICATION_ID = '181259711925270'
+TEST_APPLICATION_ID     = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
+TEST_SIGNED_REQUEST     = 'MJ1IzETiVz6zwqm2K-AxFjXxThBTwKCTU2Hmc6yMiMI.eyJh' \
+                          'bGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEz' \
+                          'NDEzMjQwMDAsImlzc3VlZF9hdCI6MTM0MTMxOTE4Niwib2F1' \
+                          'dGhfdG9rZW4iOiJBQUFDazJ0Qzl6QllCQUw1UkVQUG5iYjF5' \
+                          'OVpDcHgxcXdpZG5XWkFhMnRhbjNqWkJocEJhNVB4T3VyQmpa' \
+                          'QlgwbXlzck9tbHBWSVUwT2daQ3FDcTUwajRiWkFVQTlQQzlX' \
+                          'MVFlQUwyOFpDMFZMd1pEWkQiLCJ1c2VyIjp7ImNvdW50cnki' \
+                          'OiJubyIsImxvY2FsZSI6ImVuX0dCIiwiYWdlIjp7Im1pbiI6' \
+                          'MjF9fSwidXNlcl9pZCI6IjU4NjA1MjMzNiJ9'
 
 call_command('syncdb', interactive=False)
 call_command('migrate', interactive=False)
 
 request_factory = RequestFactory()
 
-def setup_module(module):
-    """
-    Create a Facebook test user.
-    """
-    global TEST_SIGNED_REQUEST
-
-    graph = GraphAPI('%s|%s' % (TEST_APPLICATION_ID, TEST_APPLICATION_SECRET))
-
-    user = graph.post('%s/accounts/test-users' % TEST_APPLICATION_ID,
-        installed = True,
-        permissions = ['publish_stream, read_stream']
-    )
-
-    TEST_SIGNED_REQUEST = SignedRequest(
-        user = SignedRequest.User(
-            id = user['id'],
-            age = range(0, 100),
-            locale = 'en_US',
-            country = 'Norway'
-        ),
-        oauth_token = SignedRequest.OAuthToken(
-            token = user['access_token'],
-            issued_at = datetime.now(),
-            expires_at = None
-        )
-    ).generate(TEST_APPLICATION_SECRET)
-
-def teardown_module(module):
-    """
-    Delete the Facebook test user.
-    """
-    GraphAPI('%s|%s' % (TEST_APPLICATION_ID, TEST_APPLICATION_SECRET)).delete(
-        path = SignedRequest.parse(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET).user.id
-    )
-
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_method_override():
     """
     Verify that the request method is overridden
@@ -79,7 +53,7 @@ def test_method_override():
 
     assert request.method == 'GET'
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_application_authorization():
     """
     Verify that the user is redirected to authorize the application
@@ -104,7 +78,7 @@ def test_application_authorization():
     # "http://example.org".
     assert_contains("example.org", response.content)
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_application_authorization_with_additional_permissions():
     """
     Verify that the user is redirected to authorize the application upon querying a view
@@ -121,7 +95,7 @@ def test_application_authorization_with_additional_permissions():
     # so verifying its status code will have to suffice.
     assert response.status_code == 401
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_authorization_denied():
     """
     Verify that the view referred to by AUTHORIZATION_DENIED_VIEW is
@@ -140,7 +114,7 @@ def test_authorization_denied():
     # so verifying its status code will have to suffice.
     assert response.status_code == 403
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_application_deauthorization():
     """
     Verify that users are marked as deauthorized upon
@@ -168,7 +142,7 @@ def test_application_deauthorization():
     user = User.objects.get(id=1)
     assert user.authorized == False
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_signed_request_renewal():
     """
     Verify that users are redirected to renew their signed requests
@@ -176,13 +150,13 @@ def test_signed_request_renewal():
     """
     client = Client()
 
-    signed_request = SignedRequest.parse(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
-    signed_request.oauth_token.expires_at = datetime.now() - timedelta(days=1)
+    signed_request = SignedRequest(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
+    signed_request.user.oauth_token.expires_at = datetime.now() - timedelta(days=1)
 
     response = client.get(
         path = reverse('home'),
         data = {
-            'signed_request': signed_request.generate(TEST_APPLICATION_SECRET)
+            'signed_request': signed_request.generate()
         }
     )
 
@@ -190,7 +164,7 @@ def test_signed_request_renewal():
     # so verifying its status code will have to suffice.
     assert response.status_code == 401
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_registration():
     """
     Verify that authorizing the application will register a new user.
@@ -207,11 +181,10 @@ def test_registration():
     user = User.objects.get(id=1)
 
     assert user.first_name == user.graph.get('me')['first_name']
-    assert user.middle_name == user.graph.get('me')['middle_name']
     assert user.last_name == user.graph.get('me')['last_name']
     assert user.url == user.graph.get('me')['link']
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_user_synchronization():
     """
     Verify that users may be synchronized.
@@ -229,7 +202,7 @@ def test_user_synchronization():
 
     user.synchronize()
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_user_permissions():
     """
     Verify that users maintain a list of permissions granted to the application.
@@ -247,7 +220,7 @@ def test_user_permissions():
 
     assert 'installed' in user.permissions
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_extend_oauth_token():
     """
     Verify that OAuth access tokens may be extended.
@@ -269,7 +242,7 @@ def test_extend_oauth_token():
     # the expiration time will have to suffice.
     assert user.oauth_token.expires_at
 
-@with_setup(setup = None, teardown = lambda: call_command('flush', interactive=False))
+@with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_get_post_authorization_redirect_url():
     """
     Verify that Fandjango redirects the user correctly upon authorizing the application.
