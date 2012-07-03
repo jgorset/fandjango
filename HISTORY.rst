@@ -1,6 +1,13 @@
 History
 -------
 
+4.0.7
++++++
+
+* Fandjango will now set ``request.facebook`` to ``False`` for invalid signed requests
+  rather than raising an exception.
+* Fandjango now uses the latest versions of ``requests`` and ``facepy``.
+
 4.0.6
 +++++
 
