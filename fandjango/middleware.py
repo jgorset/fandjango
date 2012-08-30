@@ -1,19 +1,18 @@
 from datetime import datetime
-import time
-
-from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
-from fandjango.views import authorize_application, authorization_denied
+from fandjango.views import authorize_application
 from fandjango.models import Facebook, User, OAuthToken
-from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID, DISABLED_PATHS, ENABLED_PATHS
+from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, \
+                DISABLED_PATHS, ENABLED_PATHS
 from fandjango.utils import (
     is_disabled_path, is_enabled_path,
     authorization_denied_view, get_post_authorization_redirect_url
 )
 
-from facepy import SignedRequest, GraphAPI
+from facepy import SignedRequest
+
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
@@ -22,7 +21,9 @@ class FacebookMiddleware():
         """Process the signed request."""
 
         if ENABLED_PATHS and DISABLED_PATHS:
-            raise ImproperlyConfigured('You may configure either FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, but not both.')
+            raise ImproperlyConfigured('You may configure either '
+                        'FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, '
+                        'but not both.')
 
         if DISABLED_PATHS and is_disabled_path(request.path):
             return
@@ -30,7 +31,7 @@ class FacebookMiddleware():
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
 
-        # An error occured during authorization...        
+        # An error occured during authorization...
         if 'error' in request.GET:
             error = request.GET['error']
 
@@ -61,6 +62,11 @@ class FacebookMiddleware():
                 )
             except SignedRequest.Error:
                 request.facebook = False
+                # delete old signed request stored in cookies to prevent errors
+                # on next time authentication
+                if 'signed_request' in request.COOKIES:
+                    request.need_delete_signed_request = True
+                return
 
             # Valid signed request and user has authorized the application
             if request.facebook and request.facebook.signed_request.user.has_authorized_application:
@@ -126,6 +132,8 @@ class FacebookMiddleware():
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
+        if getattr(request, 'need_delete_signed_request', False):
+            response.delete_cookie('signed_request')
         if 'signed_request' in request.REQUEST:
             response.set_cookie('signed_request', request.REQUEST['signed_request'])
         response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
