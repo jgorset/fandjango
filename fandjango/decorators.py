@@ -16,8 +16,9 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
     Require the user to authorize the application.
 
     :param redirect_uri: A string describing an URI to redirect to after authorization is complete.
-                         Defaults to the current URI in the Facebook canvas (e.g.
-                         ``http://apps.facebook.com/myapp/current/path``).
+                         If ``None``, redirects to the current URI in the Facebook canvas
+                         (e.g. ``http://apps.facebook.com/myapp/current/path``). Defaults to
+                         ``FACEBOOK_AUTHORIZATION_REDIRECT_URI`` (which, in turn, defaults to ``None``).
     :param permissions: A list of strings describing Facebook permissions.
     """
 
