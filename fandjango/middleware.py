@@ -22,7 +22,10 @@ class FacebookMiddleware():
         """Process the signed request."""
 
         if ENABLED_PATHS and DISABLED_PATHS:
-            raise ImproperlyConfigured('You may configure either FANDJANGO_ENABLED_PATHS or FANDJANGO_DISABLED_PATHS, but not both.')
+            raise ImproperlyConfigured(
+                'You may configure either FANDJANGO_ENABLED_PATHS '
+                'or FANDJANGO_DISABLED_PATHS, but not both.'
+            )
 
         if DISABLED_PATHS and is_disabled_path(request.path):
             return
