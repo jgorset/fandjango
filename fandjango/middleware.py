@@ -7,8 +7,10 @@ from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
-from fandjango.settings import FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID, FACEBOOK_SIGNED_REQUEST_COOKIE,\
-                                DISABLED_PATHS, ENABLED_PATHS
+from fandjango.settings import (
+    FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID,
+    FANDJANGO_CACHE_SIGNED_REQUEST, DISABLED_PATHS, ENABLED_PATHS
+)
 from fandjango.utils import (
     is_disabled_path, is_enabled_path,
     authorization_denied_view, get_post_authorization_redirect_url
@@ -130,7 +132,7 @@ class FacebookMiddleware():
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
-        if FACEBOOK_SIGNED_REQUEST_COOKIE:
+        if FANDJANGO_CACHE_SIGNED_REQUEST:
             if 'signed_request' in request.REQUEST:
                 response.set_cookie('signed_request', request.REQUEST['signed_request'])
             response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
