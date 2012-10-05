@@ -32,3 +32,7 @@ FACEBOOK_APPLICATION_INITIAL_PERMISSIONS = getattr(settings, 'FACEBOOK_APPLICATI
 
 # A string describing the Facebook's application's domain
 FACEBOOK_APPLICATION_DOMAIN = getattr(settings, 'FACEBOOK_APPLICATION_DOMAIN', 'apps.facebook.com')
+
+# A boolean to determine if must save signed request to a cookie.
+FACEBOOK_SIGNED_REQUEST_COOKIE = getattr(settings, 'FACEBOOK_SIGNED_REQUEST_COOKIE', True)
+
