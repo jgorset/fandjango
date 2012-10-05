@@ -9,16 +9,16 @@ from fandjango.views import authorize_application
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
 from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
-from fandjango.settings import FACEBOOK_AUTHORIZATION_REDIRECT_URI
+from fandjango.settings import FACEBOOK_AUTHORIZATION_REDIRECT_URL
 
-def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT_URI, permissions=None):
+def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT_URL, permissions=None):
     """
     Require the user to authorize the application.
 
-    :param redirect_uri: A string describing an URI to redirect to after authorization is complete.
-                         If ``None``, redirects to the current URI in the Facebook canvas
+    :param redirect_uri: A string describing an URL to redirect to after authorization is complete.
+                         If ``None``, redirects to the current URL in the Facebook canvas
                          (e.g. ``http://apps.facebook.com/myapp/current/path``). Defaults to
-                         ``FACEBOOK_AUTHORIZATION_REDIRECT_URI`` (which, in turn, defaults to ``None``).
+                         ``FACEBOOK_AUTHORIZATION_REDIRECT_URL`` (which, in turn, defaults to ``None``).
     :param permissions: A list of strings describing Facebook permissions.
     """
 

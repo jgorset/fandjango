@@ -8,8 +8,8 @@ FACEBOOK_APPLICATION_ID = getattr(settings, 'FACEBOOK_APPLICATION_ID')
 # A string describing the Facebook application's canvas URL.
 FACEBOOK_APPLICATION_CANVAS_URL = getattr(settings, 'FACEBOOK_APPLICATION_CANVAS_URL', None)
 
-# A string describing the URI to redirect to upon authorizing users.
-FACEBOOK_AUTHORIZATION_REDIRECT_URI = getattr(settings, 'FACEBOOK_AUTHORIZATION_REDIRECT_URI', None)
+# A string describing the URL to redirect to upon authorizing users.
+FACEBOOK_AUTHORIZATION_REDIRECT_URL = getattr(settings, 'FACEBOOK_AUTHORIZATION_REDIRECT_URL', None)
 
 # A string describing the Facebook application's secret key.
 FACEBOOK_APPLICATION_SECRET_KEY = getattr(settings, 'FACEBOOK_APPLICATION_SECRET_KEY')
