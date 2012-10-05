@@ -33,7 +33,7 @@ class FacebookMiddleware():
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
 
-        # An error occured during authorization...        
+        # An error occured during authorization...
         if 'error' in request.GET:
             error = request.GET['error']
 
