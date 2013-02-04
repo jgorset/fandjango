@@ -12,6 +12,11 @@ from facepy import GraphAPI
 
 import requests
 
+try:
+    from django.utils.timezone import now
+except ImportError:
+    from datetime.datetime import now
+
 class Facebook:
     """
     Facebook instances hold information on the current user and
@@ -241,7 +246,7 @@ class OAuthToken(models.Model):
     @property
     def expired(self):
         """Determine whether the OAuth token has expired."""
-        return self.expires_at < datetime.now() if self.expires_at else False
+        return self.expires_at < now() if self.expires_at else False
 
     @property
     def extended(self):
@@ -265,7 +270,7 @@ class OAuthToken(models.Model):
         components = parse_qs(response)
 
         self.token = components['access_token'][0]
-        self.expires_at = datetime.now() + timedelta(seconds = int(components['expires'][0]))
+        self.expires_at = now() + timedelta(seconds = int(components['expires'][0]))
 
         self.save()
 
