@@ -1,6 +1,6 @@
 from nose.tools import with_setup
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.test.client import Client
 from django.test.client import RequestFactory
@@ -16,6 +16,11 @@ from fandjango.utils import get_post_authorization_redirect_url
 from .helpers import assert_contains
 
 from facepy import GraphAPI, SignedRequest
+
+try:
+    from django.utils.timezone import now
+except ImportError:
+    from datetime.datetime import now
 
 TEST_APPLICATION_ID     = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
@@ -151,7 +156,7 @@ def test_signed_request_renewal():
     client = Client()
 
     signed_request = SignedRequest(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
-    signed_request.user.oauth_token.expires_at = datetime.now() - timedelta(days=1)
+    signed_request.user.oauth_token.expires_at = now() - timedelta(days=1)
 
     response = client.get(
         path = reverse('home'),

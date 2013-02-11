@@ -1,6 +1,3 @@
-from datetime import datetime
-import time
-
 from django.conf import settings
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
@@ -17,6 +14,13 @@ from fandjango.utils import (
 )
 
 from facepy import SignedRequest, GraphAPI
+
+try:
+    from django.utils.timezone import now
+except ImportError:
+    from datetime.datetime import now
+
+from dateutil.tz import tzlocal
 
 class FacebookMiddleware():
     """Middleware for Facebook applications."""
@@ -84,8 +88,8 @@ class FacebookMiddleware():
                 except User.DoesNotExist:
                     oauth_token = OAuthToken.objects.create(
                         token = request.facebook.signed_request.user.oauth_token.token,
-                        issued_at = request.facebook.signed_request.user.oauth_token.issued_at,
-                        expires_at = request.facebook.signed_request.user.oauth_token.expires_at
+                        issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal()),
+                        expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
                     )
 
                     user = User.objects.create(
@@ -97,15 +101,15 @@ class FacebookMiddleware():
 
                 # Update the user's details and OAuth token
                 else:
-                    user.last_seen_at = datetime.now()
+                    user.last_seen_at = now()
 
                     if 'signed_request' in request.REQUEST:
                         user.authorized = True
 
                         if request.facebook.signed_request.user.oauth_token:
                             user.oauth_token.token = request.facebook.signed_request.user.oauth_token.token
-                            user.oauth_token.issued_at = request.facebook.signed_request.user.oauth_token.issued_at
-                            user.oauth_token.expires_at = request.facebook.signed_request.user.oauth_token.expires_at
+                            user.oauth_token.issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal())
+                            user.oauth_token.expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
                             user.oauth_token.save()
 
                     user.save()
