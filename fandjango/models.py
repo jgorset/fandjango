@@ -15,7 +15,8 @@ import requests
 try:
     from django.utils.timezone import now
 except ImportError:
-    from datetime.datetime import now
+    def now():
+        return datetime.now()
 
 class Facebook:
     """

@@ -18,7 +18,9 @@ from facepy import SignedRequest, GraphAPI
 try:
     from django.utils.timezone import now
 except ImportError:
-    from datetime.datetime import now
+    from datetime import datetime
+    def now():
+        return datetime.now()
 
 from dateutil.tz import tzlocal
 
