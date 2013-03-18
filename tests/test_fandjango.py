@@ -20,7 +20,9 @@ from facepy import GraphAPI, SignedRequest
 try:
     from django.utils.timezone import now
 except ImportError:
-    from datetime.datetime import now
+    from datetime import datetime
+    def now():
+        return datetime.now()
 
 TEST_APPLICATION_ID     = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
