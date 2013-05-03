@@ -4,3 +4,4 @@ sphinx
 facepy
 south
 python-dateutil
+django-jsonfield
