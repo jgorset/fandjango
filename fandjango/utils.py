@@ -12,6 +12,7 @@ from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import DISABLED_PATHS
 from fandjango.settings import ENABLED_PATHS
 from fandjango.settings import AUTHORIZATION_DENIED_VIEW
+from fandjango.settings import FANDJANGO_SITE_URL
 
 def is_disabled_path(path):
     """
@@ -74,17 +75,22 @@ def authorization_denied_view(request):
 
     return authorization_denied_view(request)
 
-def get_post_authorization_redirect_url(request):
+def get_post_authorization_redirect_url(request, canvas=True):
     """Determine the URL users should be redirected to upon authorization the application."""
+
     path = request.get_full_path()
 
-    if FACEBOOK_APPLICATION_CANVAS_URL:
-        path = path.replace(urlparse(FACEBOOK_APPLICATION_CANVAS_URL).path, '')
+    if canvas:
+        if FACEBOOK_APPLICATION_CANVAS_URL:
+            path = path.replace(urlparse(FACEBOOK_APPLICATION_CANVAS_URL).path, '')
 
-    redirect_uri = 'http://%(domain)s/%(namespace)s%(path)s' % {
-        'domain': FACEBOOK_APPLICATION_DOMAIN,
-        'namespace': FACEBOOK_APPLICATION_NAMESPACE,
-        'path': path
-    }
+        redirect_uri = 'http://%(domain)s/%(namespace)s%(path)s' % {
+            'domain': FACEBOOK_APPLICATION_DOMAIN,
+            'namespace': FACEBOOK_APPLICATION_NAMESPACE,
+            'path': path
+        }
+    else:
+        path = path.replace(urlparse(FANDJANGO_SITE_URL).path, '')
+        redirect_uri = FANDJANGO_SITE_URL + path
 
     return redirect_uri

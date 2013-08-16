@@ -1,13 +1,7 @@
 from functools import wraps
 
-from django.http import HttpResponse
-from django.core.urlresolvers import reverse
-from django.core.handlers.wsgi import WSGIRequest
-
 from fandjango.utils import get_post_authorization_redirect_url
 from fandjango.views import authorize_application
-from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
-from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 from fandjango.settings import FACEBOOK_AUTHORIZATION_REDIRECT_URL
 
@@ -26,6 +20,8 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
         @wraps(function)
         def wrapper(request, *args, **kwargs):
 
+            canvas = request.facebook and request.facebook.signed_request
+
             # The user has already authorized the application, but the given view requires
             # permissions besides the defaults listed in ``FACEBOOK_APPLICATION_DEFAULT_PERMISSIONS``.
             #
@@ -36,7 +32,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
                 if outstanding_permissions:
                     return authorize_application(
                         request = request,
-                        redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
+                        redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
                         permissions = outstanding_permissions
                     )
 
@@ -46,7 +42,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
             if not request.facebook or not request.facebook.user:
                 return authorize_application(
                     request = request,
-                    redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
+                    redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
                     permissions = (FACEBOOK_APPLICATION_INITIAL_PERMISSIONS or []) + (permissions or [])
                 )
 

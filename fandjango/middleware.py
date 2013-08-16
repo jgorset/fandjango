@@ -1,7 +1,8 @@
 from datetime import timedelta
 from urlparse import parse_qs
+import re
 
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.views import authorize_application
@@ -77,24 +78,27 @@ class FacebookMiddleware(BaseMiddleware):
 
         # Is there a code in the GET request?
         elif 'code' in request.GET:
-            graph = GraphAPI()
+            try:
+                graph = GraphAPI()
 
-            # Exchange code for an access_token
-            response = graph.get('oauth/access_token',
-                client_id = FACEBOOK_APPLICATION_ID,
-                redirect_uri = get_post_authorization_redirect_url(request, canvas=False),
-                client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
-                code = request.GET['code'],
-            )
-    
-            components = parse_qs(response)
-            
-            # Save new OAuth-token in DB
-            oauth_token = OAuthToken.objects.create(
-                token = components['access_token'][0],
-                issued_at = now(),
-                expires_at = now() + timedelta(seconds = int(components['expires'][0]))
-            )
+                # Exchange code for an access_token
+                response = graph.get('oauth/access_token',
+                    client_id = FACEBOOK_APPLICATION_ID,
+                    redirect_uri = get_post_authorization_redirect_url(request, canvas=False),
+                    client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+                    code = request.GET['code'],
+                )
+        
+                components = parse_qs(response)
+                
+                # Save new OAuth-token in DB
+                oauth_token, created = OAuthToken.objects.get_or_create(
+                    token = components['access_token'][0],
+                    issued_at = now(),
+                    expires_at = now() + timedelta(seconds = int(components['expires'][0]))
+                )
+            except GraphAPI.OAuthError:
+                pass
         
         # There is a valid access_token
         if oauth_token:
@@ -111,8 +115,8 @@ class FacebookMiddleware(BaseMiddleware):
                 user.authorized = True
                 user.save()
             except User.DoesNotExist:
-                g = GraphAPI(oauth_token.token)
-                profile = g.get('me')
+                graph = GraphAPI(oauth_token.token)
+                profile = graph.get('me')
                 
                 # Either the user already exists and its just a new token, or user and token both are new
                 try:
@@ -127,11 +131,15 @@ class FacebookMiddleware(BaseMiddleware):
                 user.synchronize(profile)
                 
                 # Delete old access token if there is any and  only if the new one is different
+                old_oauth_token = None
                 if user.oauth_token != oauth_token:
-                    user.oauth_token.delete()
+                    old_oauth_token = user.oauth_token
+                    user.oauth_token = oauth_token
                 
-                user.oauth_token = oauth_token
                 user.save()
+
+                if old_oauth_token:
+                    old_oauth_token.delete()
 
             if not user.oauth_token.extended:
                 # Attempt to extend the OAuth token, but ignore exceptions raised by
@@ -154,8 +162,14 @@ class FacebookMiddleware(BaseMiddleware):
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
-        if 'oauth_token' in request.session:
-            response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
+        # if request.facebook and request.facebook.user and "code" in request.REQUEST:
+        #     """ Remove the code query param """
+        #     path = request.get_full_path()
+        #     path = re.sub(r'&?code=[a-zA-Z0-9_\-]+&?', '', path)
+        #     path = re.sub(r'&?ref=web_canvas&?', '', path)
+        #     return HttpResponseRedirect(path)
+
+        response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         return response
 
 class FacebookCanvasMiddleware(BaseMiddleware):
