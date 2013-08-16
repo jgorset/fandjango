@@ -203,12 +203,12 @@ class User(models.Model):
         """
         return GraphAPI(self.oauth_token.token)
 
-    def synchronize(self):
+    def synchronize(self, graph_data=None):
         """
         Synchronize ``facebook_username``, ``first_name``, ``middle_name``,
         ``last_name`` and ``birthday`` with Facebook.
         """
-        profile = self.graph.get('me')
+        profile = graph_data or self.graph.get('me')
 
         self.facebook_username = profile.get('username')
         self.first_name = profile.get('first_name')

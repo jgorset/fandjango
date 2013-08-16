@@ -1,8 +1,10 @@
-from django.conf import settings
+from datetime import timedelta
+from urlparse import parse_qs
+
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
-from fandjango.views import authorize_application, authorization_denied
+from fandjango.views import authorize_application
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import (
     FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID,
@@ -24,12 +26,9 @@ except ImportError:
 
 from dateutil.tz import tzlocal
 
-class FacebookMiddleware():
-    """Middleware for Facebook applications."""
+class BaseMiddleware():
 
-    def process_request(self, request):
-        """Process the signed request."""
-
+    def is_valid_path(self, request):
         if ENABLED_PATHS and DISABLED_PATHS:
             raise ImproperlyConfigured(
                 'You may configure either FANDJANGO_ENABLED_PATHS '
@@ -42,12 +41,139 @@ class FacebookMiddleware():
         if ENABLED_PATHS and not is_enabled_path(request.path):
             return
 
+        return True
+
+class FacebookMiddleware(BaseMiddleware):
+    """Middleware for Facebook auth on websites."""
+
+    def process_request(self, request):
+        """Process the signed request."""
+
+        if not self.is_valid_path(request):
+            return
+
+        if hasattr(request, "facebook") and request.facebook:
+            return
+
         # An error occured during authorization...
         if 'error' in request.GET:
-            error = request.GET['error']
-
             # The user refused to authorize the application...
-            if error == 'access_denied':
+            if request.GET['error'] == 'access_denied':
+                return authorization_denied_view(request)
+
+        request.facebook = Facebook()
+        oauth_token = False
+
+        # Is there a token in the current session already present?
+        if 'oauth_token' in request.session:
+            try:
+                # Check if the current token is already in DB
+                oauth_token = OAuthToken.objects.get(token=request.session['oauth_token'])
+            except OAuthToken.DoesNotExist:
+                # It's in the session but it's not in the DB, weird, better delete it and get new one..
+                del request.session['oauth_token']
+                request.facebook = False
+                return
+
+        # Is there a code in the GET request?
+        elif 'code' in request.GET:
+            graph = GraphAPI()
+
+            # Exchange code for an access_token
+            response = graph.get('oauth/access_token',
+                client_id = FACEBOOK_APPLICATION_ID,
+                redirect_uri = get_post_authorization_redirect_url(request, canvas=False),
+                client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
+                code = request.GET['code'],
+            )
+    
+            components = parse_qs(response)
+            
+            # Save new OAuth-token in DB
+            oauth_token = OAuthToken.objects.create(
+                token = components['access_token'][0],
+                issued_at = now(),
+                expires_at = now() + timedelta(seconds = int(components['expires'][0]))
+            )
+        
+        # There is a valid access_token
+        if oauth_token:
+            # Redirect to Facebook authorization if the OAuth token has expired
+            if oauth_token.expired:
+                request.facebook = False
+                return
+
+            # Is there a user already connected to the current token?
+            try:
+                user = oauth_token.user
+                # Update user's details
+                user.last_seen_at = now()
+                user.authorized = True
+                user.save()
+            except User.DoesNotExist:
+                g = GraphAPI(oauth_token.token)
+                profile = g.get('me')
+                
+                # Either the user already exists and its just a new token, or user and token both are new
+                try:
+                    user = User.objects.get(facebook_id = profile.get('id'))
+                except User.DoesNotExist:
+                    # Create a new user to go with token
+                    user = User.objects.create(
+                        facebook_id = profile.get('id'),
+                        oauth_token = oauth_token
+                    )                    
+                
+                user.synchronize(profile)
+                
+                # Delete old access token if there is any and  only if the new one is different
+                if user.oauth_token != oauth_token:
+                    user.oauth_token.delete()
+                
+                user.oauth_token = oauth_token
+                user.save()
+
+            if not user.oauth_token.extended:
+                # Attempt to extend the OAuth token, but ignore exceptions raised by
+                # bug #102727766518358 in the Facebook Platform.
+                #
+                # http://developers.facebook.com/bugs/102727766518358/
+                try:
+                    user.oauth_token.extend()
+                except:
+                    pass
+
+            request.facebook.user = user
+            request.session['oauth_token'] = user.oauth_token.token
+
+    def process_response(self, request, response):
+        """
+        Set compact P3P policies and save signed request to cookie.
+
+        P3P is a WC3 standard (see http://www.w3.org/TR/P3P/), and although largely ignored by most
+        browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
+        documents in iframes). If they are not set correctly, IE will not set these cookies.
+        """
+        if 'oauth_token' in request.session:
+            response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
+        return response
+
+class FacebookCanvasMiddleware(BaseMiddleware):
+    """Middleware for Facebook canvas applications."""
+
+    def process_request(self, request):
+        """Process the signed request."""
+
+        if not self.is_valid_path(request):
+            return
+
+        if hasattr(request, "facebook") and request.facebook:
+            return
+
+        # An error occured during authorization...
+        if 'error' in request.GET:
+            # The user refused to authorize the application...
+            if request.GET['error'] == 'access_denied':
                 return authorization_denied_view(request)
 
         # Signed request found in either GET, POST or COOKIES...
