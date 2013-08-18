@@ -1,4 +1,7 @@
 from functools import wraps
+import re
+
+from django.http import HttpResponseRedirect
 
 from fandjango.utils import get_post_authorization_redirect_url
 from fandjango.views import authorize_application
@@ -45,6 +48,13 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
                     redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
                     permissions = (FACEBOOK_APPLICATION_INITIAL_PERMISSIONS or []) + (permissions or [])
                 )
+
+            if "code" in request.REQUEST:
+                """ Remove the code query param """
+                path = request.get_full_path()
+                path = re.sub(r'&?code=[a-zA-Z0-9_\-]+&?', '', path)
+                path = re.sub(r'&?ref=web_canvas&?', '', path)
+                return HttpResponseRedirect(path)
 
             return function(request, *args, **kwargs)
         return wrapper

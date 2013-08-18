@@ -1,8 +1,7 @@
 from datetime import timedelta
 from urlparse import parse_qs
-import re
 
-from django.http import QueryDict, HttpResponseRedirect
+from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.views import authorize_application
@@ -162,12 +161,6 @@ class FacebookMiddleware(BaseMiddleware):
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
-        if request.facebook and request.facebook.user and "code" in request.REQUEST:
-            """ Remove the code query param """
-            path = request.get_full_path()
-            path = re.sub(r'&?code=[a-zA-Z0-9_\-]+&?', '', path)
-            path = re.sub(r'&?ref=web_canvas&?', '', path)
-            return HttpResponseRedirect(path)
 
         response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         return response
