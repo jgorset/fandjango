@@ -4,7 +4,6 @@ from urlparse import parse_qs
 from django.http import QueryDict
 from django.core.exceptions import ImproperlyConfigured
 
-from fandjango.views import authorize_application
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import (
     FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID,
@@ -208,14 +207,9 @@ class FacebookCanvasMiddleware(BaseMiddleware):
                 request.facebook = False
 
             # Valid signed request and user has authorized the application
-            if request.facebook and request.facebook.signed_request.user.has_authorized_application:
-
-                # Redirect to Facebook Authorization if the OAuth token has expired
-                if request.facebook.signed_request.user.oauth_token.has_expired:
-                    return authorize_application(
-                        request = request,
-                        redirect_uri = get_post_authorization_redirect_url(request)
-                    )
+            if request.facebook \
+                and request.facebook.signed_request.user.has_authorized_application \
+                and not request.facebook.signed_request.user.oauth_token.has_expired:
 
                 # Initialize a User object and its corresponding OAuth token
                 try:
