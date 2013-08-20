@@ -214,10 +214,13 @@ def test_registration():
     client = Client()
 
     with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        first_name = 'Foo'
+        last_name = 'Bar'
+        link = 'http://example.com'
         graph_get.return_value = {
-            'first_name': 'Adem',
-            'last_name': 'Gaygusuz',
-            'link': 'http://www.ardweb.co.uk'
+            'first_name': first_name,
+            'last_name': last_name,
+            'link': link
         }
         client.post(
             path = reverse('home'),
@@ -228,9 +231,9 @@ def test_registration():
 
         user = User.objects.get(id=1)
 
-        assert user.first_name == user.first_name
-        assert user.last_name == user.last_name
-        assert user.url == user.url
+        assert first_name == user.first_name
+        assert last_name == user.last_name
+        assert link == user.graph.get('me').get('link')
 
 @with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_user_synchronization():
