@@ -1,6 +1,10 @@
 from nose.tools import with_setup
 
 from datetime import timedelta
+import base64
+import hashlib
+import hmac
+import json
 
 from django.test.client import Client
 from django.test.client import RequestFactory
@@ -17,6 +21,8 @@ from .helpers import assert_contains
 
 from facepy import GraphAPI, SignedRequest
 
+from mock import patch
+
 try:
     from django.utils.timezone import now
 except ImportError:
@@ -24,17 +30,39 @@ except ImportError:
     def now():
         return datetime.now()
 
+from time import time
+
 TEST_APPLICATION_ID     = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
-TEST_SIGNED_REQUEST     = 'MJ1IzETiVz6zwqm2K-AxFjXxThBTwKCTU2Hmc6yMiMI.eyJh' \
-                          'bGdvcml0aG0iOiJITUFDLVNIQTI1NiIsImV4cGlyZXMiOjEz' \
-                          'NDEzMjQwMDAsImlzc3VlZF9hdCI6MTM0MTMxOTE4Niwib2F1' \
-                          'dGhfdG9rZW4iOiJBQUFDazJ0Qzl6QllCQUw1UkVQUG5iYjF5' \
-                          'OVpDcHgxcXdpZG5XWkFhMnRhbjNqWkJocEJhNVB4T3VyQmpa' \
-                          'QlgwbXlzck9tbHBWSVUwT2daQ3FDcTUwajRiWkFVQTlQQzlX' \
-                          'MVFlQUwyOFpDMFZMd1pEWkQiLCJ1c2VyIjp7ImNvdW50cnki' \
-                          'OiJubyIsImxvY2FsZSI6ImVuX0dCIiwiYWdlIjp7Im1pbiI6' \
-                          'MjF9fSwidXNlcl9pZCI6IjU4NjA1MjMzNiJ9'
+
+def get_signed_request():
+    payload = {
+       'algorithm': 'HMAC-SHA256'
+    }
+    payload['user'] = {}
+    payload['user']['country'] = 'uk'
+    payload['user']['locale'] = 'en_GB'
+    payload['oauth_token'] = 'ABCDE'
+    payload['expires'] = time() + 999999
+    payload['issued_at'] = time()
+    payload['user_id'] = 12345
+
+    encoded_payload = base64.urlsafe_b64encode(
+        json.dumps(payload, separators=(',', ':'))
+    )
+
+    encoded_signature = base64.urlsafe_b64encode(hmac.new(
+        TEST_APPLICATION_SECRET,
+        encoded_payload,
+        hashlib.sha256
+    ).digest())
+
+    return '%(signature)s.%(payload)s' % {
+        'signature': encoded_signature,
+        'payload': encoded_payload
+    }
+
+TEST_SIGNED_REQUEST = get_signed_request()
 
 call_command('syncdb', interactive=False)
 call_command('migrate', interactive=False)
@@ -49,14 +77,17 @@ def test_method_override():
     """
     facebook_middleware = FacebookMiddleware()
 
-    request = request_factory.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {}
 
-    facebook_middleware.process_request(request)
+        request = request_factory.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
+
+        facebook_middleware.process_request(request)
 
     assert request.method == 'GET'
 
@@ -127,19 +158,23 @@ def test_application_deauthorization():
     Verify that users are marked as deauthorized upon
     deauthorizing the application.
     """
+
     client = Client()
 
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {}
+
+        client.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
 
     user = User.objects.get(id=1)
     assert user.authorized == True
 
-    response = client.post(
+    client.post(
         path = reverse('deauthorize_application'),
         data = {
             'signed_request': TEST_SIGNED_REQUEST
@@ -178,18 +213,24 @@ def test_registration():
     """
     client = Client()
 
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {
+            'first_name': 'Adem',
+            'last_name': 'Gaygusuz',
+            'link': 'http://www.ardweb.co.uk'
         }
-    )
+        client.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
 
-    user = User.objects.get(id=1)
+        user = User.objects.get(id=1)
 
-    assert user.first_name == user.graph.get('me')['first_name']
-    assert user.last_name == user.graph.get('me')['last_name']
-    assert user.url == user.graph.get('me')['link']
+        assert user.first_name == user.first_name
+        assert user.last_name == user.last_name
+        assert user.url == user.url
 
 @with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_user_synchronization():
@@ -198,16 +239,18 @@ def test_user_synchronization():
     """
     client = Client()
 
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {}
+        client.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
 
-    user = User.objects.get(id=1)
+        user = User.objects.get(id=1)
 
-    user.synchronize()
+        user.synchronize()
 
 @with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_user_permissions():
@@ -216,16 +259,25 @@ def test_user_permissions():
     """
     client = Client()
 
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {}
+        client.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
 
     user = User.objects.get(id=1)
 
-    assert 'installed' in user.permissions
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {
+            'data': [
+                {'installed': True}
+            ]
+        }
+        
+        assert 'installed' in user.permissions
 
 @with_setup(teardown = lambda: call_command('flush', interactive=False))
 def test_extend_oauth_token():
@@ -234,16 +286,22 @@ def test_extend_oauth_token():
     """
     client = Client()
 
-    client.post(
-        path = reverse('home'),
-        data = {
-            'signed_request': TEST_SIGNED_REQUEST
-        }
-    )
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = {}
+
+        client.post(
+            path = reverse('home'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
 
     user = User.objects.get(id=1)
 
-    user.oauth_token.extend()
+    with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        graph_get.return_value = '&access_token=%s&expires=%d' % ('ABCDE', 99999)
+
+        user.oauth_token.extend()
 
     # Facebook doesn't extend access tokens for test users, so asserting
     # the expiration time will have to suffice.
