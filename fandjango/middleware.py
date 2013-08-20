@@ -44,6 +44,7 @@ class FacebookMiddleware():
 
         # An error occured during authorization...
         if 'error' in request.GET:
+            request.facebook = False
             error = request.GET['error']
 
             # The user refused to authorize the application...
