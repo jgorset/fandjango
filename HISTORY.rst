@@ -1,6 +1,16 @@
 History
 -------
 
+4.1
++++
+
+* You may now customize where the user is redirected upon authorizing the application.
+* You may now elect to throw away the signed request instead of caching it to a cookie.
+* Fixed an issue where the signed request would be read from and saved back to the same cookie.
+* ``User#authorized`` is now only truthy for fresh signed requests.
+* All ``DateTime`` instances are now timezone-aware.
+* User details are now persisted instead of cached for 30 days.
+
 4.0.7
 +++++
 

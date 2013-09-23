@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from urlparse import parse_qs
 
 from django.db import models
+import jsonfield
 from django.utils.translation import ugettext as _
 
 from fandjango.utils import cached_property as cached
@@ -54,6 +55,15 @@ class User(models.Model):
     birthday = models.DateField(_('birthday'), blank=True, null=True)
     """A ``datetime`` object describing the user's birthday."""
 
+    email = models.CharField(_('email'), max_length=255, blank=True, null=True)
+    """A string describing the user's email."""
+
+    locale = models.CharField(_('locale'), max_length=255, blank=True, null=True)
+    """A string describing the user's locale."""
+
+    gender = models.CharField(_('gender'), max_length=255, blank=True, null=True)
+    """A string describing the user's gender."""
+
     authorized = models.BooleanField(_('authorized'), default=True)
     """A boolean describing whether the user has currently authorized the application."""
 
@@ -66,6 +76,9 @@ class User(models.Model):
     last_seen_at = models.DateTimeField(_('last seen at'), auto_now_add=True)
     """A ``datetime`` object describing when the user was last seen."""
 
+    extra_data = jsonfield.JSONField()
+    """A ``JSONField`` object containig all additional facebookdata."""
+
     @property
     def full_name(self):
         """Return the user's first name."""
@@ -76,107 +89,11 @@ class User(models.Model):
 
     @property
     @cached(days=30)
-    def url(self):
-        """
-        A string describing the URL to the user's Facebook profile.
-        """
-        return self.graph.get('me').get('link', None)
-
-    @property
-    @cached(days=30)
-    def gender(self):
-        """
-        A string describing the user's gender.
-        """
-        return self.graph.get('me').get('gender', None)
-
-    @property
-    @cached(days=30)
-    def hometown(self):
-        """
-        A dictionary describing the user's hometown.
-        """
-        return self.graph.get('me').get('hometown', None)
-
-    @property
-    @cached(days=30)
-    def location(self):
-        """
-        A dictionary describing the user's location.
-        """
-        return self.graph.get('me').get('location', None)
-
-    @property
-    @cached(days=30)
-    def bio(self):
-        """
-        A string describing the user's bio.
-        """
-        return self.graph.get('me').get('bio', None)
-
-    @property
-    @cached(days=30)
-    def relationship_status(self):
-        """
-        A dictionary describing the user's relationship status.
-        """
-        return self.graph.get('me').get('relationship_status', None)
-
-    @property
-    @cached(days=30)
-    def political_views(self):
-        """
-        A string describing the user's political views.
-        """
-        return self.graph.get('me').get('political', None)
-
-    @property
-    @cached(days=30)
-    def email(self):
-        """
-        A string describing the user's email.
-        """
-        return self.graph.get('me').get('email', None)
-
-    @property
-    @cached(days=30)
-    def website(self):
-        """
-        A string describing the user's website.
-        """
-        return self.graph.get('me').get('website', None)
-
-    @property
-    @cached(days=30)
-    def locale(self):
-        """
-        A string describing the user's locale.
-        """
-        return self.graph.get('me').get('locale', None)
-
-    @property
-    @cached(days=30)
-    def timezone(self):
-        """
-        An integer describing the user's timezone.
-        """
-        return self.graph.get('me').get('timezone', None)
-
-    @property
-    @cached(days=30)
     def picture(self):
         """
         A string describing the URL to the user's profile picture.
         """
         return requests.get('http://graph.facebook.com/%s/picture' % self.facebook_id).url
-
-    @property
-    @cached(days=30)
-    def verified(self):
-        """
-        A boolean describing whether the user is verified by Facebook.
-        """
-        return self.graph.get('me').get('verified', None)
 
     @property
     def permissions(self):
@@ -215,6 +132,10 @@ class User(models.Model):
         self.middle_name = profile.get('middle_name')
         self.last_name = profile.get('last_name')
         self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
+        self.email = profile.get('email')
+        self.locale = profile.get('locale')
+        self.gender = profile.get('gender')
+        self.extra_data = profile
         self.save()
 
     def __unicode__(self):
