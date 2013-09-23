@@ -268,7 +268,7 @@ class FacebookCanvasMiddleware(BaseMiddleware):
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
         if FANDJANGO_CACHE_SIGNED_REQUEST:
-            if request.facebook:
+            if request.facebook and request.facebook.signed_request:
                 response.set_cookie('signed_request', request.facebook.signed_request.generate())
             response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         return response
