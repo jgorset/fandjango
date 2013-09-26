@@ -3,13 +3,10 @@ from urllib import urlencode
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from facepy import SignedRequest
-
 from fandjango.models import User
 from fandjango.settings import (
     FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_DOMAIN,
-    FACEBOOK_APPLICATION_NAMESPACE, FACEBOOK_APPLICATION_SECRET_KEY,
-    FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
+    FACEBOOK_APPLICATION_NAMESPACE, FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 )
 
 def authorize_application(

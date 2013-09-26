@@ -1,5 +1,3 @@
-from warnings import warn
-
 from django.conf import settings
 
 # A string describing the Facebook application's ID.
