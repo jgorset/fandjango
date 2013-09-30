@@ -94,3 +94,9 @@ def get_post_authorization_redirect_url(request, canvas=True):
         redirect_uri = FANDJANGO_SITE_URL + path
 
     return redirect_uri
+
+def get_full_path(request, remove_querystrings=[]):
+    path = request.get_full_path()
+    for qs in remove_querystrings:
+        path = re.sub(r'&?' + qs + '=?(.+)?&?', '', path)
+    return path

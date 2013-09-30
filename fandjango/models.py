@@ -30,6 +30,9 @@ class Facebook:
     signed_request = None
     """A ``SignedRequest`` instance."""
 
+    oauth_token = None
+    """A ``OAuthToken`` instance."""
+
 class User(models.Model):
     """
     Instances of the User class represent Facebook users who

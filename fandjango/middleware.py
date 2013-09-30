@@ -264,6 +264,7 @@ class FacebookWebMiddleware(BaseMiddleware):
                     pass
 
             request.facebook.user = user
+            request.facebook.oauth_token = oauth_token
         else:
             request.facebook = False
 
@@ -275,135 +276,15 @@ class FacebookWebMiddleware(BaseMiddleware):
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
-        if request.facebook and request.facebook.signed_request:
-            response.set_cookie('oauth_token', request.facebook.user.oauth_token.token)
+        if request.facebook and request.facebook.oauth_token:
+            response.set_cookie('oauth_token', request.facebook.oauth_token.token)
             response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
-        else:
-            response.delete_cookie('oauth_token')
-        return response
 
-class FacebookWebMiddleware(BaseMiddleware):
-    """Middleware for Facebook auth on websites."""
+            if "code" in request.REQUEST:
+                """ Remove fb related query params """
+                path = get_full_path(request, remove_querystrings=['code', 'web_canvas'])
+                return HttpResponseRedirect(path)
 
-    def process_request(self, request):
-        """Process the signed request."""
-
-        if not self.is_valid_path(request):
-            return
-
-        # User is already authenticated via FacebookMiddleware (canvas)
-        if hasattr(request, "facebook") and request.facebook:
-            return
-
-        # An error occured during authorization...
-        if 'error' in request.GET:
-            # The user refused to authorize the application...
-            if request.GET['error'] == 'access_denied':
-                request.facebook = False
-                return authorization_denied_view(request)
-
-        request.facebook = Facebook()
-        oauth_token = False
-
-        # Is there a token cookie already present?
-        if 'oauth_token' in request.COOKIES:
-            try:
-                # Check if the current token is already in DB
-                oauth_token = OAuthToken.objects.get(token=request.COOKIES['oauth_token'])
-            except OAuthToken.DoesNotExist:
-                request.facebook = False
-                return
-
-        # Is there a code in the GET request?
-        elif 'code' in request.GET:
-            try:
-                graph = GraphAPI()
-
-                # Exchange code for an access_token
-                response = graph.get('oauth/access_token',
-                    client_id = FACEBOOK_APPLICATION_ID,
-                    redirect_uri = get_post_authorization_redirect_url(request, canvas=False),
-                    client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
-                    code = request.GET['code'],
-                )
-
-                components = parse_qs(response)
-                
-                # Save new OAuth-token in DB
-                oauth_token, created = OAuthToken.objects.get_or_create(
-                    token = components['access_token'][0],
-                    issued_at = now(),
-                    expires_at = now() + timedelta(seconds = int(components['expires'][0]))
-                )
-            except GraphAPI.OAuthError:
-                pass
-
-        # There is a valid access_token
-        if oauth_token:
-            # Redirect to Facebook authorization if the OAuth token has expired
-            if oauth_token.expired:
-                request.facebook = False
-                return
-
-            # Is there a user already connected to the current token?
-            try:
-                user = oauth_token.user
-                # Update user's details
-                user.last_seen_at = now()
-                user.authorized = True
-                user.save()
-            except User.DoesNotExist:
-                graph = GraphAPI(oauth_token.token)
-                profile = graph.get('me')
-                
-                # Either the user already exists and its just a new token, or user and token both are new
-                try:
-                    user = User.objects.get(facebook_id = profile.get('id'))
-                except User.DoesNotExist:
-                    # Create a new user to go with token
-                    user = User.objects.create(
-                        facebook_id = profile.get('id'),
-                        oauth_token = oauth_token
-                    )                    
-                
-                user.synchronize(profile)
-                
-                # Delete old access token if there is any and only if the new one is different
-                old_oauth_token = None
-                if user.oauth_token != oauth_token:
-                    old_oauth_token = user.oauth_token
-                    user.oauth_token = oauth_token
-                
-                user.save()
-
-                if old_oauth_token:
-                    old_oauth_token.delete()
-
-            if not user.oauth_token.extended:
-                # Attempt to extend the OAuth token, but ignore exceptions raised by
-                # bug #102727766518358 in the Facebook Platform.
-                #
-                # http://developers.facebook.com/bugs/102727766518358/
-                try:
-                    user.oauth_token.extend()
-                except:
-                    pass
-
-            request.facebook.user = user
-        else:
-            request.facebook = False
-
-    def process_response(self, request, response):
-        """
-        Set compact P3P policies and save auth token to cookie.
-
-        P3P is a WC3 standard (see http://www.w3.org/TR/P3P/), and although largely ignored by most
-        browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
-        documents in iframes). If they are not set correctly, IE will not set these cookies.
-        """
-        if request.facebook and request.facebook.signed_request:
-            response.set_cookie('oauth_token', request.facebook.user.oauth_token.token)
-            response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
         else:
             response.delete_cookie('oauth_token')
         return response
