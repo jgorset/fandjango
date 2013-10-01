@@ -42,6 +42,9 @@ class BaseMiddleware():
 
         return True
 
+    def is_access_denied(self, request):
+        return 'error' in request.GET and request.GET['error'] == 'access_denied'
+
 class FacebookMiddleware(BaseMiddleware):
     """Middleware for Facebook canvas applications."""
 
@@ -51,15 +54,12 @@ class FacebookMiddleware(BaseMiddleware):
         if not self.is_valid_path(request):
             return
 
+        if self.is_access_denied(request):
+            request.facebook = False
+            return authorization_denied_view(request)
+
         if hasattr(request, "facebook") and request.facebook:
             return
-
-        # An error occured during authorization...
-        if 'error' in request.GET:
-            # The user refused to authorize the application...
-            if request.GET['error'] == 'access_denied':
-                request.facebook = False
-                return authorization_denied_view(request)
 
         # Signed request found in either GET, POST or COOKIES...
         if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
@@ -168,8 +168,7 @@ class FacebookWebMiddleware(BaseMiddleware):
         if hasattr(request, "facebook") and request.facebook:
             return
 
-        # An error occured during authorization. The user refused to authorize the application...
-        if 'error' in request.GET and request.GET['error'] == 'access_denied':
+        if self.is_access_denied(request):
             request.facebook = False
             return authorization_denied_view(request)
 
