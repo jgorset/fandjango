@@ -551,4 +551,27 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         assert redirect_url == 'http://example.org/foo/bar/baz'
 
+    def test_querystring_removal(self):
+        """
+        Facebook related querystring parameters are removed upon successful authentication
+        """
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+
+            def side_effect(*args, **kwargs):
+                if args[0] == 'oauth/access_token':
+                    return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
+                elif args[0] == 'me':
+                    return TEST_GRAPH_ME_RESPONSE
+
+            graph_get.side_effect = side_effect
+
+            response = client.get(
+                path = reverse('home'),
+                data = {
+                    'code': TEST_AUTH_CODE
+                }
+            )
+
         assert 'code=' not in response["Location"]
