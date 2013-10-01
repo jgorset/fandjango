@@ -20,6 +20,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
         @wraps(function)
         def wrapper(request, *args, **kwargs):
 
+            # We know the user has been authenticated via a canvas page if a signed request is set.
             canvas = request.facebook and request.facebook.signed_request
 
             # The user has already authorized the application, but the given view requires

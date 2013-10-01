@@ -1,7 +1,7 @@
 from datetime import timedelta
 from urlparse import parse_qs
 
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured
 
 from fandjango.models import Facebook, User, OAuthToken
@@ -10,7 +10,7 @@ from fandjango.settings import (
     FANDJANGO_CACHE_SIGNED_REQUEST, DISABLED_PATHS, ENABLED_PATHS
 )
 from fandjango.utils import (
-    is_disabled_path, is_enabled_path,
+    is_disabled_path, is_enabled_path, get_full_path,
     authorization_denied_view, get_post_authorization_redirect_url
 )
 
@@ -73,7 +73,6 @@ class FacebookMiddleware(BaseMiddleware):
             # References:
             # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
             # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
-            print request.method
             if request.method == 'POST' and 'signed_request' in request.POST:
                 request.POST = QueryDict('')
                 request.method = 'GET'
@@ -161,7 +160,7 @@ class FacebookWebMiddleware(BaseMiddleware):
     """Middleware for Facebook auth on websites."""
 
     def process_request(self, request):
-        """Process the signed request."""
+        """Process the web-based auth request."""
 
         if not self.is_valid_path(request):
             return
@@ -169,12 +168,10 @@ class FacebookWebMiddleware(BaseMiddleware):
         if hasattr(request, "facebook") and request.facebook:
             return
 
-        # An error occured during authorization...
-        if 'error' in request.GET:
-            # The user refused to authorize the application...
-            if request.GET['error'] == 'access_denied':
-                request.facebook = False
-                return authorization_denied_view(request)
+        # An error occured during authorization. The user refused to authorize the application...
+        if 'error' in request.GET and request.GET['error'] == 'access_denied':
+            request.facebook = False
+            return authorization_denied_view(request)
 
         request.facebook = Facebook()
         oauth_token = False

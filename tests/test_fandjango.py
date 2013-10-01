@@ -11,8 +11,8 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.conf import settings
 
-from fandjango.middleware import FacebookMiddleware
-from fandjango.models import User
+from fandjango.middleware import FacebookMiddleware, FacebookWebMiddleware
+from fandjango.models import User, OAuthToken
 from fandjango.utils import get_post_authorization_redirect_url
 
 from .helpers import assert_contains
@@ -61,6 +61,7 @@ TEST_APPLICATION_ID     = '181259711925270'
 TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
 TEST_SIGNED_REQUEST = get_signed_request()
 TEST_AUTH_CODE = 'TEST_CODE'
+TEST_ACCESS_TOKEN = 'ABCDE'
 TEST_GRAPH_ACCESS_TOKEN_RESPONSE = '&access_token=%s&expires=%d' % ('ABCDE', 99999)
 TEST_GRAPH_ME_RESPONSE = {
     'id': '12345',
@@ -97,7 +98,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         facebook_middleware = FacebookMiddleware()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = TEST_GRAPH_ME_RESPONSE
 
             request = request_factory.post(
@@ -177,7 +178,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = TEST_GRAPH_ME_RESPONSE
 
             client.post(
@@ -227,7 +228,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = TEST_GRAPH_ME_RESPONSE
 
             client.post(
@@ -249,7 +250,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {}
             
             client.post(
@@ -269,7 +270,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {}
 
             client.post(
@@ -281,7 +282,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         user = User.objects.get(id=1)
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {
                 'data': [
                     {'installed': True}
@@ -296,7 +297,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {}
 
             client.post(
@@ -308,7 +309,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         user = User.objects.get(id=1)
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = '&access_token=%s&expires=%d' % ('ABCDE', 99999)
 
             user.oauth_token.extend()
@@ -340,7 +341,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         Verify that the user is redirected to authorize the application
         upon querying a view decorated by ``facebook_authorization_required``
-        sans signed request.
+        sans code nor access token.
         """
         client = Client()
 
@@ -364,7 +365,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         Verify that the user is redirected to authorize the application upon querying a view
         decorated by ``facebook_authorization_required`` and a list of additional
-        permissions sans signed request.
+        permissions sans code nor access token.
         """
         client = Client()
 
@@ -394,21 +395,23 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         # so verifying its status code will have to suffice.
         assert response.status_code == 403
 
-    def test_signed_request_renewal(self):
+    def test_oauth_token_request_renewal(self):
         """
-        Verify that users are redirected to renew their signed requests
+        Verify that users are redirected to renew their access token
         once they expire.
         """
         client = Client()
 
-        signed_request = SignedRequest(TEST_SIGNED_REQUEST, TEST_APPLICATION_SECRET)
-        signed_request.user.oauth_token.expires_at = now() - timedelta(days=1)
+        oauth_token = OAuthToken.objects.create(
+            token = TEST_ACCESS_TOKEN,
+            issued_at = now() - timedelta(days = 1),
+            expires_at = now() - timedelta(days = 2)
+        )
+
+        client.cookies['oauth_token'] = oauth_token.token
 
         response = client.get(
-            path = reverse('home'),
-            data = {
-                'code': TEST_AUTH_CODE
-            }
+            path = reverse('home')
         )
 
         # There's no way to derive the view the response originated from in Django,
@@ -421,12 +424,12 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
 
             def side_effect(*args, **kwargs):
-                if args[1] == 'oauth/access_token':
+                if args[0] == 'oauth/access_token':
                     return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
-                elif args[1] == 'me':
+                elif args[0] == 'me':
                     return TEST_GRAPH_ME_RESPONSE
 
             graph_get.side_effect = side_effect
@@ -450,12 +453,12 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
 
             def side_effect(*args, **kwargs):
-                if args[1] == 'oauth/access_token':
+                if args[0] == 'oauth/access_token':
                     return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
-                elif args[1] == 'me':
+                elif args[0] == 'me':
                     return TEST_GRAPH_ME_RESPONSE
 
             graph_get.side_effect = side_effect
@@ -477,12 +480,12 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
 
             def side_effect(*args, **kwargs):
-                if args[1] == 'oauth/access_token':
+                if args[0] == 'oauth/access_token':
                     return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
-                elif args[1] == 'me':
+                elif args[0] == 'me':
                     return TEST_GRAPH_ME_RESPONSE
 
             graph_get.side_effect = side_effect
@@ -496,7 +499,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         user = User.objects.get(id=1)
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {
                 'data': [
                     {'installed': True}
@@ -511,12 +514,12 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         client = Client()
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
 
             def side_effect(*args, **kwargs):
-                if args[1] == 'oauth/access_token':
+                if args[0] == 'oauth/access_token':
                     return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
-                elif args[1] == 'me':
+                elif args[0] == 'me':
                     return TEST_GRAPH_ME_RESPONSE
 
             graph_get.side_effect = side_effect
@@ -530,7 +533,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         user = User.objects.get(id=1)
 
-        with patch.object(GraphAPI, 'get', autospec=True) as graph_get:
+        with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = TEST_GRAPH_ACCESS_TOKEN_RESPONSE
 
             user.oauth_token.extend()
@@ -544,6 +547,8 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         Verify that Fandjango redirects the user correctly upon authorizing the application.
         """
         request = request_factory.get('/foo/bar/baz')
-        redirect_url = get_post_authorization_redirect_url(request)
+        redirect_url = get_post_authorization_redirect_url(request, canvas = False)
 
-        assert redirect_url == 'http://apps.facebook.com/fandjango-test/bar/baz'
+        assert redirect_url == 'http://example.org/foo/bar/baz'
+
+        assert 'code=' not in response["Location"]
