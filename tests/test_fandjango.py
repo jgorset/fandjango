@@ -575,3 +575,65 @@ class TestFacebookWebMiddleware(unittest.TestCase):
             )
 
         assert 'code=' not in response["Location"]
+
+class TestFacebookMultipleMiddleware(unittest.TestCase):
+
+    def setUp(self):
+        settings.MIDDLEWARE_CLASSES = [
+            'fandjango.middleware.FacebookWebMiddleware',
+            'fandjango.middleware.FacebookMiddleware'
+        ]
+
+    def tearDown(self):
+        call_command('flush', interactive=False)
+
+    def test_registration(self):
+        """
+        User will register via signed request, skipping FacebookWebMiddleware
+        """
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+            graph_get.return_value = TEST_GRAPH_ME_RESPONSE
+
+            client.post(
+                path = reverse('home'),
+                data = {
+                    'signed_request': TEST_SIGNED_REQUEST
+                }
+            )
+
+            user = User.objects.get(id=1)
+
+            assert TEST_GRAPH_ME_RESPONSE['first_name'] == user.first_name
+            assert TEST_GRAPH_ME_RESPONSE['last_name'] == user.last_name
+            assert TEST_GRAPH_ME_RESPONSE['link'] == user.extra_data.get('link')
+
+    def test_web_registration(self):
+        """
+        User will register via FacebookWebMiddleware
+        """
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+
+            def side_effect(*args, **kwargs):
+                if args[0] == 'oauth/access_token':
+                    return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
+                elif args[0] == 'me':
+                    return TEST_GRAPH_ME_RESPONSE
+
+            graph_get.side_effect = side_effect
+
+            client.get(
+                path = reverse('home'),
+                data = {
+                    'code': TEST_AUTH_CODE
+                }
+            )
+
+        user = User.objects.get(id=1)
+
+        assert TEST_GRAPH_ME_RESPONSE['first_name'] == user.first_name
+        assert TEST_GRAPH_ME_RESPONSE['last_name'] == user.last_name
+        assert TEST_GRAPH_ME_RESPONSE['link'] == user.extra_data.get('link')
