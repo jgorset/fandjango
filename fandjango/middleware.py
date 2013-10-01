@@ -58,6 +58,7 @@ class FacebookMiddleware(BaseMiddleware):
             request.facebook = False
             return authorization_denied_view(request)
 
+        # User has already been authed by alternate middleware
         if hasattr(request, "facebook") and request.facebook:
             return
 
@@ -165,6 +166,7 @@ class FacebookWebMiddleware(BaseMiddleware):
         if not self.is_valid_path(request):
             return
 
+        # User has already been authed by alternate middleware
         if hasattr(request, "facebook") and request.facebook:
             return
 

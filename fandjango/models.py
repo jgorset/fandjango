@@ -126,6 +126,8 @@ class User(models.Model):
         """
         Synchronize ``facebook_username``, ``first_name``, ``middle_name``,
         ``last_name`` and ``birthday`` with Facebook.
+
+        :param graph_data: Optional pre-fetched graph data
         """
         profile = graph_data or self.graph.get('me')
 
