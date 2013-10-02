@@ -208,64 +208,62 @@ class FacebookWebMiddleware(BaseMiddleware):
                     issued_at = now(),
                     expires_at = now() + timedelta(seconds = int(components['expires'][0]))
                 )
+
             except GraphAPI.OAuthError:
                 pass
         
-        # There is a valid access_token
-        if oauth_token:
-            # Redirect to Facebook authorization if the OAuth token has expired
-            if oauth_token.expired:
-                request.facebook = False
-                return
-
-            # Is there a user already connected to the current token?
-            try:
-                user = oauth_token.user
-                # Update user's details
-                user.last_seen_at = now()
-                user.authorized = True
-                user.save()
-            except User.DoesNotExist:
-                graph = GraphAPI(oauth_token.token)
-                profile = graph.get('me')
-                
-                # Either the user already exists and its just a new token, or user and token both are new
-                try:
-                    user = User.objects.get(facebook_id = profile.get('id'))
-                except User.DoesNotExist:
-                    # Create a new user to go with token
-                    user = User.objects.create(
-                        facebook_id = profile.get('id'),
-                        oauth_token = oauth_token
-                    )                    
-                
-                user.synchronize(profile)
-                
-                # Delete old access token if there is any and  only if the new one is different
-                old_oauth_token = None
-                if user.oauth_token != oauth_token:
-                    old_oauth_token = user.oauth_token
-                    user.oauth_token = oauth_token
-                
-                user.save()
-
-                if old_oauth_token:
-                    old_oauth_token.delete()
-
-            if not user.oauth_token.extended:
-                # Attempt to extend the OAuth token, but ignore exceptions raised by
-                # bug #102727766518358 in the Facebook Platform.
-                #
-                # http://developers.facebook.com/bugs/102727766518358/
-                try:
-                    user.oauth_token.extend()
-                except:
-                    pass
-
-            request.facebook.user = user
-            request.facebook.oauth_token = oauth_token
-        else:
+        # There isn't a valid access_token
+        if not oauth_token or oauth_token.expired:
             request.facebook = False
+            return
+        
+        # Is there a user already connected to the current token?
+        try:
+            user = oauth_token.user
+            # Update user's details
+            user.last_seen_at = now()
+            user.authorized = True
+            user.save()
+        except User.DoesNotExist:
+            graph = GraphAPI(oauth_token.token)
+            profile = graph.get('me')
+            
+            # Either the user already exists and its just a new token, or user and token both are new
+            try:
+                user = User.objects.get(facebook_id = profile.get('id'))
+            except User.DoesNotExist:
+                # Create a new user to go with token
+                user = User.objects.create(
+                    facebook_id = profile.get('id'),
+                    oauth_token = oauth_token
+                )                    
+            
+            user.synchronize(profile)
+            
+            # Delete old access token if there is any and  only if the new one is different
+            old_oauth_token = None
+            if user.oauth_token != oauth_token:
+                old_oauth_token = user.oauth_token
+                user.oauth_token = oauth_token
+            
+            user.save()
+
+            if old_oauth_token:
+                old_oauth_token.delete()
+
+        if not user.oauth_token.extended:
+            # Attempt to extend the OAuth token, but ignore exceptions raised by
+            # bug #102727766518358 in the Facebook Platform.
+            #
+            # http://developers.facebook.com/bugs/102727766518358/
+            try:
+                user.oauth_token.extend()
+            except:
+                pass
+
+        request.facebook.user = user
+        request.facebook.oauth_token = oauth_token
+
 
     def process_response(self, request, response):
         """
