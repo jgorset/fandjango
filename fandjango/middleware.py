@@ -1,9 +1,11 @@
+from django.conf import settings
+from django.http import QueryDict, HttpResponseRedirect
 from datetime import timedelta
 from urlparse import parse_qs
 
-from django.http import QueryDict, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured
 
+from fandjango.views import authorize_application, authorization_denied
 from fandjango.models import Facebook, User, OAuthToken
 from fandjango.settings import (
     FACEBOOK_APPLICATION_SECRET_KEY, FACEBOOK_APPLICATION_ID,

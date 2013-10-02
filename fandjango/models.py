@@ -1,3 +1,4 @@
+from httplib import HTTPConnection
 from datetime import datetime, timedelta
 from urlparse import parse_qs
 

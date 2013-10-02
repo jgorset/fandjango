@@ -1,7 +1,13 @@
 from functools import wraps
 
+from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.core.handlers.wsgi import WSGIRequest
+
 from fandjango.utils import get_post_authorization_redirect_url
 from fandjango.views import authorize_application
+from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
+from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 from fandjango.settings import FACEBOOK_AUTHORIZATION_REDIRECT_URL
 
