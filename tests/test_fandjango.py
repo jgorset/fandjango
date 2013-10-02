@@ -327,6 +327,24 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         assert redirect_url == 'http://apps.facebook.com/fandjango-test/bar/baz'
 
+    def test_authed_user_doesnt_get_redirected(self):
+        """
+        Verify that authorizing the application will register a new user.
+        """
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+            graph_get.return_value = TEST_GRAPH_ME_RESPONSE
+
+            response = client.post(
+                path = reverse('home'),
+                data = {
+                    'signed_request': TEST_SIGNED_REQUEST
+                }
+            )
+
+        assert response.status_code != 401
+
 class TestFacebookWebMiddleware(unittest.TestCase):
 
     def setUp(self):

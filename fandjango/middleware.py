@@ -51,97 +51,92 @@ class FacebookMiddleware(BaseMiddleware):
     def process_request(self, request):
         """Process the signed request."""
 
-        if not self.is_valid_path(request):
-            return
-
-        if self.is_access_denied(request):
-            request.facebook = False
-            return authorization_denied_view(request)
-
         # User has already been authed by alternate middleware
         if hasattr(request, "facebook") and request.facebook:
             return
 
-        # Signed request found in either GET, POST or COOKIES...
-        if 'signed_request' in request.REQUEST or 'signed_request' in request.COOKIES:
-            request.facebook = Facebook()
+        request.facebook = False
 
-            # If the request method is POST and its body only contains the signed request,
-            # chances are it's a request from the Facebook platform and we'll override
-            # the request method to HTTP GET to rectify their misinterpretation
-            # of the HTTP standard.
-            #
-            # References:
-            # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
-            # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
-            if request.method == 'POST' and 'signed_request' in request.POST:
-                request.POST = QueryDict('')
-                request.method = 'GET'
+        if not self.is_valid_path(request):
+            return
 
-            try:
-                request.facebook.signed_request = SignedRequest(
-                    signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
-                    application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
-                )
-            except SignedRequest.Error:
-                request.facebook = False
+        if self.is_access_denied(request):
+            return authorization_denied_view(request)
 
-            # Valid signed request and user has authorized the application
-            if request.facebook \
-                and request.facebook.signed_request.user.has_authorized_application \
-                and not request.facebook.signed_request.user.oauth_token.has_expired:
+        # No signed request found in either GET, POST nor COOKIES...
+        if 'signed_request' not in request.REQUEST and 'signed_request' not in request.COOKIES:
+            return
 
-                # Initialize a User object and its corresponding OAuth token
-                try:
-                    user = User.objects.get(facebook_id=request.facebook.signed_request.user.id)
-                except User.DoesNotExist:
-                    oauth_token = OAuthToken.objects.create(
-                        token = request.facebook.signed_request.user.oauth_token.token,
-                        issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal()),
-                        expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
-                    )
+        # If the request method is POST and its body only contains the signed request,
+        # chances are it's a request from the Facebook platform and we'll override
+        # the request method to HTTP GET to rectify their misinterpretation
+        # of the HTTP standard.
+        #
+        # References:
+        # "POST for Canvas" migration at http://developers.facebook.com/docs/canvas/post/
+        # "Incorrect use of the HTTP protocol" discussion at http://forum.developers.facebook.net/viewtopic.php?id=93554
+        if request.method == 'POST' and 'signed_request' in request.POST:
+            request.POST = QueryDict('')
+            request.method = 'GET'
 
-                    user = User.objects.create(
-                        facebook_id = request.facebook.signed_request.user.id,
-                        oauth_token = oauth_token
-                    )
+        request.facebook = Facebook()
 
-                    user.synchronize()
-
-                # Update the user's details and OAuth token
-                else:
-                    user.last_seen_at = now()
-
-                    if 'signed_request' in request.REQUEST:
-                        user.authorized = True
-
-                        if request.facebook.signed_request.user.oauth_token:
-                            user.oauth_token.token = request.facebook.signed_request.user.oauth_token.token
-                            user.oauth_token.issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal())
-                            user.oauth_token.expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
-                            user.oauth_token.save()
-
-                    user.save()
-
-                if not user.oauth_token.extended:
-                    # Attempt to extend the OAuth token, but ignore exceptions raised by
-                    # bug #102727766518358 in the Facebook Platform.
-                    #
-                    # http://developers.facebook.com/bugs/102727766518358/
-                    try:
-                        user.oauth_token.extend()
-                    except:
-                        pass
-
-                request.facebook.user = user
-
-            # ... invalid signed_request
-            else:
-                request.facebook = False
-
-        # ... no signed request found.
-        else:
+        try:
+            request.facebook.signed_request = SignedRequest(
+                signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
+                application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
+            )
+        except SignedRequest.Error, e:
             request.facebook = False
+
+        # Valid signed request and user has authorized the application
+        if request.facebook \
+            and request.facebook.signed_request.user.has_authorized_application \
+            and not request.facebook.signed_request.user.oauth_token.has_expired:
+
+            # Initialize a User object and its corresponding OAuth token
+            try:
+                user = User.objects.get(facebook_id=request.facebook.signed_request.user.id)
+            except User.DoesNotExist:
+                oauth_token = OAuthToken.objects.create(
+                    token = request.facebook.signed_request.user.oauth_token.token,
+                    issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal()),
+                    expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
+                )
+
+                user = User.objects.create(
+                    facebook_id = request.facebook.signed_request.user.id,
+                    oauth_token = oauth_token
+                )
+
+                user.synchronize()
+
+            # Update the user's details and OAuth token
+            else:
+                user.last_seen_at = now()
+
+                if 'signed_request' in request.REQUEST:
+                    user.authorized = True
+
+                    if request.facebook.signed_request.user.oauth_token:
+                        user.oauth_token.token = request.facebook.signed_request.user.oauth_token.token
+                        user.oauth_token.issued_at = request.facebook.signed_request.user.oauth_token.issued_at.replace(tzinfo=tzlocal())
+                        user.oauth_token.expires_at = request.facebook.signed_request.user.oauth_token.expires_at.replace(tzinfo=tzlocal())
+                        user.oauth_token.save()
+
+                user.save()
+
+            if not user.oauth_token.extended:
+                # Attempt to extend the OAuth token, but ignore exceptions raised by
+                # bug #102727766518358 in the Facebook Platform.
+                #
+                # http://developers.facebook.com/bugs/102727766518358/
+                try:
+                    user.oauth_token.extend()
+                except:
+                    pass
+
+            request.facebook.user = user
 
     def process_response(self, request, response):
         """

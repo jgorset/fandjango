@@ -40,7 +40,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
             # The user has not authorized the application yet.
             #
             # Concatenate the default permissions with permissions required for this particular view.
-            if not request.facebook:
+            if not request.facebook or not request.facebook.user:
                 return authorize_application(
                     request = request,
                     redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
