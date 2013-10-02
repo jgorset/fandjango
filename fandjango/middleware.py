@@ -162,15 +162,17 @@ class FacebookWebMiddleware(BaseMiddleware):
     def process_request(self, request):
         """Process the web-based auth request."""
 
-        if not self.is_valid_path(request):
-            return
-
         # User has already been authed by alternate middleware
         if hasattr(request, "facebook") and request.facebook:
             return
 
+        request.facebook = False
+
+        if not self.is_valid_path(request):
+            return
+
         if self.is_access_denied(request):
-            request.facebook = False
+            
             return authorization_denied_view(request)
 
         request.facebook = Facebook()
