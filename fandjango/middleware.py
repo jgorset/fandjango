@@ -146,10 +146,14 @@ class FacebookMiddleware(BaseMiddleware):
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
+        response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
+
         if FANDJANGO_CACHE_SIGNED_REQUEST:
-            if request.facebook and request.facebook.signed_request:
+            if hasattr(request, "facebook") and request.facebook and request.facebook.signed_request:
                 response.set_cookie('signed_request', request.facebook.signed_request.generate())
-            response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
+            else:
+                response.delete_cookie('signed_request')
+        
         return response
 
 class FacebookWebMiddleware(BaseMiddleware):
@@ -269,15 +273,16 @@ class FacebookWebMiddleware(BaseMiddleware):
         browsers it is considered by IE before accepting third-party cookies (ie. cookies set by
         documents in iframes). If they are not set correctly, IE will not set these cookies.
         """
-        if request.facebook and request.facebook.oauth_token:
-            response.set_cookie('oauth_token', request.facebook.oauth_token.token)
-            response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
-
+        if hasattr(request, "facebook") and request.facebook and request.facebook.oauth_token:
             if "code" in request.REQUEST:
-                """ Remove fb related query params """
+                """ Remove auth related query params """
                 path = get_full_path(request, remove_querystrings=['code', 'web_canvas'])
-                return HttpResponseRedirect(path)
+                response = HttpResponseRedirect(path)
 
+            response.set_cookie('oauth_token', request.facebook.oauth_token.token)
         else:
             response.delete_cookie('oauth_token')
+
+        response['P3P'] = 'CP="IDC CURa ADMa OUR IND PHY ONL COM STA"'
+
         return response
