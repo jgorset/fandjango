@@ -96,6 +96,8 @@ def get_post_authorization_redirect_url(request, canvas=True):
     return redirect_uri
 
 def get_full_path(request, remove_querystrings=[]):
+    """Gets the current path, removing specified querstrings"""
+
     path = request.get_full_path()
     for qs in remove_querystrings:
         path = re.sub(r'&?' + qs + '=?(.+)?&?', '', path)

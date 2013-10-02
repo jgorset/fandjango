@@ -35,10 +35,10 @@ class BaseMiddleware():
             )
 
         if DISABLED_PATHS and is_disabled_path(request.path):
-            return
+            return False
 
         if ENABLED_PATHS and not is_enabled_path(request.path):
-            return
+            return False
 
         return True
 
