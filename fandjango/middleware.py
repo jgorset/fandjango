@@ -88,7 +88,7 @@ class FacebookMiddleware(BaseMiddleware):
                 signed_request = request.REQUEST.get('signed_request') or request.COOKIES.get('signed_request'),
                 application_secret_key = FACEBOOK_APPLICATION_SECRET_KEY
             )
-        except SignedRequest.Error, e:
+        except SignedRequest.Error:
             request.facebook = False
 
         # Valid signed request and user has authorized the application
@@ -174,7 +174,6 @@ class FacebookWebMiddleware(BaseMiddleware):
             return
 
         if self.is_access_denied(request):
-            
             return authorization_denied_view(request)
 
         request.facebook = Facebook()
@@ -205,7 +204,7 @@ class FacebookWebMiddleware(BaseMiddleware):
                 components = parse_qs(response)
                 
                 # Save new OAuth-token in DB
-                oauth_token, created = OAuthToken.objects.get_or_create(
+                oauth_token, new_oauth_token = OAuthToken.objects.get_or_create(
                     token = components['access_token'][0],
                     issued_at = now(),
                     expires_at = now() + timedelta(seconds = int(components['expires'][0]))
@@ -222,9 +221,10 @@ class FacebookWebMiddleware(BaseMiddleware):
         # Is there a user already connected to the current token?
         try:
             user = oauth_token.user
-            # Update user's details
+            if not user.authorized:
+                request.facebook = False
+                return
             user.last_seen_at = now()
-            user.authorized = True
             user.save()
         except User.DoesNotExist:
             graph = GraphAPI(oauth_token.token)
@@ -233,6 +233,13 @@ class FacebookWebMiddleware(BaseMiddleware):
             # Either the user already exists and its just a new token, or user and token both are new
             try:
                 user = User.objects.get(facebook_id = profile.get('id'))
+                if not user.authorized:
+                    if new_oauth_token:
+                        user.last_seen_at = now()
+                        user.authorized = True
+                    else:
+                        request.facebook = False
+                        return
             except User.DoesNotExist:
                 # Create a new user to go with token
                 user = User.objects.create(
