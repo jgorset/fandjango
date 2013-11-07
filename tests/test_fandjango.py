@@ -594,6 +594,54 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         assert 'code=' not in response["Location"]
 
+    def test_delete_old_oauthtoken(self):
+        """
+        Check old token is deleted which was previously associated with the user.
+        """
+
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+
+            def side_effect(*args, **kwargs):
+                if args[0] == 'oauth/access_token':
+                    return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
+                elif args[0] == 'me':
+                    return TEST_GRAPH_ME_RESPONSE
+
+            graph_get.side_effect = side_effect
+
+            client.get(
+                path = reverse('home'),
+                data = {
+                    'code': TEST_AUTH_CODE
+                }
+            )
+
+        assert OAuthToken.objects.count() == 1
+
+        # Clear token from cookie so that a new token object is created,
+        client.cookies['oauth_token'] = None
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+
+            def side_effect(*args, **kwargs):
+                if args[0] == 'oauth/access_token':
+                    return 'second_token'
+                elif args[0] == 'me':
+                    return TEST_GRAPH_ME_RESPONSE
+
+            graph_get.side_effect = side_effect
+
+            client.get(
+                path = reverse('home'),
+                data = {
+                    'code': TEST_AUTH_CODE
+                }
+            )
+
+        assert OAuthToken.objects.count() == 1
+
 class TestFacebookMultipleMiddleware(unittest.TestCase):
 
     def setUp(self):
