@@ -598,8 +598,8 @@ class TestFacebookMultipleMiddleware(unittest.TestCase):
 
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
-            'fandjango.middleware.FacebookWebMiddleware',
-            'fandjango.middleware.FacebookMiddleware'
+            'fandjango.middleware.FacebookMiddleware',
+            'fandjango.middleware.FacebookWebMiddleware'
         ]
 
     def tearDown(self):
@@ -655,3 +655,42 @@ class TestFacebookMultipleMiddleware(unittest.TestCase):
         assert TEST_GRAPH_ME_RESPONSE['first_name'] == user.first_name
         assert TEST_GRAPH_ME_RESPONSE['last_name'] == user.last_name
         assert TEST_GRAPH_ME_RESPONSE['link'] == user.extra_data.get('link')
+
+    def test_deauthorized_user(self):
+        """
+        Check user cannot log in after deauthrorizing app.
+        """
+
+        client = Client()
+
+        with patch.object(GraphAPI, 'get') as graph_get:
+
+            def side_effect(*args, **kwargs):
+                if args[0] == 'oauth/access_token':
+                    return TEST_GRAPH_ACCESS_TOKEN_RESPONSE
+                elif args[0] == 'me':
+                    return TEST_GRAPH_ME_RESPONSE
+
+            graph_get.side_effect = side_effect
+
+            client.get(
+                path = reverse('home'),
+                data = {
+                    'code': TEST_AUTH_CODE
+                }
+            )
+
+        client.post(
+            path = reverse('deauthorize_application'),
+            data = {
+                'signed_request': TEST_SIGNED_REQUEST
+            }
+        )
+
+        client.cookies['signed_request'] = None
+
+        response = client.get(
+            path = reverse('home')
+        )
+
+        assert response.status_code == 401
