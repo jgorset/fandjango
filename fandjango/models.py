@@ -31,6 +31,9 @@ class Facebook:
     signed_request = None
     """A ``SignedRequest`` instance."""
 
+    oauth_token = None
+    """A ``OAuthToken`` instance."""
+
 class User(models.Model):
     """
     Instances of the User class represent Facebook users who
@@ -120,12 +123,14 @@ class User(models.Model):
         """
         return GraphAPI(self.oauth_token.token)
 
-    def synchronize(self):
+    def synchronize(self, graph_data=None):
         """
         Synchronize ``facebook_username``, ``first_name``, ``middle_name``,
         ``last_name`` and ``birthday`` with Facebook.
+
+        :param graph_data: Optional pre-fetched graph data
         """
-        profile = self.graph.get('me')
+        profile = graph_data or self.graph.get('me')
 
         self.facebook_username = profile.get('username')
         self.first_name = profile.get('first_name')

@@ -5,10 +5,6 @@ DATABASES = {
     }
 }
 
-MIDDLEWARE_CLASSES = [
-    'fandjango.middleware.FacebookMiddleware'
-]
-
 INSTALLED_APPS = [
     'fandjango',
     'south',
@@ -24,6 +20,10 @@ FACEBOOK_APPLICATION_SECRET_KEY = '214e4cb484c28c35f18a70a3d735999b'
 FACEBOOK_APPLICATION_NAMESPACE = 'fandjango-test'
 FACEBOOK_APPLICATION_CANVAS_URL = 'http://example.org/foo'
 
+FANDJANGO_SITE_URL = FACEBOOK_APPLICATION_CANVAS_URL
+
 SECRET_KEY = '123'
 
 USE_TZ = True
+
+DEBUG = True

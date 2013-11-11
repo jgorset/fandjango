@@ -26,6 +26,9 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
         @wraps(function)
         def wrapper(request, *args, **kwargs):
 
+            # We know the user has been authenticated via a canvas page if a signed request is set.
+            canvas = request.facebook is not False and hasattr(request.facebook, "signed_request")
+
             # The user has already authorized the application, but the given view requires
             # permissions besides the defaults listed in ``FACEBOOK_APPLICATION_DEFAULT_PERMISSIONS``.
             #
@@ -36,7 +39,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
                 if outstanding_permissions:
                     return authorize_application(
                         request = request,
-                        redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
+                        redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
                         permissions = outstanding_permissions
                     )
 
@@ -46,7 +49,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
             if not request.facebook or not request.facebook.user:
                 return authorize_application(
                     request = request,
-                    redirect_uri = redirect_uri or get_post_authorization_redirect_url(request),
+                    redirect_uri = redirect_uri or get_post_authorization_redirect_url(request, canvas=canvas),
                     permissions = (FACEBOOK_APPLICATION_INITIAL_PERMISSIONS or []) + (permissions or [])
                 )
 
