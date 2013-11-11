@@ -1,6 +1,11 @@
 History
 -------
 
+4.2
++++
+
+* Fandjango now supports both applications on Facebook.com and Facebook for websites.
+
 4.1
 +++
 
