@@ -351,6 +351,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         settings.MIDDLEWARE_CLASSES = [
             'fandjango.middleware.FacebookWebMiddleware'
         ]
+        settings.FANDJANGO_SITE_URL = 'http://example.org/foo'
 
     def tearDown(self):
         call_command('flush', interactive=False)
@@ -649,6 +650,7 @@ class TestFacebookMultipleMiddleware(unittest.TestCase):
             'fandjango.middleware.FacebookMiddleware',
             'fandjango.middleware.FacebookWebMiddleware'
         ]
+        settings.FANDJANGO_SITE_URL = 'http://example.org/foo'
 
     def tearDown(self):
         call_command('flush', interactive=False)
