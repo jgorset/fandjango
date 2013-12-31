@@ -566,6 +566,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         request = request_factory.get('/foo/bar/baz')
         redirect_url = get_post_authorization_redirect_url(request, canvas = False)
+        # RequestFactory has the hostname "testserver"
         assert redirect_url == 'testserver/foo/bar/baz'
 
     def test_querystring_removal(self):
