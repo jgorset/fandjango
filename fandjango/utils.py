@@ -76,7 +76,10 @@ def authorization_denied_view(request):
     return authorization_denied_view(request)
 
 def get_post_authorization_redirect_url(request, canvas=True):
-    """Determine the URL users should be redirected to upon authorization the application."""
+    """
+    Determine the URL users should be redirected to upon authorization the application.
+    If request is non-canvas, use user defined site url if set, else the site hostname.
+    """
 
     path = request.get_full_path()
 

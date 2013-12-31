@@ -351,7 +351,6 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         settings.MIDDLEWARE_CLASSES = [
             'fandjango.middleware.FacebookWebMiddleware'
         ]
-        settings.FANDJANGO_SITE_URL = 'http://example.org/foo'
 
     def tearDown(self):
         call_command('flush', interactive=False)
@@ -567,8 +566,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         request = request_factory.get('/foo/bar/baz')
         redirect_url = get_post_authorization_redirect_url(request, canvas = False)
-
-        assert redirect_url == 'http://example.org/foo/bar/baz'
+        assert redirect_url == 'testserver/foo/bar/baz'
 
     def test_querystring_removal(self):
         """
@@ -650,7 +648,6 @@ class TestFacebookMultipleMiddleware(unittest.TestCase):
             'fandjango.middleware.FacebookMiddleware',
             'fandjango.middleware.FacebookWebMiddleware'
         ]
-        settings.FANDJANGO_SITE_URL = 'http://example.org/foo'
 
     def tearDown(self):
         call_command('flush', interactive=False)
