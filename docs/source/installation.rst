@@ -39,6 +39,11 @@ Finally, synchronize your database::
 
     If you're using `South`_, run schema migrations instead.
 
+Mobile/Web Middleware
+^^^^^^^^^^^^^^^^^^^^^
+``fandjango.middleware.FacebookWebMiddleware``
+    Add beneath ``fandjango.middleware.FacebookMiddleware`` to support Facebook mobile apps and web based Facebook login.
+
 Optional settings
 ^^^^^^^^^^^^^^^^^
 
@@ -57,6 +62,9 @@ Optional settings
 ``FACEBOOK_APPLICATION_INITIAL_PERMISSIONS``
     A list of strings describing `permissions <http://developers.facebook.com/docs/reference/api/permissions/>`_
     that will be requested upon authorizing the application.
+
+``FANDJANGO_SITE_URL``
+    Only applicable when using ``fandjango.middleware.FacebookWebMiddleware``. Determines where to redirect user post authentication. If not set, Fandjango will attempt to construct redirect URL automatically.
 
 .. _dependencies:
 
