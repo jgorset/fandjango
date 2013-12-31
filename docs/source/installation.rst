@@ -64,7 +64,7 @@ Optional settings
     that will be requested upon authorizing the application.
 
 ``FANDJANGO_SITE_URL``
-    Only applicable when using ``fandjango.middleware.FacebookWebMiddleware``. Determines where to redirect user post authentication. If not set, Fandjango will attempt to construct redirect URL automatically.
+    Only applicable when using ``fandjango.middleware.FacebookWebMiddleware``. Determines where to redirect user post authentication. If not set, Fandjango will attempt to construct the redirect URL automatically.
 
 .. _dependencies:
 
