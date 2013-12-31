@@ -90,8 +90,12 @@ def get_post_authorization_redirect_url(request, canvas=True):
             'path': path
         }
     else:
-        path = path.replace(urlparse(FANDJANGO_SITE_URL).path, '')
-        redirect_uri = FANDJANGO_SITE_URL + path
+        if FANDJANGO_SITE_URL:
+            site_url = FANDJANGO_SITE_URL
+            path = path.replace(urlparse(site_url).path, '')
+        else:
+            site_url = request.get_host()
+        redirect_uri = site_url + path
 
     return redirect_uri
 
