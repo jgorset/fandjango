@@ -76,7 +76,10 @@ def authorization_denied_view(request):
     return authorization_denied_view(request)
 
 def get_post_authorization_redirect_url(request, canvas=True):
-    """Determine the URL users should be redirected to upon authorization the application."""
+    """
+    Determine the URL users should be redirected to upon authorization the application.
+    If request is non-canvas use user defined site url if set, else the site hostname.
+    """
 
     path = request.get_full_path()
 
@@ -90,8 +93,13 @@ def get_post_authorization_redirect_url(request, canvas=True):
             'path': path
         }
     else:
-        path = path.replace(urlparse(FANDJANGO_SITE_URL).path, '')
-        redirect_uri = FANDJANGO_SITE_URL + path
+        if FANDJANGO_SITE_URL:
+            site_url = FANDJANGO_SITE_URL
+            path = path.replace(urlparse(site_url).path, '')
+        else:
+            protocol = "https" if request.is_secure() else "http"
+            site_url = "%s://%s" % (protocol, request.get_host())
+        redirect_uri = site_url + path
 
     return redirect_uri
 

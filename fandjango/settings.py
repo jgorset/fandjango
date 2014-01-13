@@ -37,4 +37,4 @@ FACEBOOK_APPLICATION_DOMAIN = getattr(settings, 'FACEBOOK_APPLICATION_DOMAIN', '
 FANDJANGO_CACHE_SIGNED_REQUEST = getattr(settings, 'FACEBOOK_SIGNED_REQUEST_COOKIE', True)
 
 # A string describing the website URL.
-FANDJANGO_SITE_URL = getattr(settings, 'FANDJANGO_SITE_URL')
+FANDJANGO_SITE_URL = getattr(settings, 'FANDJANGO_SITE_URL', None)
