@@ -88,13 +88,7 @@ def get_post_authorization_redirect_url(request, canvas=True):
         if FACEBOOK_APPLICATION_CANVAS_URL:
             path = path.replace(urlparse(FACEBOOK_APPLICATION_CANVAS_URL).path, '')
 
-        if 'https' in FACEBOOK_APPLICATION_CANVAS_URL:
-            scheme = 'https'
-        else:
-            scheme = 'http'
-
-        redirect_uri = '%(scheme)s://%(domain)s/%(namespace)s%(path)s' % {
-            'scheme': scheme,
+        redirect_uri = 'https://%(domain)s/%(namespace)s%(path)s' % {
             'domain': FACEBOOK_APPLICATION_DOMAIN,
             'namespace': FACEBOOK_APPLICATION_NAMESPACE,
             'path': path

@@ -325,7 +325,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         request = request_factory.get('/foo/bar/baz')
         redirect_url = get_post_authorization_redirect_url(request)
 
-        assert redirect_url == 'http://apps.facebook.com/fandjango-test/bar/baz'
+        assert redirect_url == 'https://apps.facebook.com/fandjango-test/bar/baz'
 
     def test_authed_user_doesnt_get_redirected(self):
         """
