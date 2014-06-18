@@ -7,7 +7,6 @@ from django.core.cache import cache
 from django.utils.importlib import import_module
 
 from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL
-from fandjango.settings import FACEBOOK_APPLICATION_CANVAS_URL_IS_HTTPS
 from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
 from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import DISABLED_PATHS
@@ -89,9 +88,10 @@ def get_post_authorization_redirect_url(request, canvas=True):
         if FACEBOOK_APPLICATION_CANVAS_URL:
             path = path.replace(urlparse(FACEBOOK_APPLICATION_CANVAS_URL).path, '')
 
-        scheme = 'http'
-        if FACEBOOK_APPLICATION_CANVAS_URL_IS_HTTPS:
+        if 'https' in FACEBOOK_APPLICATION_CANVAS_URL:
             scheme = 'https'
+        else:
+            scheme = 'http'
 
         redirect_uri = '%(scheme)s://%(domain)s/%(namespace)s%(path)s' % {
             'scheme': scheme,

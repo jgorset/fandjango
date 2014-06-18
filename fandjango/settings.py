@@ -8,9 +8,6 @@ FACEBOOK_APPLICATION_ID = getattr(settings, 'FACEBOOK_APPLICATION_ID')
 # A string describing the Facebook application's canvas URL.
 FACEBOOK_APPLICATION_CANVAS_URL = getattr(settings, 'FACEBOOK_APPLICATION_CANVAS_URL', None)
 
-# A canvas URL https boolean
-FACEBOOK_APPLICATION_CANVAS_URL_IS_HTTPS = getattr(settings, 'FACEBOOK_APPLICATION_CANVAS_URL_IS_HTTPS', False)
-
 # A string describing the URL to redirect to upon authorizing users.
 FACEBOOK_AUTHORIZATION_REDIRECT_URL = getattr(settings, 'FACEBOOK_AUTHORIZATION_REDIRECT_URL', None)
 
