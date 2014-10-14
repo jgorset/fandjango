@@ -1,8 +1,7 @@
-django==1.5.2
+django==1.7
 nose
 sphinx
 facepy
-south
 python-dateutil
-django-jsonfield
+jsonfield
 mock

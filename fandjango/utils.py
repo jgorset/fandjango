@@ -3,7 +3,7 @@ from datetime import timedelta
 try:
     from urllib.parse import urlparse
 except ImportError:  # Python 2.x
-    from urlparse import parse_qs
+    from urlparse import parse_qs as urlparse
 
 from functools import wraps
 

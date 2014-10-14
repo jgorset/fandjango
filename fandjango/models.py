@@ -10,7 +10,7 @@ except ImportError:  # Python 2.x
 
 from django.db import models
 import jsonfield
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from fandjango.utils import cached_property as cached
 from fandjango.settings import FACEBOOK_APPLICATION_ID, FACEBOOK_APPLICATION_SECRET_KEY

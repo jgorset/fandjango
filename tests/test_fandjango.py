@@ -5,6 +5,7 @@ import hmac
 import json
 import unittest
 
+import django
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -26,6 +27,8 @@ try:
 except ImportError:
     def now():
         return datetime.now()
+
+django.setup()
 
 from time import time
 
@@ -66,7 +69,7 @@ TEST_GRAPH_ACCESS_TOKEN_RESPONSE = '&access_token=%s&expires=%d' % ('ABCDE', 999
 TEST_GRAPH_ME_RESPONSE = {
     'id': '12345',
     'username': 'foobar',
-    'name': 'Foo Bar', 
+    'name': 'Foo Bar',
     'first_name': 'Foo',
     'last_name': 'Bar',
     'birthday': '03/03/2000',
@@ -76,13 +79,12 @@ TEST_GRAPH_ME_RESPONSE = {
     'link': 'http://www.foo.com'
 }
 
-call_command('syncdb', interactive=False)
 call_command('migrate', interactive=False)
 
 request_factory = RequestFactory()
 
 class TestFacebookMiddleware(unittest.TestCase):
-    
+
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
             'fandjango.middleware.FacebookMiddleware'
@@ -156,7 +158,7 @@ class TestFacebookMiddleware(unittest.TestCase):
         """
         Verify that the view referred to by AUTHORIZATION_DENIED_VIEW is
         rendered upon refusing to authorize the application.
-        """    
+        """
         client = Client()
 
         response = client.get(
@@ -252,7 +254,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {}
-            
+
             client.post(
                 path = reverse('home'),
                 data = {
@@ -288,7 +290,7 @@ class TestFacebookMiddleware(unittest.TestCase):
                     {'installed': True}
                 ]
             }
-            
+
             assert 'installed' in user.permissions
 
     def test_extend_oauth_token(self):
@@ -399,7 +401,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         """
         Verify that the view referred to by AUTHORIZATION_DENIED_VIEW is
         rendered upon refusing to authorize the application.
-        """    
+        """
         client = Client()
 
         response = client.get(
@@ -523,7 +525,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
                     {'installed': True}
                 ]
             }
-            
+
             assert 'installed' in user.permissions
 
     def test_extend_oauth_token(self):
