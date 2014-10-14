@@ -28,7 +28,8 @@ setup(
     },
     install_requires = [
         'facepy >= 0.8',
-        'requests >= 0.8'
+        'requests >= 0.8',
+        'jsonfield',
     ],
     classifiers = [
         'Development Status :: 5 - Production/Stable',

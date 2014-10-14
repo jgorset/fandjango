@@ -1,4 +1,4 @@
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from django.http import HttpResponse
 from django.shortcuts import render

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import QueryDict, HttpResponseRedirect
 from datetime import timedelta
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 from django.core.exceptions import ImproperlyConfigured
 

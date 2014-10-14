@@ -1,6 +1,6 @@
-from httplib import HTTPConnection
+from http.client import HTTPConnection
 from datetime import datetime, timedelta
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 from django.db import models
 import jsonfield
@@ -108,7 +108,7 @@ class User(models.Model):
         records = self.graph.get('me/permissions')['data'][0]
 
         permissions = []
-        for permission, status in records.items():
+        for permission, status in list(records.items()):
             if status:
                 permissions.append(permission)
 
@@ -136,7 +136,7 @@ class User(models.Model):
         self.first_name = profile.get('first_name')
         self.middle_name = profile.get('middle_name')
         self.last_name = profile.get('last_name')
-        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if profile.has_key('birthday') else None
+        self.birthday = datetime.strptime(profile['birthday'], '%m/%d/%Y') if 'birthday' in profile else None
         self.email = profile.get('email')
         self.locale = profile.get('locale')
         self.gender = profile.get('gender')
@@ -145,11 +145,11 @@ class User(models.Model):
 
     def __unicode__(self):
         if self.full_name:
-            return u'%s' % self.full_name
+            return '%s' % self.full_name
         elif self.facebook_username:
-            return u'%s' % self.facebook_username
+            return '%s' % self.facebook_username
         else:
-            return u'%s' % self.facebook_id
+            return '%s' % self.facebook_id
 
     class Meta:
         verbose_name = _('user')
