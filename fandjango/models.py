@@ -1,6 +1,12 @@
-from http.client import HTTPConnection
+try:
+    from http.client import HTTPConnection
+except ImportError:  # Python 2.x
+    from httplib import HTTPConnection
 from datetime import datetime, timedelta
-from urllib.parse import parse_qs
+try:
+    from urllib.parse import parse_qs
+except ImportError:  # Python 2.x
+    from urlparse import parse_qs
 
 from django.db import models
 import jsonfield
