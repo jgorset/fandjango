@@ -1,6 +1,6 @@
 from django.conf.urls import *
 
-from views import home, places, redirect
+from .views import home, places, redirect
 
 urlpatterns = patterns('',
     url(r'^$', home, name='home'),
