@@ -4,7 +4,7 @@ from setuptools import setup
 
 with open("fandjango/version.py") as f:
     code = compile(f.read(), "fandjango/version.py", 'exec')
-    exec(code, global_vars, local_vars)
+    exec(code)
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read()
