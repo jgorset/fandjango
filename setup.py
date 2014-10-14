@@ -2,7 +2,9 @@
 
 from setuptools import setup
 
-execfile('fandjango/version.py')
+with open("fandjango/version.py") as f:
+    code = compile(f.read(), "fandjango/version.py", 'exec')
+    exec(code, global_vars, local_vars)
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read()
