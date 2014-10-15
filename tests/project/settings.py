@@ -7,8 +7,14 @@ DATABASES = {
 
 INSTALLED_APPS = [
     'fandjango',
+    'south',
     'tests.project.app'
 ]
+
+SOUTH_TESTS_MIGRATE = False
+SOUTH_MIGRATION_MODULES = {
+    'fandjango': 'fandjango.south_migrations',
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -5,7 +5,6 @@ import hmac
 import json
 import unittest
 
-import django
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -27,8 +26,6 @@ try:
 except ImportError:
     def now():
         return datetime.now()
-
-django.setup()
 
 from time import time
 
@@ -78,7 +75,8 @@ TEST_GRAPH_ME_RESPONSE = {
     'link': 'http://www.foo.com'
 }
 
-call_command('migrate', interactive=False)
+call_command('syncdb', interactive=False)
+#call_command('migrate', interactive=False)
 
 request_factory = RequestFactory()
 
