@@ -5,6 +5,7 @@ import hmac
 import json
 import unittest
 
+from django.test import SimpleTestCase
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -80,7 +81,7 @@ call_command('syncdb', interactive=False)
 
 request_factory = RequestFactory()
 
-class TestFacebookMiddleware(unittest.TestCase):
+class TestFacebookMiddleware(SimpleTestCase):
 
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
@@ -133,7 +134,8 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         # Verify that the URL the user is redirected to will in turn redirect to
         # "http://example.org".
-        assert_contains("example.org", response.content)
+
+        self.assertContains(response, "example.org", status_code=401)
 
     def test_application_authorization_with_additional_permissions(self):
         """
@@ -344,7 +346,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         assert response.status_code != 401
 
-class TestFacebookWebMiddleware(unittest.TestCase):
+class TestFacebookWebMiddleware(SimpleTestCase):
 
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
@@ -376,7 +378,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         # Verify that the URL the user is redirected to will in turn redirect to
         # "http://example.org".
-        assert_contains("example.org", response.content)
+        self.assertContains(response, "example.org", status_code=401)
 
     def test_application_authorization_with_additional_permissions(self):
         """
