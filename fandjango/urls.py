@@ -3,7 +3,7 @@ try:
 except:
     from django.conf.urls import patterns, url
 
-from views import *
+from .views import *
 
 urlpatterns = patterns('',
     url(r'^authorize_application.html$', authorize_application, name='authorize_application'),

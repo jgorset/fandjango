@@ -2,7 +2,9 @@
 
 from setuptools import setup
 
-execfile('fandjango/version.py')
+with open("fandjango/version.py") as f:
+    code = compile(f.read(), "fandjango/version.py", 'exec')
+    exec(code)
 
 readme = open('README.rst').read()
 history = open('HISTORY.rst').read()
@@ -28,7 +30,8 @@ setup(
     },
     install_requires = [
         'facepy >= 0.8',
-        'requests >= 0.8'
+        'requests >= 0.8',
+        'jsonfield',
     ],
     classifiers = [
         'Development Status :: 5 - Production/Stable',
@@ -38,5 +41,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.4'
     ]
 )

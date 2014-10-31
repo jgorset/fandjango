@@ -1,6 +1,10 @@
 import re
 from datetime import timedelta
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:  # Python 2.x
+    from urlparse import urlparse
+
 from functools import wraps
 
 from django.core.cache import cache

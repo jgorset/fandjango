@@ -13,6 +13,15 @@ INSTALLED_APPS = [
 
 SOUTH_TESTS_MIGRATE = False
 
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
 ROOT_URLCONF = 'tests.project.urls'
 
 FACEBOOK_APPLICATION_ID = 181259711925270

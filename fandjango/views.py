@@ -1,4 +1,7 @@
-from urllib import urlencode
+try:
+    from urllib.parse import urlencode
+except ImportError:  # Python 2.x
+    from urllib import urlencode
 
 from django.http import HttpResponse
 from django.shortcuts import render

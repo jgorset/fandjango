@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.http import QueryDict, HttpResponseRedirect
 from datetime import timedelta
-from urlparse import parse_qs
+try:
+    from urllib.parse import parse_qs
+except ImportError:  # Python 2.x
+    from urlparse import parse_qs
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -155,7 +158,7 @@ class FacebookMiddleware(BaseMiddleware):
                 response.set_cookie('signed_request', request.facebook.signed_request.generate())
             else:
                 response.delete_cookie('signed_request')
-        
+
         return response
 
 class FacebookWebMiddleware(BaseMiddleware):
@@ -200,9 +203,9 @@ class FacebookWebMiddleware(BaseMiddleware):
                     client_secret = FACEBOOK_APPLICATION_SECRET_KEY,
                     code = request.GET['code'],
                 )
-        
+
                 components = parse_qs(response)
-                
+
                 # Save new OAuth-token in DB
                 oauth_token, new_oauth_token = OAuthToken.objects.get_or_create(
                     token = components['access_token'][0],
@@ -212,12 +215,12 @@ class FacebookWebMiddleware(BaseMiddleware):
 
             except GraphAPI.OAuthError:
                 pass
-        
+
         # There isn't a valid access_token
         if not oauth_token or oauth_token.expired:
             request.facebook = False
             return
-        
+
         # Is there a user already connected to the current token?
         try:
             user = oauth_token.user
@@ -229,7 +232,7 @@ class FacebookWebMiddleware(BaseMiddleware):
         except User.DoesNotExist:
             graph = GraphAPI(oauth_token.token)
             profile = graph.get('me')
-            
+
             # Either the user already exists and its just a new token, or user and token both are new
             try:
                 user = User.objects.get(facebook_id = profile.get('id'))
@@ -245,16 +248,16 @@ class FacebookWebMiddleware(BaseMiddleware):
                 user = User.objects.create(
                     facebook_id = profile.get('id'),
                     oauth_token = oauth_token
-                )                    
-            
+                )
+
             user.synchronize(profile)
-            
+
             # Delete old access token if there is any and  only if the new one is different
             old_oauth_token = None
             if user.oauth_token != oauth_token:
                 old_oauth_token = user.oauth_token
                 user.oauth_token = oauth_token
-            
+
             user.save()
 
             if old_oauth_token:

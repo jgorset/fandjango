@@ -1,66 +1,53 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-        
-        # Adding model 'User'
-        db.create_table('fandjango_user', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('facebook_id', self.gf('django.db.models.fields.BigIntegerField')()),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('profile_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('gender', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('oauth_token', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['fandjango.OAuthToken'], unique=True)),
-            ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('last_seen_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('fandjango', ['User'])
-
-        # Adding model 'OAuthToken'
-        db.create_table('fandjango_oauthtoken', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('token', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('issued_at', self.gf('django.db.models.fields.DateTimeField')()),
-            ('expires_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('fandjango', ['OAuthToken'])
+from django.db import models, migrations
+import jsonfield.fields
 
 
-    def backwards(self, orm):
-        
-        # Deleting model 'User'
-        db.delete_table('fandjango_user')
+class Migration(migrations.Migration):
 
-        # Deleting model 'OAuthToken'
-        db.delete_table('fandjango_oauthtoken')
+    dependencies = [
+    ]
 
-
-    models = {
-        'fandjango.oauthtoken': {
-            'Meta': {'object_name': 'OAuthToken'},
-            'expires_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'issued_at': ('django.db.models.fields.DateTimeField', [], {}),
-            'token': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'fandjango.user': {
-            'Meta': {'object_name': 'User'},
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'facebook_id': ('django.db.models.fields.BigIntegerField', [], {}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'gender': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'last_seen_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'oauth_token': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['fandjango.OAuthToken']", 'unique': 'True'}),
-            'profile_url': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
-        }
-    }
-
-    complete_apps = ['fandjango']
+    operations = [
+        migrations.CreateModel(
+            name='OAuthToken',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('token', models.TextField(verbose_name='token')),
+                ('issued_at', models.DateTimeField(verbose_name='issued at')),
+                ('expires_at', models.DateTimeField(null=True, verbose_name='expires at', blank=True)),
+            ],
+            options={
+                'verbose_name': 'OAuth token',
+                'verbose_name_plural': 'OAuth tokens',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='User',
+            fields=[
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('facebook_id', models.BigIntegerField(verbose_name='facebook id', unique=True)),
+                ('facebook_username', models.CharField(null=True, max_length=255, verbose_name='facebook username', blank=True)),
+                ('first_name', models.CharField(null=True, max_length=255, verbose_name='first name', blank=True)),
+                ('middle_name', models.CharField(null=True, max_length=255, verbose_name='middle name', blank=True)),
+                ('last_name', models.CharField(null=True, max_length=255, verbose_name='last name', blank=True)),
+                ('birthday', models.DateField(null=True, verbose_name='birthday', blank=True)),
+                ('email', models.CharField(null=True, max_length=255, verbose_name='email', blank=True)),
+                ('locale', models.CharField(null=True, max_length=255, verbose_name='locale', blank=True)),
+                ('gender', models.CharField(null=True, max_length=255, verbose_name='gender', blank=True)),
+                ('authorized', models.BooleanField(verbose_name='authorized', default=True)),
+                ('created_at', models.DateTimeField(verbose_name='created at', auto_now_add=True)),
+                ('last_seen_at', models.DateTimeField(verbose_name='last seen at', auto_now_add=True)),
+                ('extra_data', jsonfield.fields.JSONField()),
+                ('oauth_token', models.OneToOneField(verbose_name='OAuth token', to='fandjango.OAuthToken')),
+            ],
+            options={
+                'verbose_name': 'user',
+                'verbose_name_plural': 'users',
+            },
+            bases=(models.Model,),
+        ),
+    ]

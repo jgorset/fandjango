@@ -10,6 +10,7 @@ from fandjango.settings import FACEBOOK_APPLICATION_DOMAIN
 from fandjango.settings import FACEBOOK_APPLICATION_NAMESPACE
 from fandjango.settings import FACEBOOK_APPLICATION_INITIAL_PERMISSIONS
 from fandjango.settings import FACEBOOK_AUTHORIZATION_REDIRECT_URL
+import collections
 
 def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT_URL, permissions=None):
     """
@@ -56,7 +57,7 @@ def facebook_authorization_required(redirect_uri=FACEBOOK_AUTHORIZATION_REDIRECT
             return function(request, *args, **kwargs)
         return wrapper
 
-    if callable(redirect_uri):
+    if isinstance(redirect_uri, collections.Callable):
         function = redirect_uri
         redirect_uri = None
 
