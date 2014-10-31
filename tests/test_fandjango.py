@@ -5,6 +5,7 @@ import hmac
 import json
 import unittest
 
+from django.test import SimpleTestCase
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -46,18 +47,15 @@ def get_signed_request():
     encoded_payload = base64.urlsafe_b64encode(dump.encode("UTF-8"))
 
     encoded_signature = base64.urlsafe_b64encode(hmac.new(
-        TEST_APPLICATION_SECRET,
+        TEST_APPLICATION_SECRET.encode("utf-8"),
         encoded_payload,
         hashlib.sha256
     ).digest())
 
-    return '%(signature)s.%(payload)s' % {
-        'signature': encoded_signature,
-        'payload': encoded_payload
-    }
+    return ".".join([encoded_signature.decode(), encoded_payload.decode()])
 
 TEST_APPLICATION_ID     = '181259711925270'
-TEST_APPLICATION_SECRET = b'214e4cb484c28c35f18a70a3d735999b'
+TEST_APPLICATION_SECRET = '214e4cb484c28c35f18a70a3d735999b'
 TEST_SIGNED_REQUEST = get_signed_request()
 TEST_AUTH_CODE = 'TEST_CODE'
 TEST_ACCESS_TOKEN = 'ABCDE'
@@ -80,7 +78,7 @@ call_command('syncdb', interactive=False)
 
 request_factory = RequestFactory()
 
-class TestFacebookMiddleware(unittest.TestCase):
+class TestFacebookMiddleware(SimpleTestCase):
 
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
@@ -133,7 +131,8 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         # Verify that the URL the user is redirected to will in turn redirect to
         # "http://example.org".
-        assert_contains("example.org", response.content)
+
+        self.assertContains(response, "example.org", status_code=401)
 
     def test_application_authorization_with_additional_permissions(self):
         """
@@ -344,7 +343,7 @@ class TestFacebookMiddleware(unittest.TestCase):
 
         assert response.status_code != 401
 
-class TestFacebookWebMiddleware(unittest.TestCase):
+class TestFacebookWebMiddleware(SimpleTestCase):
 
     def setUp(self):
         settings.MIDDLEWARE_CLASSES = [
@@ -376,7 +375,7 @@ class TestFacebookWebMiddleware(unittest.TestCase):
 
         # Verify that the URL the user is redirected to will in turn redirect to
         # "http://example.org".
-        assert_contains("example.org", response.content)
+        self.assertContains(response, "example.org", status_code=401)
 
     def test_application_authorization_with_additional_permissions(self):
         """
