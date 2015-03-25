@@ -1,6 +1,10 @@
 CHANGELOG
 
 v3.7.5
+- Fixed a bug that caused KeyError when Facebook omits the 'liked'
+  attribute of the 'page' object in signed requests.
+
+v3.7.5
 - Fixed a bug that caused intermittent ValueErrors upon querying the
   user's Facebook profile.
 
