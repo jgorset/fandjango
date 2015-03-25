@@ -53,7 +53,10 @@ class FacebookMiddleware():
                 request.facebook.page = FacebookPage(
                     id = facebook_data['page']['id'],
                     is_admin = facebook_data['page']['admin'],
-                    is_liked = facebook_data['page']['liked']
+
+                    # In March 2015, the 'liked' attribute of the 'page' object has
+                    # mysteriously dissapeared and so we'll default it to False.
+                    is_liked = facebook_data['page'].get('liked', False)
                 )
 
             # User has authorized the application...
