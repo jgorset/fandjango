@@ -1,6 +1,13 @@
 History
 -------
 
+4.2.1
++++++
+
+* Fixed a bug that caused ``User#permissions`` to only return the first permission with
+  recent versions of the Graph API.
+* Fandjango now defaults to redirecting to HTTPS upon authorizing.
+
 4.2
 +++
 
