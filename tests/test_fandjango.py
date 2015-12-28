@@ -285,10 +285,13 @@ class TestFacebookMiddleware(unittest.TestCase):
         with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {
                 'data': [
-                    {'installed': True}
+                    {
+                        'permission': 'installed',
+                        'status': 'granted'
+                    }
                 ]
             }
-            
+
             assert 'installed' in user.permissions
 
     def test_extend_oauth_token(self):
@@ -520,7 +523,10 @@ class TestFacebookWebMiddleware(unittest.TestCase):
         with patch.object(GraphAPI, 'get') as graph_get:
             graph_get.return_value = {
                 'data': [
-                    {'installed': True}
+                    {
+                        'permission': 'installed',
+                        'status': 'granted'
+                    }
                 ]
             }
             

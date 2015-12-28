@@ -105,12 +105,12 @@ class User(models.Model):
 
         .. _permissions: http://developers.facebook.com/docs/reference/api/permissions/
         """
-        records = self.graph.get('me/permissions')['data'][0]
+        records = self.graph.get('me/permissions')['data']
 
         permissions = []
-        for permission, status in records.items():
-            if status:
-                permissions.append(permission)
+        for record in records:
+            if record['status'] == 'granted':
+                permissions.append(record['permission'])
 
         return permissions
 
