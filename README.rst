@@ -15,7 +15,7 @@ Usage
         return HttpResponse('Hi, %s!' % request.facebook.user.first_name)
 
 If you'd like to create an application that's a little more elaborate, you should
-`read the documentation <http://readthedocs.org/docs/fandjango>`_.
+`read the documentation <http://readthedocs.org/projects/fandjango>`_.
 
 Installation
 ------------
