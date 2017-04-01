@@ -38,8 +38,8 @@ I love you
 Johannes Gorset made this. You should `tweet me <http://twitter.com/jgorset>`_ if you can't get it
 to work. In fact, you should tweet me anyway.
 
-I love Hyper
-------------
+I love Schibsted
+----------------
 
-I work at Hyper with a bunch of awesome folks who are all every bit as passionate about good code
-as myself. If you're using this library, we probably want to hire you.
+I work at Schibsted with a bunch of awesome folks who are all every bit as passionate about
+good code as myself. If you're using this library, we probably want to hire you.
