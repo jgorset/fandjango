@@ -79,7 +79,7 @@ class User(models.Model):
     last_seen_at = models.DateTimeField(_('last seen at'), auto_now_add=True)
     """A ``datetime`` object describing when the user was last seen."""
 
-    extra_data = jsonfield.JSONField()
+    extra_data = jsonfield.JSONField(default={})
     """A ``JSONField`` object containig all additional facebookdata."""
 
     @property
