@@ -1,4 +1,4 @@
-django==1.5.2
+django==1.11.23
 nose
 sphinx
 facepy
