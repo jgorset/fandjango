@@ -80,7 +80,7 @@ class User(models.Model):
     """A ``datetime`` object describing when the user was last seen."""
 
     extra_data = jsonfield.JSONField()
-    """A ``JSONField`` object containig all additional facebookdata."""
+    """A ``JSONField`` object containing all additional facebook data."""
 
     @property
     def full_name(self):
